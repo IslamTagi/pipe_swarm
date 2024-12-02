@@ -6,28 +6,35 @@
     <xacro:property name="male_l" value="0.01" />  <!-- length /m -->
     <xacro:property name="male_h" value="0.01" />  <!-- height /m -->
 
-    <xacro:property name="female_thickness_out" value="0.028" />  <!-- outer thickness /m -->
-    <xacro:property name="female_diameter" value="0.04" />  <!-- outer thickness /m -->
-    <xacro:property name="female_wall_thickness" value="0.05" />  <!-- outer thickness /m -->
+    <xacro:property name="female_thickness_out" value="0.028" />  <!-- /m -->
+    <xacro:property name="female_diameter" value="0.04" />  <!-- /m -->
+    <xacro:property name="female_stopper_thickness" value="0.05" />  <!-- /m -->
+    <xacro:property name="female_hole_depth" value="0.03" />  <!-- /m -->
+    <xacro:property name="female_wall_thickness" value="0.01" />  <!-- /m -->
+    <xacro:property name="female_hole_thickness" value="0.01" />  <!-- /m -->
 
-    <xacro:macro name="female_shape_1">
+    <xacro:macro name="female_rotation_shape">
             <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
             <geometry>
                 <cylinder radius="${female_diameter/2}" length="${female_thickness_out}"/>
             </geometry>
     </xacro:macro>
-    <xacro:macro name="female_shape_2">
-            <origin xyz="${-female_wall_thickness/2} 0 0" rpy="0 0 0"/>
+    <xacro:macro name="female_stopper_shape">
+            <origin xyz="${-female_stopper_thickness/2} 0 0" rpy="0 0 0"/>
             <geometry>
-                <box size="${female_wall_thickness} ${female_thickness_out} ${female_diameter}"/>
+                <box size="${female_stopper_thickness} ${female_thickness_out} ${female_diameter}"/>
             </geometry>
     </xacro:macro>
-    <!-- <xacro:macro name="female_shape_3">
-            <origin xyz="${-(female_diameter/2)} 0 0" rpy="0 0 0"/>
+    <xacro:macro name="female_wall_shape" params="y_offset z_offset">
+            <origin xyz="${-(female_stopper_thickness + female_hole_depth/2)} 
+                        ${y_offset * (female_wall_thickness/2 + female_hole_thickness/2)} 
+                        ${z_offset * (female_wall_thickness/2 + female_hole_thickness/2)}" 
+                        rpy="0 0 0"/>
             <geometry>
-                <box size="0.05 ${female_thickness_out} ${female_diameter}"/>
+                <box size="${female_hole_depth} ${female_wall_thickness} ${female_wall_thickness}"/>
             </geometry>
-    </xacro:macro> -->
+    </xacro:macro>
+
     
     <!-- LINKS -->
     <link name="male_link">
@@ -47,26 +54,66 @@
             </geometry>
         </collision>
 
-        <xacro:box_inertial m="${male_m}" w="${male_w}" l="${male_l}" h="${male_h}" xyz="0 0 0 " rpy="0 0 0"/>
+        <!-- <xacro:box_inertial m="${male_m}" w="${male_w}" l="${male_l}" h="${male_h}" xyz="0 0 0 " rpy="0 0 0"/> -->
     </link>
 
     <link name="female_link">
         <visual>
-            <xacro:female_shape_1 />
+            <xacro:female_rotation_shape />
             <material name="base">
                 <color rgba="1.0 1.0 1.0 1.0"/>
             </material>
         </visual>
         <visual>
-            <xacro:female_shape_2 />
+            <xacro:female_stopper_shape />
+            <material name="base">
+                <color rgba="1.0 1.0 1.0 1.0"/>
+            </material>
+        </visual>
+        <visual>
+            <xacro:female_wall_shape y_offset="0" z_offset="1"/>
+            <material name="base">
+                <color rgba="1.0 1.0 1.0 1.0"/>
+            </material>
+        </visual>
+        <visual>
+            <xacro:female_wall_shape y_offset="1" z_offset="0"/>
+            <material name="base">
+                <color rgba="1.0 1.0 1.0 1.0"/>
+            </material>
+        </visual>
+        <visual>
+            <xacro:female_wall_shape y_offset="-1" z_offset="0"/>
+            <material name="base">
+                <color rgba="1.0 1.0 1.0 1.0"/>
+            </material>
+        </visual>
+        <visual>
+            <xacro:female_wall_shape y_offset="0" z_offset="-1"/>
             <material name="base">
                 <color rgba="1.0 1.0 1.0 1.0"/>
             </material>
         </visual>
         
         <collision>
-            <xacro:female_shape_1 />
+            <xacro:female_rotation_shape />
         </collision>
+        <collision>
+            <xacro:female_stopper_shape />
+        </collision>
+        <collision>
+            <xacro:female_wall_shape y_offset="0" z_offset="1"/>
+        </collision>
+        <collision>
+            <xacro:female_wall_shape y_offset="0" z_offset="-1"/>
+        </collision>
+        <collision>
+            <xacro:female_wall_shape y_offset="1" z_offset="0"/>
+        </collision>
+        <collision>
+            <xacro:female_wall_shape y_offset="-1" z_offset="0"/>
+        </collision>
+
         <!-- TODO Fix inertia -->
         <!-- <xacro:box_inertial m="${male_m}" w="${male_w}" l="${male_l}" h="${male_h}" xyz="0 0 0 " rpy="0 0 0"/> -->
     </link>
@@ -78,10 +125,12 @@
         <child link="male_link"/>
     </joint>
 
-    <joint name="base_female_joint" type="fixed">
+    <joint name="base_female_joint" type="revolute">
         <origin xyz="${-(base_w*0.5) + 0.023} 0 0" rpy="0 0 0"/>
         <parent link="base_link"/>
         <child link="female_link"/>
+        <axis xyz="0 1 0"/>
+        <limit lower="${-pi/2}" upper="${pi/2}" effort="1.0" velocity="1.0"/>
     </joint>
 
     <!-- GAZEBO -->
