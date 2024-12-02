@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<robot name="linkage" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    
+    <xacro:property name="male_m" value="0.1" />  <!-- mass /kg -->
+    <xacro:property name="male_w" value="0.04" />  <!-- width /m -->
+    <xacro:property name="male_l" value="0.01" />  <!-- length /m -->
+    <xacro:property name="male_h" value="0.01" />  <!-- height /m -->
+
+    <xacro:property name="female_thickness_out" value="0.028" />  <!-- outer thickness /m -->
+    <xacro:property name="female_diameter" value="0.04" />  <!-- outer thickness /m -->
+    <xacro:property name="female_wall_thickness" value="0.05" />  <!-- outer thickness /m -->
+
+    <xacro:macro name="female_shape_1">
+            <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
+            <geometry>
+                <cylinder radius="${female_diameter/2}" length="${female_thickness_out}"/>
+            </geometry>
+    </xacro:macro>
+    <xacro:macro name="female_shape_2">
+            <origin xyz="${-female_wall_thickness/2} 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="${female_wall_thickness} ${female_thickness_out} ${female_diameter}"/>
+            </geometry>
+    </xacro:macro>
+    <!-- <xacro:macro name="female_shape_3">
+            <origin xyz="${-(female_diameter/2)} 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.05 ${female_thickness_out} ${female_diameter}"/>
+            </geometry>
+    </xacro:macro> -->
+    
+    <!-- LINKS -->
+    <link name="male_link">
+        <visual>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <geometry>
+                <box size="${male_w} ${male_l} ${male_h}"/>
+            </geometry>
+            <material name="base">
+                <color rgba="1.0 1.0 1.0 1.0"/>
+            </material>
+        </visual>
+        
+        <collision>
+            <geometry>
+                <box size="${male_w} ${male_l} ${male_h}"/>
+            </geometry>
+        </collision>
+
+        <xacro:box_inertial m="${male_m}" w="${male_w}" l="${male_l}" h="${male_h}" xyz="0 0 0 " rpy="0 0 0"/>
+    </link>
+
+    <link name="female_link">
+        <visual>
+            <xacro:female_shape_1 />
+            <material name="base">
+                <color rgba="1.0 1.0 1.0 1.0"/>
+            </material>
+        </visual>
+        <visual>
+            <xacro:female_shape_2 />
+            <material name="base">
+                <color rgba="1.0 1.0 1.0 1.0"/>
+            </material>
+        </visual>
+        
+        <collision>
+            <xacro:female_shape_1 />
+        </collision>
+        <!-- TODO Fix inertia -->
+        <!-- <xacro:box_inertial m="${male_m}" w="${male_w}" l="${male_l}" h="${male_h}" xyz="0 0 0 " rpy="0 0 0"/> -->
+    </link>
+    
+    <!-- JOINTS -->
+    <joint name="base_male_joint" type="fixed">
+        <origin xyz="${(base_w*0.5) + (male_w*0.5)} 0 0" rpy="0 0 0"/>
+        <parent link="base_link"/>
+        <child link="male_link"/>
+    </joint>
+
+    <joint name="base_female_joint" type="fixed">
+        <origin xyz="${-(base_w*0.5) + 0.023} 0 0" rpy="0 0 0"/>
+        <parent link="base_link"/>
+        <child link="female_link"/>
+    </joint>
+
+    <!-- GAZEBO -->
+
+</robot>
