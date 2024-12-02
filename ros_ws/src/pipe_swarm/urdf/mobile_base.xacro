@@ -3,7 +3,7 @@
 
     <xacro:property name="base_m" value="1" />  <!-- mass /kg -->
     <xacro:property name="base_w" value="0.15" />  <!-- width /m -->
-    <xacro:property name="base_l" value="0.075" />  <!-- length /m -->
+    <xacro:property name="base_l" value="0.05" />  <!-- length /m -->
     <xacro:property name="base_h" value="0.045" />  <!-- height /m -->
     
     <!-- LINKS -->
