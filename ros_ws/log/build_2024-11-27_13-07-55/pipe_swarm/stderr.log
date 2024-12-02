@@ -1,0 +1,4 @@
+failed to create symbolic link '/home/islam/source_code/pipe_swarm/ros_ws/build/pipe_swarm/ament_cmake_python/pipe_swarm/pipe_swarm' because existing path cannot be removed: Is a directory
+gmake[2]: *** [CMakeFiles/ament_cmake_python_symlink_pipe_swarm.dir/build.make:70: CMakeFiles/ament_cmake_python_symlink_pipe_swarm] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:138: CMakeFiles/ament_cmake_python_symlink_pipe_swarm.dir/all] Error 2
+gmake: *** [Makefile:146: all] Error 2

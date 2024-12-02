@@ -1,0 +1,188 @@
+[0.000000] (-) TimerEvent: {}
+[0.002117] (pipe_swarm) JobQueued: {'identifier': 'pipe_swarm', 'dependencies': OrderedDict()}
+[0.002317] (pipe_swarm) JobStarted: {'identifier': 'pipe_swarm'}
+[0.017226] (pipe_swarm) JobProgress: {'identifier': 'pipe_swarm', 'progress': 'cmake'}
+[0.019934] (pipe_swarm) Command: {'cmd': ['/usr/bin/cmake', '/home/islam/source_code/pipe_swarm/ros_ws/src/pipe_swarm', '-DCMAKE_INSTALL_PREFIX=/home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm'], 'cwd': '/home/islam/source_code/pipe_swarm/ros_ws/build/pipe_swarm', 'env': OrderedDict([('LESSOPEN', '| /usr/bin/lesspipe %s'), ('USER', 'islam'), ('GIT_ASKPASS', '/home/islam/.vscode-server/bin/f1a4fb101478ce6ec82fe9627c43efbf9e98c813/extensions/git/dist/askpass.sh'), ('SHLVL', '2'), ('LD_LIBRARY_PATH', '/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('WT_PROFILE_ID', '{4ff56d04-d9cf-57ea-bae2-ad396374e7e3}'), ('HOME', '/home/islam'), ('OLDPWD', '/home/islam/source_code/pipe_swarm/ros_ws/src'), ('TERM_PROGRAM_VERSION', '1.95.3'), ('VSCODE_IPC_HOOK_CLI', '/run/user/1000/vscode-ipc-7f749bb1-8651-4bc7-98d9-04602f84ae30.sock'), ('ROS_PYTHON_VERSION', '3'), ('VSCODE_GIT_ASKPASS_MAIN', '/home/islam/.vscode-server/bin/f1a4fb101478ce6ec82fe9627c43efbf9e98c813/extensions/git/dist/askpass-main.js'), ('VSCODE_GIT_ASKPASS_NODE', '/home/islam/.vscode-server/bin/f1a4fb101478ce6ec82fe9627c43efbf9e98c813/node'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus'), ('COLORTERM', 'truecolor'), ('WSL_DISTRO_NAME', 'Ubuntu-22.04'), ('WAYLAND_DISPLAY', 'wayland-0'), ('COLCON_PREFIX_PATH', '/home/islam/source_code/pipe_swarm/ros_ws/install:/home/islam/source_code/ros_ws/install'), ('ROS_DISTRO', 'humble'), ('LOGNAME', 'islam'), ('NAME', 'Code'), ('WSL_INTEROP', '/run/WSL/3018_interop'), ('PULSE_SERVER', 'unix:/mnt/wslg/PulseServer'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('TERM', 'xterm-256color'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/home/islam/.vscode-server/bin/f1a4fb101478ce6ec82fe9627c43efbf9e98c813/bin/remote-cli:/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/Program Files (x86)/NVIDIA Corporation/PhysX/Common:/mnt/c/Python312/Scripts/:/mnt/c/Python312/:/mnt/c/Program Files/Microsoft/jdk-11.0.16.101-hotspot/bin:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files/dotnet/:/mnt/c/Program Files/PuTTY/:/mnt/c/Program Files/Microsoft SQL Server/150/Tools/Binn/:/mnt/c/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/:/mnt/c/Program Files/nodejs/:/mnt/c/ProgramData/chocolatey/bin:/mnt/c/Program Files/Git/cmd:/mnt/c/Program Files/MATLAB/R2024a/bin:/mnt/c/Program Files (x86)/Pulse Secure/VC142.CRT/X64/:/mnt/c/Program Files (x86)/Pulse Secure/VC142.CRT/X86/:/mnt/c/Program Files/Microchip/xc8/v2.46/bin:/mnt/c/Program Files/Docker/Docker/resources/bin:/mnt/c/Program Files (x86)/Microsoft SQL Server/150/Tools/Binn/:/mnt/c/Program Files/Microsoft SQL Server/150/DTS/Binn/:/mnt/c/Program Files (x86)/Windows Kits/8.1/Windows Performance Toolkit/:/mnt/c/Users/islam/AppData/Local/Microsoft/WindowsApps:/mnt/c/intelFPGA_lite/17.1/modelsim_ase/win32aloem:/mnt/c/Users/islam/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Users/islam/.dotnet/tools:/mnt/c/Users/islam/AppData/Roaming/npm:/snap/bin'), ('WT_SESSION', '73df8285-8772-4b4c-8678-d12510f8308f'), ('XDG_RUNTIME_DIR', '/run/user/1000/'), ('DISPLAY', ':0'), ('LANG', 'C.UTF-8'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('VSCODE_GIT_IPC_HANDLE', '/run/user/1000/vscode-git-6d3df6539b.sock'), ('TERM_PROGRAM', 'vscode'), ('AMENT_PREFIX_PATH', '/home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm:/home/islam/source_code/ros_ws/install/urdf_tutorial_r2d2:/home/islam/source_code/ros_ws/install/py_cpp_pkg:/opt/ros/humble'), ('SHELL', '/bin/bash'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('VSCODE_GIT_ASKPASS_EXTRA_ARGS', ''), ('PWD', '/home/islam/source_code/pipe_swarm/ros_ws/build/pipe_swarm'), ('XDG_DATA_DIRS', '/usr/local/share:/usr/share:/var/lib/snapd/desktop'), ('PYTHONPATH', '/home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/local/lib/python3.10/dist-packages:/home/islam/source_code/ros_ws/install/urdf_tutorial_r2d2/lib/python3.10/site-packages:/home/islam/source_code/ros_ws/install/py_cpp_pkg/local/lib/python3.10/dist-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('WSL2_GUI_APPS_ENABLED', '1'), ('HOSTTYPE', 'x86_64'), ('CMAKE_PREFIX_PATH', '/home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm:/home/islam/source_code/ros_ws/install/py_cpp_pkg:/home/islam/source_code/ros_ws/install/urdf_tutorial_r2d2:/opt/ros/humble'), ('WSLENV', 'ELECTRON_RUN_AS_NODE/w:WT_SESSION:WT_PROFILE_ID:')]), 'shell': False}
+[0.046991] (pipe_swarm) StdoutLine: {'line': b'-- Found ament_cmake: 1.3.10 (/opt/ros/humble/share/ament_cmake/cmake)\n'}
+[0.099783] (-) TimerEvent: {}
+[0.180245] (pipe_swarm) StdoutLine: {'line': b'-- Override CMake install command with custom implementation using symlinks instead of copying resources\n'}
+[0.187035] (pipe_swarm) StdoutLine: {'line': b'-- Found rclpy: 3.3.14 (/opt/ros/humble/share/rclpy/cmake)\n'}
+[0.187635] (pipe_swarm) StdoutLine: {'line': b'-- Found rclcpp: 16.0.10 (/opt/ros/humble/share/rclcpp/cmake)\n'}
+[0.200193] (-) TimerEvent: {}
+[0.300854] (-) TimerEvent: {}
+[0.401486] (-) TimerEvent: {}
+[0.502121] (-) TimerEvent: {}
+[0.602538] (-) TimerEvent: {}
+[0.653006] (pipe_swarm) StdoutLine: {'line': b'-- Found rosidl_generator_c: 3.1.5 (/opt/ros/humble/share/rosidl_generator_c/cmake)\n'}
+[0.656022] (pipe_swarm) StdoutLine: {'line': b'-- Found rosidl_adapter: 3.1.5 (/opt/ros/humble/share/rosidl_adapter/cmake)\n'}
+[0.661678] (pipe_swarm) StdoutLine: {'line': b'-- Found rosidl_generator_cpp: 3.1.5 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)\n'}
+[0.672242] (pipe_swarm) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c\n'}
+[0.684557] (pipe_swarm) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp\n'}
+[0.702778] (-) TimerEvent: {}
+[0.713788] (pipe_swarm) StdoutLine: {'line': b'-- Found rmw_implementation_cmake: 6.1.2 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)\n'}
+[0.716187] (pipe_swarm) StdoutLine: {'line': b'-- Found rmw_fastrtps_cpp: 6.2.7 (/opt/ros/humble/share/rmw_fastrtps_cpp/cmake)\n'}
+[0.802938] (-) TimerEvent: {}
+[0.903298] (-) TimerEvent: {}
+[1.003681] (-) TimerEvent: {}
+[1.104103] (-) TimerEvent: {}
+[1.204539] (-) TimerEvent: {}
+[1.304908] (-) TimerEvent: {}
+[1.405278] (-) TimerEvent: {}
+[1.505759] (-) TimerEvent: {}
+[1.606185] (-) TimerEvent: {}
+[1.706625] (-) TimerEvent: {}
+[1.807298] (-) TimerEvent: {}
+[1.907765] (-) TimerEvent: {}
+[2.008224] (-) TimerEvent: {}
+[2.108704] (-) TimerEvent: {}
+[2.209259] (-) TimerEvent: {}
+[2.310022] (-) TimerEvent: {}
+[2.410544] (-) TimerEvent: {}
+[2.510979] (-) TimerEvent: {}
+[2.611403] (-) TimerEvent: {}
+[2.711782] (-) TimerEvent: {}
+[2.812174] (-) TimerEvent: {}
+[2.912640] (-) TimerEvent: {}
+[3.013040] (-) TimerEvent: {}
+[3.113442] (-) TimerEvent: {}
+[3.213810] (-) TimerEvent: {}
+[3.314118] (-) TimerEvent: {}
+[3.414554] (-) TimerEvent: {}
+[3.514952] (-) TimerEvent: {}
+[3.615371] (-) TimerEvent: {}
+[3.715719] (-) TimerEvent: {}
+[3.816134] (-) TimerEvent: {}
+[3.916643] (-) TimerEvent: {}
+[4.017035] (-) TimerEvent: {}
+[4.117513] (-) TimerEvent: {}
+[4.217950] (-) TimerEvent: {}
+[4.318457] (-) TimerEvent: {}
+[4.418936] (-) TimerEvent: {}
+[4.519312] (-) TimerEvent: {}
+[4.619620] (-) TimerEvent: {}
+[4.719935] (-) TimerEvent: {}
+[4.820340] (-) TimerEvent: {}
+[4.920781] (-) TimerEvent: {}
+[5.021321] (-) TimerEvent: {}
+[5.121762] (-) TimerEvent: {}
+[5.222258] (-) TimerEvent: {}
+[5.322910] (-) TimerEvent: {}
+[5.423415] (-) TimerEvent: {}
+[5.523795] (-) TimerEvent: {}
+[5.624216] (-) TimerEvent: {}
+[5.724894] (-) TimerEvent: {}
+[5.825405] (-) TimerEvent: {}
+[5.925966] (-) TimerEvent: {}
+[6.026346] (-) TimerEvent: {}
+[6.126775] (-) TimerEvent: {}
+[6.227152] (-) TimerEvent: {}
+[6.327577] (-) TimerEvent: {}
+[6.427963] (-) TimerEvent: {}
+[6.528373] (-) TimerEvent: {}
+[6.628675] (-) TimerEvent: {}
+[6.729043] (-) TimerEvent: {}
+[6.829549] (-) TimerEvent: {}
+[6.930026] (-) TimerEvent: {}
+[7.030451] (-) TimerEvent: {}
+[7.130934] (-) TimerEvent: {}
+[7.231387] (-) TimerEvent: {}
+[7.331838] (-) TimerEvent: {}
+[7.432244] (-) TimerEvent: {}
+[7.532702] (-) TimerEvent: {}
+[7.633143] (-) TimerEvent: {}
+[7.733557] (-) TimerEvent: {}
+[7.834026] (-) TimerEvent: {}
+[7.934537] (-) TimerEvent: {}
+[8.035051] (-) TimerEvent: {}
+[8.135526] (-) TimerEvent: {}
+[8.236049] (-) TimerEvent: {}
+[8.336500] (-) TimerEvent: {}
+[8.436868] (-) TimerEvent: {}
+[8.537256] (-) TimerEvent: {}
+[8.637773] (-) TimerEvent: {}
+[8.738323] (-) TimerEvent: {}
+[8.838827] (-) TimerEvent: {}
+[8.939396] (-) TimerEvent: {}
+[9.039883] (-) TimerEvent: {}
+[9.140320] (-) TimerEvent: {}
+[9.240784] (-) TimerEvent: {}
+[9.341293] (-) TimerEvent: {}
+[9.441851] (-) TimerEvent: {}
+[9.542483] (-) TimerEvent: {}
+[9.643184] (-) TimerEvent: {}
+[9.743787] (-) TimerEvent: {}
+[9.844467] (-) TimerEvent: {}
+[9.945072] (-) TimerEvent: {}
+[10.045574] (-) TimerEvent: {}
+[10.145950] (-) TimerEvent: {}
+[10.246381] (-) TimerEvent: {}
+[10.346782] (-) TimerEvent: {}
+[10.447193] (-) TimerEvent: {}
+[10.547599] (-) TimerEvent: {}
+[10.648057] (-) TimerEvent: {}
+[10.748474] (-) TimerEvent: {}
+[10.848938] (-) TimerEvent: {}
+[10.949414] (-) TimerEvent: {}
+[11.049861] (-) TimerEvent: {}
+[11.150218] (-) TimerEvent: {}
+[11.250557] (-) TimerEvent: {}
+[11.350929] (-) TimerEvent: {}
+[11.451221] (-) TimerEvent: {}
+[11.551588] (-) TimerEvent: {}
+[11.651929] (-) TimerEvent: {}
+[11.752343] (-) TimerEvent: {}
+[11.852642] (-) TimerEvent: {}
+[11.953030] (-) TimerEvent: {}
+[12.053387] (-) TimerEvent: {}
+[12.153701] (-) TimerEvent: {}
+[12.253986] (-) TimerEvent: {}
+[12.354451] (-) TimerEvent: {}
+[12.454862] (-) TimerEvent: {}
+[12.555222] (-) TimerEvent: {}
+[12.655557] (-) TimerEvent: {}
+[12.755932] (-) TimerEvent: {}
+[12.856258] (-) TimerEvent: {}
+[12.956586] (-) TimerEvent: {}
+[13.057011] (-) TimerEvent: {}
+[13.157481] (-) TimerEvent: {}
+[13.257874] (-) TimerEvent: {}
+[13.358243] (-) TimerEvent: {}
+[13.458787] (-) TimerEvent: {}
+[13.559092] (-) TimerEvent: {}
+[13.659405] (-) TimerEvent: {}
+[13.759794] (-) TimerEvent: {}
+[13.860191] (-) TimerEvent: {}
+[13.960648] (-) TimerEvent: {}
+[14.061015] (-) TimerEvent: {}
+[14.161357] (-) TimerEvent: {}
+[14.261675] (-) TimerEvent: {}
+[14.362053] (-) TimerEvent: {}
+[14.462633] (-) TimerEvent: {}
+[14.563053] (-) TimerEvent: {}
+[14.663546] (-) TimerEvent: {}
+[14.764057] (-) TimerEvent: {}
+[14.864587] (-) TimerEvent: {}
+[14.964969] (-) TimerEvent: {}
+[15.065511] (-) TimerEvent: {}
+[15.166246] (-) TimerEvent: {}
+[15.266626] (-) TimerEvent: {}
+[15.367006] (-) TimerEvent: {}
+[15.467433] (-) TimerEvent: {}
+[15.567816] (-) TimerEvent: {}
+[15.662420] (pipe_swarm) StdoutLine: {'line': b"-- Using RMW implementation 'rmw_fastrtps_cpp' as default\n"}
+[15.668041] (-) TimerEvent: {}
+[15.768559] (-) TimerEvent: {}
+[15.863962] (pipe_swarm) StdoutLine: {'line': b'-- Configuring done\n'}
+[15.868764] (pipe_swarm) StdoutLine: {'line': b'-- Generating done\n'}
+[15.869021] (-) TimerEvent: {}
+[15.872074] (pipe_swarm) StdoutLine: {'line': b'-- Build files have been written to: /home/islam/source_code/pipe_swarm/ros_ws/build/pipe_swarm\n'}
+[15.881511] (pipe_swarm) CommandEnded: {'returncode': 0}
+[15.885028] (pipe_swarm) JobProgress: {'identifier': 'pipe_swarm', 'progress': 'build'}
+[15.885240] (pipe_swarm) Command: {'cmd': ['/usr/bin/cmake', '--build', '/home/islam/source_code/pipe_swarm/ros_ws/build/pipe_swarm', '--', '-j8', '-l8'], 'cwd': '/home/islam/source_code/pipe_swarm/ros_ws/build/pipe_swarm', 'env': OrderedDict([('LESSOPEN', '| /usr/bin/lesspipe %s'), ('USER', 'islam'), ('GIT_ASKPASS', '/home/islam/.vscode-server/bin/f1a4fb101478ce6ec82fe9627c43efbf9e98c813/extensions/git/dist/askpass.sh'), ('SHLVL', '2'), ('LD_LIBRARY_PATH', '/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('WT_PROFILE_ID', '{4ff56d04-d9cf-57ea-bae2-ad396374e7e3}'), ('HOME', '/home/islam'), ('OLDPWD', '/home/islam/source_code/pipe_swarm/ros_ws/src'), ('TERM_PROGRAM_VERSION', '1.95.3'), ('VSCODE_IPC_HOOK_CLI', '/run/user/1000/vscode-ipc-7f749bb1-8651-4bc7-98d9-04602f84ae30.sock'), ('ROS_PYTHON_VERSION', '3'), ('VSCODE_GIT_ASKPASS_MAIN', '/home/islam/.vscode-server/bin/f1a4fb101478ce6ec82fe9627c43efbf9e98c813/extensions/git/dist/askpass-main.js'), ('VSCODE_GIT_ASKPASS_NODE', '/home/islam/.vscode-server/bin/f1a4fb101478ce6ec82fe9627c43efbf9e98c813/node'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus'), ('COLORTERM', 'truecolor'), ('WSL_DISTRO_NAME', 'Ubuntu-22.04'), ('WAYLAND_DISPLAY', 'wayland-0'), ('COLCON_PREFIX_PATH', '/home/islam/source_code/pipe_swarm/ros_ws/install:/home/islam/source_code/ros_ws/install'), ('ROS_DISTRO', 'humble'), ('LOGNAME', 'islam'), ('NAME', 'Code'), ('WSL_INTEROP', '/run/WSL/3018_interop'), ('PULSE_SERVER', 'unix:/mnt/wslg/PulseServer'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('TERM', 'xterm-256color'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/home/islam/.vscode-server/bin/f1a4fb101478ce6ec82fe9627c43efbf9e98c813/bin/remote-cli:/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/Program Files (x86)/NVIDIA Corporation/PhysX/Common:/mnt/c/Python312/Scripts/:/mnt/c/Python312/:/mnt/c/Program Files/Microsoft/jdk-11.0.16.101-hotspot/bin:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files/dotnet/:/mnt/c/Program Files/PuTTY/:/mnt/c/Program Files/Microsoft SQL Server/150/Tools/Binn/:/mnt/c/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/:/mnt/c/Program Files/nodejs/:/mnt/c/ProgramData/chocolatey/bin:/mnt/c/Program Files/Git/cmd:/mnt/c/Program Files/MATLAB/R2024a/bin:/mnt/c/Program Files (x86)/Pulse Secure/VC142.CRT/X64/:/mnt/c/Program Files (x86)/Pulse Secure/VC142.CRT/X86/:/mnt/c/Program Files/Microchip/xc8/v2.46/bin:/mnt/c/Program Files/Docker/Docker/resources/bin:/mnt/c/Program Files (x86)/Microsoft SQL Server/150/Tools/Binn/:/mnt/c/Program Files/Microsoft SQL Server/150/DTS/Binn/:/mnt/c/Program Files (x86)/Windows Kits/8.1/Windows Performance Toolkit/:/mnt/c/Users/islam/AppData/Local/Microsoft/WindowsApps:/mnt/c/intelFPGA_lite/17.1/modelsim_ase/win32aloem:/mnt/c/Users/islam/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Users/islam/.dotnet/tools:/mnt/c/Users/islam/AppData/Roaming/npm:/snap/bin'), ('WT_SESSION', '73df8285-8772-4b4c-8678-d12510f8308f'), ('XDG_RUNTIME_DIR', '/run/user/1000/'), ('DISPLAY', ':0'), ('LANG', 'C.UTF-8'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('VSCODE_GIT_IPC_HANDLE', '/run/user/1000/vscode-git-6d3df6539b.sock'), ('TERM_PROGRAM', 'vscode'), ('AMENT_PREFIX_PATH', '/home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm:/home/islam/source_code/ros_ws/install/urdf_tutorial_r2d2:/home/islam/source_code/ros_ws/install/py_cpp_pkg:/opt/ros/humble'), ('SHELL', '/bin/bash'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('VSCODE_GIT_ASKPASS_EXTRA_ARGS', ''), ('PWD', '/home/islam/source_code/pipe_swarm/ros_ws/build/pipe_swarm'), ('XDG_DATA_DIRS', '/usr/local/share:/usr/share:/var/lib/snapd/desktop'), ('PYTHONPATH', '/home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/local/lib/python3.10/dist-packages:/home/islam/source_code/ros_ws/install/urdf_tutorial_r2d2/lib/python3.10/site-packages:/home/islam/source_code/ros_ws/install/py_cpp_pkg/local/lib/python3.10/dist-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('WSL2_GUI_APPS_ENABLED', '1'), ('HOSTTYPE', 'x86_64'), ('CMAKE_PREFIX_PATH', '/home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm:/home/islam/source_code/ros_ws/install/py_cpp_pkg:/home/islam/source_code/ros_ws/install/urdf_tutorial_r2d2:/opt/ros/humble'), ('WSLENV', 'ELECTRON_RUN_AS_NODE/w:WT_SESSION:WT_PROFILE_ID:')]), 'shell': False}
+[15.930072] (pipe_swarm) StderrLine: {'line': b"failed to create symbolic link '/home/islam/source_code/pipe_swarm/ros_ws/build/pipe_swarm/ament_cmake_python/pipe_swarm/pipe_swarm' because existing path cannot be removed: Is a directory\n"}
+[15.930590] (pipe_swarm) StderrLine: {'line': b'gmake[2]: *** [CMakeFiles/ament_cmake_python_symlink_pipe_swarm.dir/build.make:70: CMakeFiles/ament_cmake_python_symlink_pipe_swarm] Error 1\n'}
+[15.931078] (pipe_swarm) StderrLine: {'line': b'gmake[1]: *** [CMakeFiles/Makefile2:138: CMakeFiles/ament_cmake_python_symlink_pipe_swarm.dir/all] Error 2\n'}
+[15.931362] (pipe_swarm) StderrLine: {'line': b'gmake: *** [Makefile:146: all] Error 2\n'}
+[15.933814] (pipe_swarm) CommandEnded: {'returncode': 2}
+[15.946604] (pipe_swarm) JobEnded: {'identifier': 'pipe_swarm', 'rc': 2}
+[15.957555] (-) EventReactorShutdown: {}

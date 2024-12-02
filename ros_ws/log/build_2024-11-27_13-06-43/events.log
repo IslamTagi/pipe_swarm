@@ -1,0 +1,184 @@
+[0.000000] (-) TimerEvent: {}
+[0.000394] (pipe_swarm) JobQueued: {'identifier': 'pipe_swarm', 'dependencies': OrderedDict()}
+[0.000480] (pipe_swarm) JobStarted: {'identifier': 'pipe_swarm'}
+[0.008870] (pipe_swarm) JobProgress: {'identifier': 'pipe_swarm', 'progress': 'cmake'}
+[0.010401] (pipe_swarm) JobProgress: {'identifier': 'pipe_swarm', 'progress': 'build'}
+[0.012386] (pipe_swarm) Command: {'cmd': ['/usr/bin/cmake', '--build', '/home/islam/source_code/pipe_swarm/ros_ws/build/pipe_swarm', '--', '-j8', '-l8'], 'cwd': '/home/islam/source_code/pipe_swarm/ros_ws/build/pipe_swarm', 'env': OrderedDict([('LESSOPEN', '| /usr/bin/lesspipe %s'), ('USER', 'islam'), ('GIT_ASKPASS', '/home/islam/.vscode-server/bin/f1a4fb101478ce6ec82fe9627c43efbf9e98c813/extensions/git/dist/askpass.sh'), ('SHLVL', '2'), ('LD_LIBRARY_PATH', '/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('WT_PROFILE_ID', '{4ff56d04-d9cf-57ea-bae2-ad396374e7e3}'), ('HOME', '/home/islam'), ('OLDPWD', '/home/islam/source_code/pipe_swarm/ros_ws/src'), ('TERM_PROGRAM_VERSION', '1.95.3'), ('VSCODE_IPC_HOOK_CLI', '/run/user/1000/vscode-ipc-7f749bb1-8651-4bc7-98d9-04602f84ae30.sock'), ('ROS_PYTHON_VERSION', '3'), ('VSCODE_GIT_ASKPASS_MAIN', '/home/islam/.vscode-server/bin/f1a4fb101478ce6ec82fe9627c43efbf9e98c813/extensions/git/dist/askpass-main.js'), ('VSCODE_GIT_ASKPASS_NODE', '/home/islam/.vscode-server/bin/f1a4fb101478ce6ec82fe9627c43efbf9e98c813/node'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus'), ('COLORTERM', 'truecolor'), ('WSL_DISTRO_NAME', 'Ubuntu-22.04'), ('WAYLAND_DISPLAY', 'wayland-0'), ('COLCON_PREFIX_PATH', '/home/islam/source_code/pipe_swarm/ros_ws/install:/home/islam/source_code/ros_ws/install'), ('ROS_DISTRO', 'humble'), ('LOGNAME', 'islam'), ('NAME', 'Code'), ('WSL_INTEROP', '/run/WSL/3018_interop'), ('PULSE_SERVER', 'unix:/mnt/wslg/PulseServer'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('TERM', 'xterm-256color'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/home/islam/.vscode-server/bin/f1a4fb101478ce6ec82fe9627c43efbf9e98c813/bin/remote-cli:/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/Program Files (x86)/NVIDIA Corporation/PhysX/Common:/mnt/c/Python312/Scripts/:/mnt/c/Python312/:/mnt/c/Program Files/Microsoft/jdk-11.0.16.101-hotspot/bin:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files/dotnet/:/mnt/c/Program Files/PuTTY/:/mnt/c/Program Files/Microsoft SQL Server/150/Tools/Binn/:/mnt/c/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/:/mnt/c/Program Files/nodejs/:/mnt/c/ProgramData/chocolatey/bin:/mnt/c/Program Files/Git/cmd:/mnt/c/Program Files/MATLAB/R2024a/bin:/mnt/c/Program Files (x86)/Pulse Secure/VC142.CRT/X64/:/mnt/c/Program Files (x86)/Pulse Secure/VC142.CRT/X86/:/mnt/c/Program Files/Microchip/xc8/v2.46/bin:/mnt/c/Program Files/Docker/Docker/resources/bin:/mnt/c/Program Files (x86)/Microsoft SQL Server/150/Tools/Binn/:/mnt/c/Program Files/Microsoft SQL Server/150/DTS/Binn/:/mnt/c/Program Files (x86)/Windows Kits/8.1/Windows Performance Toolkit/:/mnt/c/Users/islam/AppData/Local/Microsoft/WindowsApps:/mnt/c/intelFPGA_lite/17.1/modelsim_ase/win32aloem:/mnt/c/Users/islam/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Users/islam/.dotnet/tools:/mnt/c/Users/islam/AppData/Roaming/npm:/snap/bin'), ('WT_SESSION', '73df8285-8772-4b4c-8678-d12510f8308f'), ('XDG_RUNTIME_DIR', '/run/user/1000/'), ('DISPLAY', ':0'), ('LANG', 'C.UTF-8'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('VSCODE_GIT_IPC_HANDLE', '/run/user/1000/vscode-git-6d3df6539b.sock'), ('TERM_PROGRAM', 'vscode'), ('AMENT_PREFIX_PATH', '/home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm:/home/islam/source_code/ros_ws/install/urdf_tutorial_r2d2:/home/islam/source_code/ros_ws/install/py_cpp_pkg:/opt/ros/humble'), ('SHELL', '/bin/bash'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('VSCODE_GIT_ASKPASS_EXTRA_ARGS', ''), ('PWD', '/home/islam/source_code/pipe_swarm/ros_ws/build/pipe_swarm'), ('XDG_DATA_DIRS', '/usr/local/share:/usr/share:/var/lib/snapd/desktop'), ('PYTHONPATH', '/home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/local/lib/python3.10/dist-packages:/home/islam/source_code/ros_ws/install/urdf_tutorial_r2d2/lib/python3.10/site-packages:/home/islam/source_code/ros_ws/install/py_cpp_pkg/local/lib/python3.10/dist-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('WSL2_GUI_APPS_ENABLED', '1'), ('HOSTTYPE', 'x86_64'), ('CMAKE_PREFIX_PATH', '/home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm:/home/islam/source_code/ros_ws/install/py_cpp_pkg:/home/islam/source_code/ros_ws/install/urdf_tutorial_r2d2:/opt/ros/humble'), ('WSLENV', 'ELECTRON_RUN_AS_NODE/w:WT_SESSION:WT_PROFILE_ID:')]), 'shell': False}
+[0.052572] (pipe_swarm) StdoutLine: {'line': b'-- Found ament_cmake: 1.3.10 (/opt/ros/humble/share/ament_cmake/cmake)\n'}
+[0.098627] (-) TimerEvent: {}
+[0.197009] (pipe_swarm) StdoutLine: {'line': b'-- Override CMake install command with custom implementation using symlinks instead of copying resources\n'}
+[0.198704] (-) TimerEvent: {}
+[0.205066] (pipe_swarm) StdoutLine: {'line': b'-- Found rclpy: 3.3.14 (/opt/ros/humble/share/rclpy/cmake)\n'}
+[0.205380] (pipe_swarm) StdoutLine: {'line': b'-- Found rclcpp: 16.0.10 (/opt/ros/humble/share/rclcpp/cmake)\n'}
+[0.298839] (-) TimerEvent: {}
+[0.399197] (-) TimerEvent: {}
+[0.499606] (-) TimerEvent: {}
+[0.600058] (-) TimerEvent: {}
+[0.700458] (-) TimerEvent: {}
+[0.779247] (pipe_swarm) StdoutLine: {'line': b'-- Found rosidl_generator_c: 3.1.5 (/opt/ros/humble/share/rosidl_generator_c/cmake)\n'}
+[0.785706] (pipe_swarm) StdoutLine: {'line': b'-- Found rosidl_adapter: 3.1.5 (/opt/ros/humble/share/rosidl_adapter/cmake)\n'}
+[0.798544] (pipe_swarm) StdoutLine: {'line': b'-- Found rosidl_generator_cpp: 3.1.5 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)\n'}
+[0.800616] (-) TimerEvent: {}
+[0.817516] (pipe_swarm) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c\n'}
+[0.841591] (pipe_swarm) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp\n'}
+[0.900851] (-) TimerEvent: {}
+[0.917450] (pipe_swarm) StdoutLine: {'line': b'-- Found rmw_implementation_cmake: 6.1.2 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)\n'}
+[0.919338] (pipe_swarm) StdoutLine: {'line': b'-- Found rmw_fastrtps_cpp: 6.2.7 (/opt/ros/humble/share/rmw_fastrtps_cpp/cmake)\n'}
+[1.000930] (-) TimerEvent: {}
+[1.101292] (-) TimerEvent: {}
+[1.201760] (-) TimerEvent: {}
+[1.302227] (-) TimerEvent: {}
+[1.402626] (-) TimerEvent: {}
+[1.502968] (-) TimerEvent: {}
+[1.603281] (-) TimerEvent: {}
+[1.703662] (-) TimerEvent: {}
+[1.804196] (-) TimerEvent: {}
+[1.904508] (-) TimerEvent: {}
+[2.004983] (-) TimerEvent: {}
+[2.105307] (-) TimerEvent: {}
+[2.205628] (-) TimerEvent: {}
+[2.306170] (-) TimerEvent: {}
+[2.406605] (-) TimerEvent: {}
+[2.506952] (-) TimerEvent: {}
+[2.607312] (-) TimerEvent: {}
+[2.707862] (-) TimerEvent: {}
+[2.808176] (-) TimerEvent: {}
+[2.908494] (-) TimerEvent: {}
+[3.008828] (-) TimerEvent: {}
+[3.109180] (-) TimerEvent: {}
+[3.209539] (-) TimerEvent: {}
+[3.309924] (-) TimerEvent: {}
+[3.410305] (-) TimerEvent: {}
+[3.510728] (-) TimerEvent: {}
+[3.611130] (-) TimerEvent: {}
+[3.711530] (-) TimerEvent: {}
+[3.812036] (-) TimerEvent: {}
+[3.912417] (-) TimerEvent: {}
+[4.012898] (-) TimerEvent: {}
+[4.113376] (-) TimerEvent: {}
+[4.213872] (-) TimerEvent: {}
+[4.314227] (-) TimerEvent: {}
+[4.414593] (-) TimerEvent: {}
+[4.515012] (-) TimerEvent: {}
+[4.615421] (-) TimerEvent: {}
+[4.715924] (-) TimerEvent: {}
+[4.816465] (-) TimerEvent: {}
+[4.916984] (-) TimerEvent: {}
+[5.017451] (-) TimerEvent: {}
+[5.118052] (-) TimerEvent: {}
+[5.218528] (-) TimerEvent: {}
+[5.318987] (-) TimerEvent: {}
+[5.419575] (-) TimerEvent: {}
+[5.520079] (-) TimerEvent: {}
+[5.620472] (-) TimerEvent: {}
+[5.721009] (-) TimerEvent: {}
+[5.821445] (-) TimerEvent: {}
+[5.921970] (-) TimerEvent: {}
+[6.022470] (-) TimerEvent: {}
+[6.123115] (-) TimerEvent: {}
+[6.223601] (-) TimerEvent: {}
+[6.324307] (-) TimerEvent: {}
+[6.424764] (-) TimerEvent: {}
+[6.525319] (-) TimerEvent: {}
+[6.625747] (-) TimerEvent: {}
+[6.726175] (-) TimerEvent: {}
+[6.826672] (-) TimerEvent: {}
+[6.927279] (-) TimerEvent: {}
+[7.027784] (-) TimerEvent: {}
+[7.128168] (-) TimerEvent: {}
+[7.228547] (-) TimerEvent: {}
+[7.328928] (-) TimerEvent: {}
+[7.429241] (-) TimerEvent: {}
+[7.529584] (-) TimerEvent: {}
+[7.629900] (-) TimerEvent: {}
+[7.730267] (-) TimerEvent: {}
+[7.830647] (-) TimerEvent: {}
+[7.931015] (-) TimerEvent: {}
+[8.031335] (-) TimerEvent: {}
+[8.131728] (-) TimerEvent: {}
+[8.232139] (-) TimerEvent: {}
+[8.332510] (-) TimerEvent: {}
+[8.432847] (-) TimerEvent: {}
+[8.533447] (-) TimerEvent: {}
+[8.634308] (-) TimerEvent: {}
+[8.734685] (-) TimerEvent: {}
+[8.835295] (-) TimerEvent: {}
+[8.935704] (-) TimerEvent: {}
+[9.036177] (-) TimerEvent: {}
+[9.136626] (-) TimerEvent: {}
+[9.237251] (-) TimerEvent: {}
+[9.337796] (-) TimerEvent: {}
+[9.438346] (-) TimerEvent: {}
+[9.538779] (-) TimerEvent: {}
+[9.639242] (-) TimerEvent: {}
+[9.739555] (-) TimerEvent: {}
+[9.839897] (-) TimerEvent: {}
+[9.940248] (-) TimerEvent: {}
+[10.040647] (-) TimerEvent: {}
+[10.141029] (-) TimerEvent: {}
+[10.241617] (-) TimerEvent: {}
+[10.342061] (-) TimerEvent: {}
+[10.442415] (-) TimerEvent: {}
+[10.542832] (-) TimerEvent: {}
+[10.643248] (-) TimerEvent: {}
+[10.743686] (-) TimerEvent: {}
+[10.844194] (-) TimerEvent: {}
+[10.944709] (-) TimerEvent: {}
+[11.045513] (-) TimerEvent: {}
+[11.146475] (-) TimerEvent: {}
+[11.247064] (-) TimerEvent: {}
+[11.347476] (-) TimerEvent: {}
+[11.447943] (-) TimerEvent: {}
+[11.548588] (-) TimerEvent: {}
+[11.649454] (-) TimerEvent: {}
+[11.750154] (-) TimerEvent: {}
+[11.850553] (-) TimerEvent: {}
+[11.950979] (-) TimerEvent: {}
+[12.051558] (-) TimerEvent: {}
+[12.152085] (-) TimerEvent: {}
+[12.252630] (-) TimerEvent: {}
+[12.353221] (-) TimerEvent: {}
+[12.453830] (-) TimerEvent: {}
+[12.554406] (-) TimerEvent: {}
+[12.654968] (-) TimerEvent: {}
+[12.755415] (-) TimerEvent: {}
+[12.855912] (-) TimerEvent: {}
+[12.956309] (-) TimerEvent: {}
+[13.056685] (-) TimerEvent: {}
+[13.157140] (-) TimerEvent: {}
+[13.257889] (-) TimerEvent: {}
+[13.358718] (-) TimerEvent: {}
+[13.459145] (-) TimerEvent: {}
+[13.559576] (-) TimerEvent: {}
+[13.660007] (-) TimerEvent: {}
+[13.760450] (-) TimerEvent: {}
+[13.860853] (-) TimerEvent: {}
+[13.961206] (-) TimerEvent: {}
+[14.061606] (-) TimerEvent: {}
+[14.162003] (-) TimerEvent: {}
+[14.262375] (-) TimerEvent: {}
+[14.362792] (-) TimerEvent: {}
+[14.463213] (-) TimerEvent: {}
+[14.563584] (-) TimerEvent: {}
+[14.663930] (-) TimerEvent: {}
+[14.764295] (-) TimerEvent: {}
+[14.864804] (-) TimerEvent: {}
+[14.965163] (-) TimerEvent: {}
+[14.982887] (pipe_swarm) StdoutLine: {'line': b"-- Using RMW implementation 'rmw_fastrtps_cpp' as default\n"}
+[15.065302] (-) TimerEvent: {}
+[15.165705] (-) TimerEvent: {}
+[15.170885] (pipe_swarm) StderrLine: {'line': b'\x1b[31mCMake Error at /opt/ros/humble/share/ament_cmake_python/cmake/ament_python_install_package.cmake:66 (message):\n'}
+[15.171165] (pipe_swarm) StderrLine: {'line': b'  ament_python_install_package() the Python package folder\n'}
+[15.171396] (pipe_swarm) StderrLine: {'line': b"  '/home/islam/source_code/pipe_swarm/ros_ws/src/pipe_swarm/pipe_swarm'\n"}
+[15.171539] (pipe_swarm) StderrLine: {'line': b"  doesn't contain an '__init__.py' file\n"}
+[15.171642] (pipe_swarm) StderrLine: {'line': b'Call Stack (most recent call first):\n'}
+[15.171726] (pipe_swarm) StderrLine: {'line': b'  /opt/ros/humble/share/ament_cmake_python/cmake/ament_python_install_package.cmake:39 (_ament_cmake_python_install_package)\n'}
+[15.171809] (pipe_swarm) StderrLine: {'line': b'  CMakeLists.txt:28 (ament_python_install_package)\n'}
+[15.171892] (pipe_swarm) StderrLine: {'line': b'\n'}
+[15.171982] (pipe_swarm) StderrLine: {'line': b'\x1b[0m\n'}
+[15.172090] (pipe_swarm) StdoutLine: {'line': b'-- Configuring incomplete, errors occurred!\n'}
+[15.172251] (pipe_swarm) StdoutLine: {'line': b'See also "/home/islam/source_code/pipe_swarm/ros_ws/build/pipe_swarm/CMakeFiles/CMakeOutput.log".\n'}
+[15.181135] (pipe_swarm) StderrLine: {'line': b'gmake: *** [Makefile:254: cmake_check_build_system] Error 1\n'}
+[15.185519] (pipe_swarm) CommandEnded: {'returncode': 2}
+[15.207556] (pipe_swarm) JobEnded: {'identifier': 'pipe_swarm', 'rc': 2}
+[15.209955] (-) EventReactorShutdown: {}

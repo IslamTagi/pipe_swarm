@@ -1,0 +1,41 @@
+Built target ament_cmake_python_symlink_pipe_swarm
+running egg_info
+writing pipe_swarm.egg-info/PKG-INFO
+writing dependency_links to pipe_swarm.egg-info/dependency_links.txt
+writing top-level names to pipe_swarm.egg-info/top_level.txt
+reading manifest file 'pipe_swarm.egg-info/SOURCES.txt'
+writing manifest file 'pipe_swarm.egg-info/SOURCES.txt'
+Built target ament_cmake_python_build_pipe_swarm_egg
+-- Install configuration: ""
+-- Execute custom install script
+-- Up-to-date symlink: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/urdf/camera.xacro
+-- Up-to-date symlink: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/urdf/common.xacro
+-- Up-to-date symlink: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/urdf/mobile_base.xacro
+-- Up-to-date symlink: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/urdf/pipe_robot.urdf.xacro
+-- Symlinking: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/launch/display_robot.launch.py
+-- Up-to-date symlink: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/environment/pythonpath.sh
+-- Up-to-date symlink: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/environment/pythonpath.dsv
+-- Up-to-date symlink: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/local/lib/python3.10/dist-packages/pipe_swarm-0.0.0-py3.10.egg-info/PKG-INFO
+-- Up-to-date symlink: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/local/lib/python3.10/dist-packages/pipe_swarm-0.0.0-py3.10.egg-info/SOURCES.txt
+-- Up-to-date symlink: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/local/lib/python3.10/dist-packages/pipe_swarm-0.0.0-py3.10.egg-info/dependency_links.txt
+-- Up-to-date symlink: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/local/lib/python3.10/dist-packages/pipe_swarm-0.0.0-py3.10.egg-info/top_level.txt
+-- Up-to-date symlink: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/local/lib/python3.10/dist-packages/pipe_swarm/__init__.py
+-- Up-to-date symlink: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/local/lib/python3.10/dist-packages/pipe_swarm/python_chatter.py
+-- Up-to-date symlink: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/lib/pipe_swarm//python_listener.py
+-- Up-to-date symlink: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/lib/pipe_swarm//python_talker.py
+-- Up-to-date symlink: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/ament_index/resource_index/package_run_dependencies/pipe_swarm
+-- Up-to-date symlink: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/ament_index/resource_index/parent_prefix_path/pipe_swarm
+-- Up-to-date symlink: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/environment/ament_prefix_path.sh
+-- Up-to-date symlink: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/environment/ament_prefix_path.dsv
+-- Up-to-date symlink: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/environment/path.sh
+-- Up-to-date symlink: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/environment/path.dsv
+-- Up-to-date symlink: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/local_setup.bash
+-- Up-to-date symlink: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/local_setup.sh
+-- Up-to-date symlink: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/local_setup.zsh
+-- Up-to-date symlink: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/local_setup.dsv
+-- Symlinking: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/package.dsv
+-- Up-to-date symlink: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/ament_index/resource_index/packages/pipe_swarm
+-- Up-to-date symlink: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/cmake/pipe_swarmConfig.cmake
+-- Up-to-date symlink: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/cmake/pipe_swarmConfig-version.cmake
+-- Up-to-date symlink: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/package.xml
+Listing '/home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/local/lib/python3.10/dist-packages/pipe_swarm'...

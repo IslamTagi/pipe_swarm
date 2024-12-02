@@ -1,0 +1,205 @@
+[0.000000] (-) TimerEvent: {}
+[0.000715] (pipe_swarm) JobQueued: {'identifier': 'pipe_swarm', 'dependencies': OrderedDict()}
+[0.000779] (pipe_swarm) JobStarted: {'identifier': 'pipe_swarm'}
+[0.009721] (pipe_swarm) JobProgress: {'identifier': 'pipe_swarm', 'progress': 'cmake'}
+[0.010671] (pipe_swarm) JobProgress: {'identifier': 'pipe_swarm', 'progress': 'build'}
+[0.012161] (pipe_swarm) Command: {'cmd': ['/usr/bin/cmake', '--build', '/home/islam/source_code/pipe_swarm/ros_ws/build/pipe_swarm', '--', '-j8', '-l8'], 'cwd': '/home/islam/source_code/pipe_swarm/ros_ws/build/pipe_swarm', 'env': OrderedDict([('LESSOPEN', '| /usr/bin/lesspipe %s'), ('USER', 'islam'), ('GIT_ASKPASS', '/home/islam/.vscode-server/bin/f1a4fb101478ce6ec82fe9627c43efbf9e98c813/extensions/git/dist/askpass.sh'), ('SHLVL', '2'), ('LD_LIBRARY_PATH', '/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('WT_PROFILE_ID', '{4ff56d04-d9cf-57ea-bae2-ad396374e7e3}'), ('HOME', '/home/islam'), ('OLDPWD', '/home/islam/source_code/pipe_swarm/ros_ws/src/pipe_swarm'), ('TERM_PROGRAM_VERSION', '1.95.3'), ('VSCODE_IPC_HOOK_CLI', '/run/user/1000/vscode-ipc-7f749bb1-8651-4bc7-98d9-04602f84ae30.sock'), ('ROS_PYTHON_VERSION', '3'), ('VSCODE_GIT_ASKPASS_MAIN', '/home/islam/.vscode-server/bin/f1a4fb101478ce6ec82fe9627c43efbf9e98c813/extensions/git/dist/askpass-main.js'), ('VSCODE_GIT_ASKPASS_NODE', '/home/islam/.vscode-server/bin/f1a4fb101478ce6ec82fe9627c43efbf9e98c813/node'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus'), ('COLORTERM', 'truecolor'), ('WSL_DISTRO_NAME', 'Ubuntu-22.04'), ('WAYLAND_DISPLAY', 'wayland-0'), ('COLCON_PREFIX_PATH', '/home/islam/source_code/ros_ws/install'), ('ROS_DISTRO', 'humble'), ('LOGNAME', 'islam'), ('NAME', 'Code'), ('WSL_INTEROP', '/run/WSL/3018_interop'), ('PULSE_SERVER', 'unix:/mnt/wslg/PulseServer'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('TERM', 'xterm-256color'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/home/islam/.vscode-server/bin/f1a4fb101478ce6ec82fe9627c43efbf9e98c813/bin/remote-cli:/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/Program Files (x86)/NVIDIA Corporation/PhysX/Common:/mnt/c/Python312/Scripts/:/mnt/c/Python312/:/mnt/c/Program Files/Microsoft/jdk-11.0.16.101-hotspot/bin:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files/dotnet/:/mnt/c/Program Files/PuTTY/:/mnt/c/Program Files/Microsoft SQL Server/150/Tools/Binn/:/mnt/c/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/:/mnt/c/Program Files/nodejs/:/mnt/c/ProgramData/chocolatey/bin:/mnt/c/Program Files/Git/cmd:/mnt/c/Program Files/MATLAB/R2024a/bin:/mnt/c/Program Files (x86)/Pulse Secure/VC142.CRT/X64/:/mnt/c/Program Files (x86)/Pulse Secure/VC142.CRT/X86/:/mnt/c/Program Files/Microchip/xc8/v2.46/bin:/mnt/c/Program Files/Docker/Docker/resources/bin:/mnt/c/Program Files (x86)/Microsoft SQL Server/150/Tools/Binn/:/mnt/c/Program Files/Microsoft SQL Server/150/DTS/Binn/:/mnt/c/Program Files (x86)/Windows Kits/8.1/Windows Performance Toolkit/:/mnt/c/Users/islam/AppData/Local/Microsoft/WindowsApps:/mnt/c/intelFPGA_lite/17.1/modelsim_ase/win32aloem:/mnt/c/Users/islam/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Users/islam/.dotnet/tools:/mnt/c/Users/islam/AppData/Roaming/npm:/snap/bin'), ('WT_SESSION', '73df8285-8772-4b4c-8678-d12510f8308f'), ('XDG_RUNTIME_DIR', '/run/user/1000/'), ('DISPLAY', ':0'), ('LANG', 'C.UTF-8'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('VSCODE_GIT_IPC_HANDLE', '/run/user/1000/vscode-git-6d3df6539b.sock'), ('TERM_PROGRAM', 'vscode'), ('AMENT_PREFIX_PATH', '/home/islam/source_code/ros_ws/install/urdf_tutorial_r2d2:/home/islam/source_code/ros_ws/install/py_cpp_pkg:/opt/ros/humble'), ('SHELL', '/bin/bash'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('VSCODE_GIT_ASKPASS_EXTRA_ARGS', ''), ('PWD', '/home/islam/source_code/pipe_swarm/ros_ws/build/pipe_swarm'), ('XDG_DATA_DIRS', '/usr/local/share:/usr/share:/var/lib/snapd/desktop'), ('PYTHONPATH', '/home/islam/source_code/ros_ws/install/urdf_tutorial_r2d2/lib/python3.10/site-packages:/home/islam/source_code/ros_ws/install/py_cpp_pkg/local/lib/python3.10/dist-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('WSL2_GUI_APPS_ENABLED', '1'), ('HOSTTYPE', 'x86_64'), ('CMAKE_PREFIX_PATH', '/home/islam/source_code/ros_ws/install/py_cpp_pkg:/home/islam/source_code/ros_ws/install/urdf_tutorial_r2d2:/opt/ros/humble'), ('WSLENV', 'ELECTRON_RUN_AS_NODE/w:WT_SESSION:WT_PROFILE_ID:')]), 'shell': False}
+[0.040976] (pipe_swarm) StdoutLine: {'line': b'-- Found ament_cmake: 1.3.10 (/opt/ros/humble/share/ament_cmake/cmake)\n'}
+[0.098113] (-) TimerEvent: {}
+[0.198477] (-) TimerEvent: {}
+[0.198854] (pipe_swarm) StdoutLine: {'line': b'-- Found rclpy: 3.3.14 (/opt/ros/humble/share/rclpy/cmake)\n'}
+[0.199353] (pipe_swarm) StdoutLine: {'line': b'-- Found rclcpp: 16.0.10 (/opt/ros/humble/share/rclcpp/cmake)\n'}
+[0.298625] (-) TimerEvent: {}
+[0.398981] (-) TimerEvent: {}
+[0.499389] (-) TimerEvent: {}
+[0.599797] (-) TimerEvent: {}
+[0.647926] (pipe_swarm) StdoutLine: {'line': b'-- Found rosidl_generator_c: 3.1.5 (/opt/ros/humble/share/rosidl_generator_c/cmake)\n'}
+[0.649603] (pipe_swarm) StdoutLine: {'line': b'-- Found rosidl_adapter: 3.1.5 (/opt/ros/humble/share/rosidl_adapter/cmake)\n'}
+[0.654225] (pipe_swarm) StdoutLine: {'line': b'-- Found rosidl_generator_cpp: 3.1.5 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)\n'}
+[0.662181] (pipe_swarm) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c\n'}
+[0.672074] (pipe_swarm) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp\n'}
+[0.697656] (pipe_swarm) StdoutLine: {'line': b'-- Found rmw_implementation_cmake: 6.1.2 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)\n'}
+[0.698974] (pipe_swarm) StdoutLine: {'line': b'-- Found rmw_fastrtps_cpp: 6.2.7 (/opt/ros/humble/share/rmw_fastrtps_cpp/cmake)\n'}
+[0.699890] (-) TimerEvent: {}
+[0.800205] (-) TimerEvent: {}
+[0.900589] (-) TimerEvent: {}
+[1.000953] (-) TimerEvent: {}
+[1.101365] (-) TimerEvent: {}
+[1.201838] (-) TimerEvent: {}
+[1.302416] (-) TimerEvent: {}
+[1.402846] (-) TimerEvent: {}
+[1.503311] (-) TimerEvent: {}
+[1.603616] (-) TimerEvent: {}
+[1.704039] (-) TimerEvent: {}
+[1.804538] (-) TimerEvent: {}
+[1.904908] (-) TimerEvent: {}
+[2.005270] (-) TimerEvent: {}
+[2.105682] (-) TimerEvent: {}
+[2.206073] (-) TimerEvent: {}
+[2.306408] (-) TimerEvent: {}
+[2.406871] (-) TimerEvent: {}
+[2.507347] (-) TimerEvent: {}
+[2.607862] (-) TimerEvent: {}
+[2.708284] (-) TimerEvent: {}
+[2.808793] (-) TimerEvent: {}
+[2.909272] (-) TimerEvent: {}
+[3.009886] (-) TimerEvent: {}
+[3.110235] (-) TimerEvent: {}
+[3.210684] (-) TimerEvent: {}
+[3.311122] (-) TimerEvent: {}
+[3.411591] (-) TimerEvent: {}
+[3.512078] (-) TimerEvent: {}
+[3.612520] (-) TimerEvent: {}
+[3.712928] (-) TimerEvent: {}
+[3.813243] (-) TimerEvent: {}
+[3.913614] (-) TimerEvent: {}
+[4.014024] (-) TimerEvent: {}
+[4.114536] (-) TimerEvent: {}
+[4.214956] (-) TimerEvent: {}
+[4.315536] (-) TimerEvent: {}
+[4.415989] (-) TimerEvent: {}
+[4.516361] (-) TimerEvent: {}
+[4.616832] (-) TimerEvent: {}
+[4.717310] (-) TimerEvent: {}
+[4.817802] (-) TimerEvent: {}
+[4.918446] (-) TimerEvent: {}
+[5.018986] (-) TimerEvent: {}
+[5.119715] (-) TimerEvent: {}
+[5.220261] (-) TimerEvent: {}
+[5.320655] (-) TimerEvent: {}
+[5.421087] (-) TimerEvent: {}
+[5.521617] (-) TimerEvent: {}
+[5.621966] (-) TimerEvent: {}
+[5.722330] (-) TimerEvent: {}
+[5.822701] (-) TimerEvent: {}
+[5.923081] (-) TimerEvent: {}
+[6.023458] (-) TimerEvent: {}
+[6.123844] (-) TimerEvent: {}
+[6.224340] (-) TimerEvent: {}
+[6.324674] (-) TimerEvent: {}
+[6.425049] (-) TimerEvent: {}
+[6.525379] (-) TimerEvent: {}
+[6.625818] (-) TimerEvent: {}
+[6.726248] (-) TimerEvent: {}
+[6.826652] (-) TimerEvent: {}
+[6.927055] (-) TimerEvent: {}
+[7.027401] (-) TimerEvent: {}
+[7.127873] (-) TimerEvent: {}
+[7.228199] (-) TimerEvent: {}
+[7.328571] (-) TimerEvent: {}
+[7.428986] (-) TimerEvent: {}
+[7.529406] (-) TimerEvent: {}
+[7.629748] (-) TimerEvent: {}
+[7.730191] (-) TimerEvent: {}
+[7.830538] (-) TimerEvent: {}
+[7.930967] (-) TimerEvent: {}
+[8.031299] (-) TimerEvent: {}
+[8.131737] (-) TimerEvent: {}
+[8.232091] (-) TimerEvent: {}
+[8.332430] (-) TimerEvent: {}
+[8.432756] (-) TimerEvent: {}
+[8.533193] (-) TimerEvent: {}
+[8.633588] (-) TimerEvent: {}
+[8.734023] (-) TimerEvent: {}
+[8.834387] (-) TimerEvent: {}
+[8.934692] (-) TimerEvent: {}
+[9.035077] (-) TimerEvent: {}
+[9.135418] (-) TimerEvent: {}
+[9.235828] (-) TimerEvent: {}
+[9.336295] (-) TimerEvent: {}
+[9.436639] (-) TimerEvent: {}
+[9.537006] (-) TimerEvent: {}
+[9.637376] (-) TimerEvent: {}
+[9.737759] (-) TimerEvent: {}
+[9.838091] (-) TimerEvent: {}
+[9.938455] (-) TimerEvent: {}
+[10.038815] (-) TimerEvent: {}
+[10.139146] (-) TimerEvent: {}
+[10.239496] (-) TimerEvent: {}
+[10.339857] (-) TimerEvent: {}
+[10.440393] (-) TimerEvent: {}
+[10.541020] (-) TimerEvent: {}
+[10.641775] (-) TimerEvent: {}
+[10.742338] (-) TimerEvent: {}
+[10.842914] (-) TimerEvent: {}
+[10.943656] (-) TimerEvent: {}
+[11.044186] (-) TimerEvent: {}
+[11.144780] (-) TimerEvent: {}
+[11.245256] (-) TimerEvent: {}
+[11.345775] (-) TimerEvent: {}
+[11.446415] (-) TimerEvent: {}
+[11.546911] (-) TimerEvent: {}
+[11.647580] (-) TimerEvent: {}
+[11.748271] (-) TimerEvent: {}
+[11.848927] (-) TimerEvent: {}
+[11.949465] (-) TimerEvent: {}
+[12.050214] (-) TimerEvent: {}
+[12.150699] (-) TimerEvent: {}
+[12.251355] (-) TimerEvent: {}
+[12.351974] (-) TimerEvent: {}
+[12.452542] (-) TimerEvent: {}
+[12.552937] (-) TimerEvent: {}
+[12.653367] (-) TimerEvent: {}
+[12.753892] (-) TimerEvent: {}
+[12.854494] (-) TimerEvent: {}
+[12.954980] (-) TimerEvent: {}
+[13.055589] (-) TimerEvent: {}
+[13.140120] (pipe_swarm) StdoutLine: {'line': b"-- Using RMW implementation 'rmw_fastrtps_cpp' as default\n"}
+[13.155855] (-) TimerEvent: {}
+[13.256214] (-) TimerEvent: {}
+[13.334070] (pipe_swarm) StdoutLine: {'line': b'-- Configuring done\n'}
+[13.340086] (pipe_swarm) StdoutLine: {'line': b'-- Generating done\n'}
+[13.343527] (pipe_swarm) StdoutLine: {'line': b'-- Build files have been written to: /home/islam/source_code/pipe_swarm/ros_ws/build/pipe_swarm\n'}
+[13.356372] (-) TimerEvent: {}
+[13.382915] (pipe_swarm) StdoutLine: {'line': b'Built target ament_cmake_python_copy_pipe_swarm\n'}
+[13.456584] (-) TimerEvent: {}
+[13.557050] (-) TimerEvent: {}
+[13.657698] (-) TimerEvent: {}
+[13.703015] (pipe_swarm) StdoutLine: {'line': b'running egg_info\n'}
+[13.703908] (pipe_swarm) StdoutLine: {'line': b'creating pipe_swarm.egg-info\n'}
+[13.704555] (pipe_swarm) StdoutLine: {'line': b'writing pipe_swarm.egg-info/PKG-INFO\n'}
+[13.704866] (pipe_swarm) StdoutLine: {'line': b'writing dependency_links to pipe_swarm.egg-info/dependency_links.txt\n'}
+[13.705138] (pipe_swarm) StdoutLine: {'line': b'writing top-level names to pipe_swarm.egg-info/top_level.txt\n'}
+[13.705544] (pipe_swarm) StdoutLine: {'line': b"writing manifest file 'pipe_swarm.egg-info/SOURCES.txt'\n"}
+[13.710547] (pipe_swarm) StdoutLine: {'line': b"reading manifest file 'pipe_swarm.egg-info/SOURCES.txt'\n"}
+[13.711462] (pipe_swarm) StdoutLine: {'line': b"writing manifest file 'pipe_swarm.egg-info/SOURCES.txt'\n"}
+[13.757930] (-) TimerEvent: {}
+[13.761084] (pipe_swarm) StdoutLine: {'line': b'Built target ament_cmake_python_build_pipe_swarm_egg\n'}
+[13.785818] (pipe_swarm) CommandEnded: {'returncode': 0}
+[13.788736] (pipe_swarm) JobProgress: {'identifier': 'pipe_swarm', 'progress': 'install'}
+[13.798425] (pipe_swarm) Command: {'cmd': ['/usr/bin/cmake', '--install', '/home/islam/source_code/pipe_swarm/ros_ws/build/pipe_swarm'], 'cwd': '/home/islam/source_code/pipe_swarm/ros_ws/build/pipe_swarm', 'env': OrderedDict([('LESSOPEN', '| /usr/bin/lesspipe %s'), ('USER', 'islam'), ('GIT_ASKPASS', '/home/islam/.vscode-server/bin/f1a4fb101478ce6ec82fe9627c43efbf9e98c813/extensions/git/dist/askpass.sh'), ('SHLVL', '2'), ('LD_LIBRARY_PATH', '/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('WT_PROFILE_ID', '{4ff56d04-d9cf-57ea-bae2-ad396374e7e3}'), ('HOME', '/home/islam'), ('OLDPWD', '/home/islam/source_code/pipe_swarm/ros_ws/src/pipe_swarm'), ('TERM_PROGRAM_VERSION', '1.95.3'), ('VSCODE_IPC_HOOK_CLI', '/run/user/1000/vscode-ipc-7f749bb1-8651-4bc7-98d9-04602f84ae30.sock'), ('ROS_PYTHON_VERSION', '3'), ('VSCODE_GIT_ASKPASS_MAIN', '/home/islam/.vscode-server/bin/f1a4fb101478ce6ec82fe9627c43efbf9e98c813/extensions/git/dist/askpass-main.js'), ('VSCODE_GIT_ASKPASS_NODE', '/home/islam/.vscode-server/bin/f1a4fb101478ce6ec82fe9627c43efbf9e98c813/node'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus'), ('COLORTERM', 'truecolor'), ('WSL_DISTRO_NAME', 'Ubuntu-22.04'), ('WAYLAND_DISPLAY', 'wayland-0'), ('COLCON_PREFIX_PATH', '/home/islam/source_code/ros_ws/install'), ('ROS_DISTRO', 'humble'), ('LOGNAME', 'islam'), ('NAME', 'Code'), ('WSL_INTEROP', '/run/WSL/3018_interop'), ('PULSE_SERVER', 'unix:/mnt/wslg/PulseServer'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('TERM', 'xterm-256color'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/home/islam/.vscode-server/bin/f1a4fb101478ce6ec82fe9627c43efbf9e98c813/bin/remote-cli:/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/Program Files (x86)/NVIDIA Corporation/PhysX/Common:/mnt/c/Python312/Scripts/:/mnt/c/Python312/:/mnt/c/Program Files/Microsoft/jdk-11.0.16.101-hotspot/bin:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files/dotnet/:/mnt/c/Program Files/PuTTY/:/mnt/c/Program Files/Microsoft SQL Server/150/Tools/Binn/:/mnt/c/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/:/mnt/c/Program Files/nodejs/:/mnt/c/ProgramData/chocolatey/bin:/mnt/c/Program Files/Git/cmd:/mnt/c/Program Files/MATLAB/R2024a/bin:/mnt/c/Program Files (x86)/Pulse Secure/VC142.CRT/X64/:/mnt/c/Program Files (x86)/Pulse Secure/VC142.CRT/X86/:/mnt/c/Program Files/Microchip/xc8/v2.46/bin:/mnt/c/Program Files/Docker/Docker/resources/bin:/mnt/c/Program Files (x86)/Microsoft SQL Server/150/Tools/Binn/:/mnt/c/Program Files/Microsoft SQL Server/150/DTS/Binn/:/mnt/c/Program Files (x86)/Windows Kits/8.1/Windows Performance Toolkit/:/mnt/c/Users/islam/AppData/Local/Microsoft/WindowsApps:/mnt/c/intelFPGA_lite/17.1/modelsim_ase/win32aloem:/mnt/c/Users/islam/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Users/islam/.dotnet/tools:/mnt/c/Users/islam/AppData/Roaming/npm:/snap/bin'), ('WT_SESSION', '73df8285-8772-4b4c-8678-d12510f8308f'), ('XDG_RUNTIME_DIR', '/run/user/1000/'), ('DISPLAY', ':0'), ('LANG', 'C.UTF-8'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('VSCODE_GIT_IPC_HANDLE', '/run/user/1000/vscode-git-6d3df6539b.sock'), ('TERM_PROGRAM', 'vscode'), ('AMENT_PREFIX_PATH', '/home/islam/source_code/ros_ws/install/urdf_tutorial_r2d2:/home/islam/source_code/ros_ws/install/py_cpp_pkg:/opt/ros/humble'), ('SHELL', '/bin/bash'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('VSCODE_GIT_ASKPASS_EXTRA_ARGS', ''), ('PWD', '/home/islam/source_code/pipe_swarm/ros_ws/build/pipe_swarm'), ('XDG_DATA_DIRS', '/usr/local/share:/usr/share:/var/lib/snapd/desktop'), ('PYTHONPATH', '/home/islam/source_code/ros_ws/install/urdf_tutorial_r2d2/lib/python3.10/site-packages:/home/islam/source_code/ros_ws/install/py_cpp_pkg/local/lib/python3.10/dist-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('WSL2_GUI_APPS_ENABLED', '1'), ('HOSTTYPE', 'x86_64'), ('CMAKE_PREFIX_PATH', '/home/islam/source_code/ros_ws/install/py_cpp_pkg:/home/islam/source_code/ros_ws/install/urdf_tutorial_r2d2:/opt/ros/humble'), ('WSLENV', 'ELECTRON_RUN_AS_NODE/w:WT_SESSION:WT_PROFILE_ID:')]), 'shell': False}
+[13.810356] (pipe_swarm) StdoutLine: {'line': b'-- Install configuration: ""\n'}
+[13.810733] (pipe_swarm) StdoutLine: {'line': b'-- Installing: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/environment/pythonpath.sh\n'}
+[13.811094] (pipe_swarm) StdoutLine: {'line': b'-- Installing: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/environment/pythonpath.dsv\n'}
+[13.811610] (pipe_swarm) StdoutLine: {'line': b'-- Installing: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/local/lib/python3.10/dist-packages/pipe_swarm-0.0.0-py3.10.egg-info\n'}
+[13.812071] (pipe_swarm) StdoutLine: {'line': b'-- Installing: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/local/lib/python3.10/dist-packages/pipe_swarm-0.0.0-py3.10.egg-info/dependency_links.txt\n'}
+[13.812292] (pipe_swarm) StdoutLine: {'line': b'-- Installing: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/local/lib/python3.10/dist-packages/pipe_swarm-0.0.0-py3.10.egg-info/PKG-INFO\n'}
+[13.812486] (pipe_swarm) StdoutLine: {'line': b'-- Installing: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/local/lib/python3.10/dist-packages/pipe_swarm-0.0.0-py3.10.egg-info/top_level.txt\n'}
+[13.812814] (pipe_swarm) StdoutLine: {'line': b'-- Installing: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/local/lib/python3.10/dist-packages/pipe_swarm-0.0.0-py3.10.egg-info/SOURCES.txt\n'}
+[13.813058] (pipe_swarm) StdoutLine: {'line': b'-- Installing: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/local/lib/python3.10/dist-packages/pipe_swarm\n'}
+[13.813317] (pipe_swarm) StdoutLine: {'line': b'-- Installing: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/local/lib/python3.10/dist-packages/pipe_swarm/__init__.py\n'}
+[13.813802] (pipe_swarm) StdoutLine: {'line': b'-- Installing: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/local/lib/python3.10/dist-packages/pipe_swarm/python_chatter.py\n'}
+[13.858110] (-) TimerEvent: {}
+[13.865701] (pipe_swarm) StdoutLine: {'line': b"Listing '/home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/local/lib/python3.10/dist-packages/pipe_swarm'...\n"}
+[13.866055] (pipe_swarm) StdoutLine: {'line': b"Compiling '/home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/local/lib/python3.10/dist-packages/pipe_swarm/__init__.py'...\n"}
+[13.866254] (pipe_swarm) StdoutLine: {'line': b"Compiling '/home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/local/lib/python3.10/dist-packages/pipe_swarm/python_chatter.py'...\n"}
+[13.874036] (pipe_swarm) StdoutLine: {'line': b'-- Installing: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/lib/pipe_swarm/python_listener.py\n'}
+[13.874623] (pipe_swarm) StdoutLine: {'line': b'-- Installing: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/lib/pipe_swarm/python_talker.py\n'}
+[13.875199] (pipe_swarm) StdoutLine: {'line': b'-- Up-to-date: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/ament_index/resource_index/package_run_dependencies/pipe_swarm\n'}
+[13.875325] (pipe_swarm) StdoutLine: {'line': b'-- Up-to-date: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/ament_index/resource_index/parent_prefix_path/pipe_swarm\n'}
+[13.875405] (pipe_swarm) StdoutLine: {'line': b'-- Up-to-date: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/environment/ament_prefix_path.sh\n'}
+[13.875597] (pipe_swarm) StdoutLine: {'line': b'-- Installing: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/environment/ament_prefix_path.dsv\n'}
+[13.875885] (pipe_swarm) StdoutLine: {'line': b'-- Up-to-date: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/environment/path.sh\n'}
+[13.876115] (pipe_swarm) StdoutLine: {'line': b'-- Installing: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/environment/path.dsv\n'}
+[13.876361] (pipe_swarm) StdoutLine: {'line': b'-- Up-to-date: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/local_setup.bash\n'}
+[13.876572] (pipe_swarm) StdoutLine: {'line': b'-- Installing: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/local_setup.sh\n'}
+[13.876824] (pipe_swarm) StdoutLine: {'line': b'-- Up-to-date: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/local_setup.zsh\n'}
+[13.877070] (pipe_swarm) StdoutLine: {'line': b'-- Installing: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/local_setup.dsv\n'}
+[13.877406] (pipe_swarm) StdoutLine: {'line': b'-- Installing: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/package.dsv\n'}
+[13.877702] (pipe_swarm) StdoutLine: {'line': b'-- Up-to-date: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/ament_index/resource_index/packages/pipe_swarm\n'}
+[13.877936] (pipe_swarm) StdoutLine: {'line': b'-- Up-to-date: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/cmake/pipe_swarmConfig.cmake\n'}
+[13.878169] (pipe_swarm) StdoutLine: {'line': b'-- Up-to-date: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/cmake/pipe_swarmConfig-version.cmake\n'}
+[13.878396] (pipe_swarm) StdoutLine: {'line': b'-- Up-to-date: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/package.xml\n'}
+[13.880168] (pipe_swarm) CommandEnded: {'returncode': 0}
+[13.899743] (pipe_swarm) JobEnded: {'identifier': 'pipe_swarm', 'rc': 0}
+[13.901605] (-) EventReactorShutdown: {}

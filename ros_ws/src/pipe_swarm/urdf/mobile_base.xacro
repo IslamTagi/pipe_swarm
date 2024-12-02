@@ -1,0 +1,42 @@
+<?xml version="1.0" ?>
+<robot name="mobile_base" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <xacro:property name="base_m" value="1" />  <!-- mass /kg -->
+    <xacro:property name="base_w" value="0.15" />  <!-- width /m -->
+    <xacro:property name="base_l" value="0.075" />  <!-- length /m -->
+    <xacro:property name="base_h" value="0.045" />  <!-- height /m -->
+    
+    <!-- LINKS -->
+    <link name="footprint_link" />
+
+    <link name="base_link">
+        <visual>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <geometry>
+                <box size="${base_w} ${base_l} ${base_h}"/>
+            </geometry>
+            <material name="red">
+                <color rgba="1 0 0 1"/>
+            </material>
+        </visual>
+        
+        <collision>
+            <geometry>
+                <box size="${base_w} ${base_l} ${base_h}"/>
+            </geometry>
+        </collision>
+        
+        <xacro:box_inertial m="${base_m}" w="${base_w}" l="${base_l}" h="${base_h}" xyz="0 0 0 " rpy="0 0 0"/>
+    </link>
+
+    <!-- JOINTS -->
+    <joint name="base_footprint" type="fixed">
+        <origin xyz="0 0 0.035" rpy="0 0 0"/>
+        <parent link="footprint_link"/>
+        <child link="base_link"/>
+    </joint>
+
+    
+
+
+</robot>

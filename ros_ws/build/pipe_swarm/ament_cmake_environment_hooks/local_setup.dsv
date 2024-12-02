@@ -1,0 +1,3 @@
+source;share/pipe_swarm/environment/ament_prefix_path.sh
+source;share/pipe_swarm/environment/path.sh
+source;share/pipe_swarm/environment/pythonpath.sh

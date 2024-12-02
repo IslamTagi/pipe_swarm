@@ -1,0 +1,59 @@
+[0.017s] Invoking command in '/home/islam/source_code/pipe_swarm/ros_ws/build/pipe_swarm': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/islam/source_code/ros_ws/install/urdf_tutorial_r2d2:/opt/ros/humble /usr/bin/cmake /home/islam/source_code/pipe_swarm/ros_ws/src/pipe_swarm -DCMAKE_INSTALL_PREFIX=/home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm
+[0.258s] -- The C compiler identification is GNU 11.4.0
+[0.891s] -- The CXX compiler identification is GNU 11.4.0
+[1.391s] -- Detecting C compiler ABI info
+[1.562s] -- Detecting C compiler ABI info - done
+[1.568s] -- Check for working C compiler: /usr/bin/cc - skipped
+[1.574s] -- Detecting C compile features
+[1.576s] -- Detecting C compile features - done
+[1.581s] -- Detecting CXX compiler ABI info
+[1.755s] -- Detecting CXX compiler ABI info - done
+[1.762s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[1.762s] -- Detecting CXX compile features
+[1.762s] -- Detecting CXX compile features - done
+[1.828s] -- Found ament_cmake: 1.3.10 (/opt/ros/humble/share/ament_cmake/cmake)
+[1.996s] -- Found Python3: /usr/bin/python3 (found version "3.10.12") found components: Interpreter 
+[2.124s] -- Found rclpy: 3.3.14 (/opt/ros/humble/share/rclpy/cmake)
+[2.128s] -- Found rclcpp: 16.0.10 (/opt/ros/humble/share/rclcpp/cmake)
+[2.482s] -- Found rosidl_generator_c: 3.1.5 (/opt/ros/humble/share/rosidl_generator_c/cmake)
+[2.490s] -- Found rosidl_adapter: 3.1.5 (/opt/ros/humble/share/rosidl_adapter/cmake)
+[2.506s] -- Found rosidl_generator_cpp: 3.1.5 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)
+[2.535s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[2.561s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[2.630s] -- Found rmw_implementation_cmake: 6.1.2 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)
+[2.635s] -- Found rmw_fastrtps_cpp: 6.2.7 (/opt/ros/humble/share/rmw_fastrtps_cpp/cmake)
+[5.328s] -- Found OpenSSL: /usr/lib/x86_64-linux-gnu/libcrypto.so (found version "3.0.2")  
+[7.752s] -- Found FastRTPS: /opt/ros/humble/include  
+[13.125s] -- Using RMW implementation 'rmw_fastrtps_cpp' as default
+[13.144s] -- Looking for pthread.h
+[13.381s] -- Looking for pthread.h - found
+[13.381s] -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+[13.564s] -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+[13.565s] -- Found Threads: TRUE  
+[13.668s] -- Found ament_lint_auto: 0.12.11 (/opt/ros/humble/share/ament_lint_auto/cmake)
+[13.768s] -- Added test 'lint_cmake' to check CMake code style
+[13.770s] -- Added test 'xmllint' to check XML markup files
+[13.772s] -- Configuring done
+[13.780s] -- Generating done
+[13.782s] -- Build files have been written to: /home/islam/source_code/pipe_swarm/ros_ws/build/pipe_swarm
+[13.790s] Invoked command in '/home/islam/source_code/pipe_swarm/ros_ws/build/pipe_swarm' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/islam/source_code/ros_ws/install/urdf_tutorial_r2d2:/opt/ros/humble /usr/bin/cmake /home/islam/source_code/pipe_swarm/ros_ws/src/pipe_swarm -DCMAKE_INSTALL_PREFIX=/home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm
+[13.792s] Invoking command in '/home/islam/source_code/pipe_swarm/ros_ws/build/pipe_swarm': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/islam/source_code/ros_ws/install/urdf_tutorial_r2d2:/opt/ros/humble /usr/bin/cmake --build /home/islam/source_code/pipe_swarm/ros_ws/build/pipe_swarm -- -j8 -l8
+[13.821s] Invoked command in '/home/islam/source_code/pipe_swarm/ros_ws/build/pipe_swarm' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/islam/source_code/ros_ws/install/urdf_tutorial_r2d2:/opt/ros/humble /usr/bin/cmake --build /home/islam/source_code/pipe_swarm/ros_ws/build/pipe_swarm -- -j8 -l8
+[13.830s] Invoking command in '/home/islam/source_code/pipe_swarm/ros_ws/build/pipe_swarm': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/islam/source_code/ros_ws/install/urdf_tutorial_r2d2:/opt/ros/humble /usr/bin/cmake --install /home/islam/source_code/pipe_swarm/ros_ws/build/pipe_swarm
+[13.834s] -- Install configuration: ""
+[13.837s] -- Installing: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/ament_index/resource_index/package_run_dependencies/pipe_swarm
+[13.837s] -- Installing: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/ament_index/resource_index/parent_prefix_path/pipe_swarm
+[13.838s] -- Installing: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/environment/ament_prefix_path.sh
+[13.838s] -- Installing: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/environment/ament_prefix_path.dsv
+[13.838s] -- Installing: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/environment/path.sh
+[13.838s] -- Installing: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/environment/path.dsv
+[13.839s] -- Installing: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/local_setup.bash
+[13.839s] -- Installing: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/local_setup.sh
+[13.839s] -- Installing: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/local_setup.zsh
+[13.839s] -- Installing: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/local_setup.dsv
+[13.839s] -- Installing: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/package.dsv
+[13.839s] -- Installing: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/ament_index/resource_index/packages/pipe_swarm
+[13.839s] -- Installing: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/cmake/pipe_swarmConfig.cmake
+[13.839s] -- Installing: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/cmake/pipe_swarmConfig-version.cmake
+[13.840s] -- Installing: /home/islam/source_code/pipe_swarm/ros_ws/install/pipe_swarm/share/pipe_swarm/package.xml
+[13.842s] Invoked command in '/home/islam/source_code/pipe_swarm/ros_ws/build/pipe_swarm' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/islam/source_code/ros_ws/install/urdf_tutorial_r2d2:/opt/ros/humble /usr/bin/cmake --install /home/islam/source_code/pipe_swarm/ros_ws/build/pipe_swarm
