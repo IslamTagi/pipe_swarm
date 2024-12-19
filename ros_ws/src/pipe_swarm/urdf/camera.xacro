@@ -42,6 +42,9 @@
             <visualize>true</visualize>
             <update_rate>10.0</update_rate> <!--update /Hz -->
             <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+                <ros>
+                    <namespace>${agent_namespace}</namespace>
+                </ros>
                 <frame_name>camera_link</frame_name>
             </plugin>
         </sensor>
