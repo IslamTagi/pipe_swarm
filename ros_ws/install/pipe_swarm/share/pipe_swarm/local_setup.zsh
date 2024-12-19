@@ -1,1 +1,0 @@
-/home/islam/source_code/pipe_swarm/ros_ws/build/pipe_swarm/ament_cmake_environment_hooks/local_setup.zsh
