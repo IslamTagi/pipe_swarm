@@ -136,7 +136,10 @@
 
     <!-- GAZEBO -->
     <gazebo reference="female_link">
-        <material>Gazebo/Red</material>
+        <material>Gazebo/White</material>
+    </gazebo>
+    <gazebo reference="male_link">
+        <material>Gazebo/White</material>
     </gazebo>
 
     <gazebo>

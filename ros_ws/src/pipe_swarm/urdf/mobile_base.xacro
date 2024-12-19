@@ -15,8 +15,8 @@
             <geometry>
                 <box size="${base_w} ${base_l} ${base_h}"/>
             </geometry>
-            <material name="red">
-                <color rgba="1 0 0 1"/>
+            <material name="blue">
+                <color rgba="0 0 1 1"/>
             </material>
         </visual>
         
@@ -35,8 +35,10 @@
         <parent link="footprint_link"/>
         <child link="base_link"/>
     </joint>
-
     
-
+    <!-- GAZEBO -->
+    <gazebo reference="base_link">
+        <material>Gazebo/Blue</material>
+    </gazebo>
 
 </robot>

@@ -13,8 +13,8 @@
             <geometry>
                 <box size="${camera_w} ${camera_l} ${camera_h}"/>
             </geometry>
-            <material name="base">
-                <color rgba="1.0 1.0 1.0 1.0"/>
+            <material name="green">
+                <color rgba="0 1 0 1"/>
             </material>
         </visual>
         
@@ -36,7 +36,7 @@
 
     <!-- GAZEBO -->
     <gazebo reference="camera_link">
-        <material>Gazebo/Red</material>
+        <material>Gazebo/Green</material>
         <sensor name="camera_sensor" type="camera">
             <pose>0 0 0 0 0 0</pose>
             <visualize>true</visualize>

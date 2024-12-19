@@ -13,7 +13,7 @@
                     <cylinder radius="${wheel_r}" length="${wheel_l}"/>
                 </geometry>
                 <material name="wheel">
-                    <color rgba="1 1 1 1.0"/>
+                    <color rgba="0 0 0 1.0"/>
                 </material>
             </visual>
             
@@ -117,16 +117,16 @@
     </gazebo>
 
     <gazebo reference="wheel_front_right_link">
-        <material>Gazebo/Blue</material>
+        <material>Gazebo/Black</material>
     </gazebo>
     <gazebo reference="wheel_front_left_link">
-        <material>Gazebo/Blue</material>
+        <material>Gazebo/Black</material>
     </gazebo>
     <gazebo reference="wheel_back_right_link">
-        <material>Gazebo/Blue</material>
+        <material>Gazebo/Black</material>
     </gazebo>
     <gazebo reference="wheel_back_left_link">
-        <material>Gazebo/Blue</material>
+        <material>Gazebo/Black</material>
     </gazebo>
 
 </robot>
