@@ -37,6 +37,9 @@
     </joint>
     
     <!-- GAZEBO -->
+    <gazebo reference="footprint_link">
+        <material>Gazebo/Blue</material>
+    </gazebo>
     <gazebo reference="base_link">
         <material>Gazebo/Blue</material>
     </gazebo>
