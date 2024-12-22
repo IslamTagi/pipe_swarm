@@ -11,7 +11,9 @@ def generate_launch_description():
     pipe_swarm_share = get_package_share_directory('pipe_swarm')
     gazebo_ros_share = get_package_share_directory('gazebo_ros')
     xacro_path = os.path.join(pipe_swarm_share, 'urdf', 'pipe_robot.urdf.xacro')
-
+    
+    namespace = f'agent_n'
+    
     return LaunchDescription([
         # Include Gazebo launch file
         IncludeLaunchDescription(
@@ -26,7 +28,7 @@ def generate_launch_description():
             package='robot_state_publisher',
             executable='robot_state_publisher',
             name='robot_state_publisher',
-            namespace='agent_n',
+            namespace=namespace,
             parameters=[{'robot_description': Command(['xacro ', xacro_path, ' agent_namespace:=', 'agent_n'])}]
         ),
 
@@ -35,7 +37,7 @@ def generate_launch_description():
             package='gazebo_ros',
             executable='spawn_entity.py',
             name='spawn_agent',
-            namespace='agent_n',
+            namespace=namespace,
             output='screen',
             arguments=['-topic', 'robot_description', '-entity', 'pipe_robot']
         ),

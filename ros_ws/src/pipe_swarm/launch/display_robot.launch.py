@@ -11,15 +11,18 @@ def generate_launch_description():
         'pipe_robot.urdf.xacro'
     )
 
+    namespace = f'agent_n'
+
     return LaunchDescription([
         Node(
             package='robot_state_publisher',
             executable='robot_state_publisher',
-            parameters=[{'robot_description': Command(['xacro ', xacro_path, ' agent_namespace:=', 'agent_n'])}]            # name='robot_state_publisher',
-            # namespace='robot_ns',
+            namespace=namespace,
+            parameters=[{'robot_description': Command(['xacro ', xacro_path, ' agent_namespace:=', namespace])}]            # name='robot_state_publisher',
         ),
         Node(
             package='joint_state_publisher_gui',
+            namespace=namespace,
             executable='joint_state_publisher_gui'
         ),
         Node(
