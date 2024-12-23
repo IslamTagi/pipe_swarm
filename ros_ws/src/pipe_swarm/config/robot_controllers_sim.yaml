@@ -1,4 +1,4 @@
-/agent_n/controller_manager:
+/namespace_tag/controller_manager:
   ros__parameters:
     update_rate: 50
 
@@ -8,7 +8,7 @@
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
 
-/agent_n/position_controller:
+/namespace_tag/position_controller:
   ros__parameters:
     joints:
       - base_female_joint
