@@ -7,6 +7,27 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import Command
 from ament_index_python.packages import get_package_share_directory
 import os
+import yaml
+
+def update_controllers_namespace(namespace):
+    pipe_swarm_share = get_package_share_directory('pipe_swarm')
+    controllers_yaml_path = os.path.join(pipe_swarm_share, 'config', 'robot_controllers_sim.yaml')
+    controllers_temp_path = os.path.join(pipe_swarm_share, 'config', f'{namespace}_controllers_sim.yaml')
+
+    updated_controllers = {}
+
+    # Load YAML file and replace `{namespace}` dynamically
+    with open(controllers_yaml_path, 'r') as file:
+        controllers = yaml.safe_load(file)
+    
+    for key, value in controllers.items():
+        updated_key = key.replace('/namespace_tag', f'/{namespace}')
+        updated_controllers[updated_key] = value
+
+    # Save updated YAML
+    with open(controllers_temp_path, 'w') as file:
+        yaml.dump(updated_controllers, file)
+
 
 def generate_launch_description():
     # Paths to resources
@@ -15,6 +36,7 @@ def generate_launch_description():
     xacro_path = os.path.join(pipe_swarm_share, 'urdf', 'pipe_robot.urdf.xacro')
 
     namespace = f'agent_n'
+    update_controllers_namespace(namespace)
 
     # Include Gazebo launch file
     gazebo_include = IncludeLaunchDescription(
@@ -81,7 +103,7 @@ def generate_launch_description():
         arguments=['position_controller'],
         output='screen',
     )
-    
+
     return LaunchDescription([
         RegisterEventHandler(
             event_handler=OnProcessExit(
