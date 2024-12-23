@@ -29,7 +29,7 @@ def generate_launch_description():
         executable='robot_state_publisher',
         name='robot_state_publisher',
         output='screen',
-        # namespace=namespace,
+        namespace=namespace,
         parameters=[{'robot_description': Command(['xacro ', xacro_path, ' agent_namespace:=', namespace])}]
     )
 
@@ -37,7 +37,7 @@ def generate_launch_description():
     spawn_entity = Node(
         package='gazebo_ros',
         executable='spawn_entity.py',
-        # namespace=namespace,
+        namespace=namespace,
         arguments=['-topic', 'robot_description',
                     '-entity', 'pipe_robot'],
         output='screen'
@@ -50,16 +50,36 @@ def generate_launch_description():
         output='screen'
     )
 
-    load_joint_state_broadcaster = ExecuteProcess(
-        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
-             'joint_state_broadcaster'],
-        output='screen'
+    # load_joint_state_broadcaster = ExecuteProcess(
+    #     cmd=['ros2', 'control', 'load_controller', 
+    #          '--set-state', 'active',
+    #          '--controller-manager', '/agent_n/controller_manager',
+    #          'joint_state_broadcaster'],
+    #     output='screen'
+    # )
+
+    # load_position_controller = ExecuteProcess(
+    #     cmd=['ros2', 'control', 'load_controller',
+    #          '--set-state', 'active',
+    #          '--controller-manager', '/agent_n/controller_manager',
+    #          'position_controller'],
+    #     output='screen'
+    # )
+
+    load_joint_state_broadcaster = Node(
+        package='controller_manager',
+        executable='spawner',
+        namespace=namespace,
+        arguments=['joint_state_broadcaster'],
+        output='screen',
     )
 
-    load_joint_trajectory_controller = ExecuteProcess(
-        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
-             'position_controller'],
-        output='screen'
+    load_position_controller = Node(
+        package='controller_manager',
+        executable='spawner',
+        namespace=namespace,
+        arguments=['position_controller'],
+        output='screen',
     )
     
     return LaunchDescription([
@@ -72,7 +92,7 @@ def generate_launch_description():
         RegisterEventHandler(
             event_handler=OnProcessExit(
                 target_action=load_joint_state_broadcaster,
-                on_exit=[load_joint_trajectory_controller],
+                on_exit=[load_position_controller],
             )
         ),
         gazebo_include,

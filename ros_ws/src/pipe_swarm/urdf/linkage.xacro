@@ -153,12 +153,12 @@
     </gazebo> -->
 
     <gazebo>
-        <plugin name="urdf_control" filename="libgazebo_ros2_control.so">
-            <!-- <ros>
-                <namespace>${agent_namespace}</namespace>
-            </ros> -->
-            <update_rate>50</update_rate>
+        <plugin name="${agent_namespace}_control" filename="libgazebo_ros2_control.so">
+            <robot_param_node>/${agent_namespace}/robot_state_publisher</robot_param_node> 
             <parameters>$(find pipe_swarm)/config/robot_controllers_sim.yaml</parameters>
+            <ros>
+                <namespace>${agent_namespace}</namespace>
+            </ros>
         </plugin>
     </gazebo>
 
