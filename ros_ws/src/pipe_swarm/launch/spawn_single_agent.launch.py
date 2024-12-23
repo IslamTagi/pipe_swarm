@@ -1,15 +1,16 @@
 from launch import LaunchDescription
 from launch_ros.actions import Node
-from launch.actions import ExecuteProcess, IncludeLaunchDescription, RegisterEventHandler
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, RegisterEventHandler, OpaqueFunction
 from launch.event_handlers import OnProcessExit
 
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import Command
+from launch.substitutions import Command, LaunchConfiguration
 from ament_index_python.packages import get_package_share_directory
 import os
 import yaml
 
 def update_controllers_namespace(namespace):
+    print(f'namespace is {namespace}')
     pipe_swarm_share = get_package_share_directory('pipe_swarm')
     controllers_yaml_path = os.path.join(pipe_swarm_share, 'config', 'robot_controllers_sim.yaml')
     controllers_temp_path = os.path.join(pipe_swarm_share, 'config', f'{namespace}_controllers_sim.yaml')
@@ -28,6 +29,12 @@ def update_controllers_namespace(namespace):
     with open(controllers_temp_path, 'w') as file:
         yaml.dump(updated_controllers, file)
 
+def run_update_controllers_namespace(context): 
+    namespace = LaunchConfiguration('namespace').perform(context)
+    update_controllers_namespace(namespace)
+    return []
+
+# -----------------
 
 def generate_launch_description():
     # Paths to resources
@@ -35,15 +42,16 @@ def generate_launch_description():
     gazebo_ros_share = get_package_share_directory('gazebo_ros')
     xacro_path = os.path.join(pipe_swarm_share, 'urdf', 'pipe_robot.urdf.xacro')
 
-    namespace = f'agent_n'
-    update_controllers_namespace(namespace)
-
+    namespace_arg = DeclareLaunchArgument('namespace',default_value='agent_n',description="Agent's Namespace")
+    update_namespace_action = OpaqueFunction(function=run_update_controllers_namespace) 
+    namespace = LaunchConfiguration('namespace')
+    
     # Include Gazebo launch file
     gazebo_include = IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(
-                os.path.join(gazebo_ros_share, 'launch', 'gazebo.launch.py')
-            )
+        PythonLaunchDescriptionSource(
+            os.path.join(gazebo_ros_share, 'launch', 'gazebo.launch.py')
         )
+    )
     
     # Load and publish the robot state
     pipe_robot_state_publisher = Node(
@@ -101,6 +109,8 @@ def generate_launch_description():
                 on_exit=[load_position_controller],
             )
         ),
+        namespace_arg,
+        update_namespace_action,
         gazebo_include,
         pipe_robot_state_publisher,
         spawn_entity,
