@@ -72,22 +72,6 @@ def generate_launch_description():
         output='screen'
     )
 
-    # load_joint_state_broadcaster = ExecuteProcess(
-    #     cmd=['ros2', 'control', 'load_controller', 
-    #          '--set-state', 'active',
-    #          '--controller-manager', '/agent_n/controller_manager',
-    #          'joint_state_broadcaster'],
-    #     output='screen'
-    # )
-
-    # load_position_controller = ExecuteProcess(
-    #     cmd=['ros2', 'control', 'load_controller',
-    #          '--set-state', 'active',
-    #          '--controller-manager', '/agent_n/controller_manager',
-    #          'position_controller'],
-    #     output='screen'
-    # )
-
     load_joint_state_broadcaster = Node(
         package='controller_manager',
         executable='spawner',
