@@ -39,7 +39,7 @@
         <material>Gazebo/Green</material>
         <sensor name="camera_sensor" type="camera">
             <pose>0 0 0 0 0 0</pose>
-            <visualize>false</visualize>
+            <visualize>true</visualize>
             <update_rate>10.0</update_rate> <!--update /Hz -->
             <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
                 <ros>

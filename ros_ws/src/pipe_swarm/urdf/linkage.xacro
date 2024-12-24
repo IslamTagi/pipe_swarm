@@ -146,12 +146,8 @@
         <plugin name="${agent_namespace}_control" filename="libgazebo_ros2_control.so">
             <robot_param_node>/${agent_namespace}/robot_state_publisher</robot_param_node> 
             <parameters>$(find pipe_swarm)/config/robot_controllers_sim.yaml</parameters>
-            <!-- <parameters>$(find pipe_swarm)/config/${agent_namespace}_controllers_sim.yaml</parameters> -->
             <ros>
                 <namespace>${agent_namespace}</namespace>
-                <remapping>/tf:=tf</remapping>
-                <remapping>/tf_static:=tf_static</remapping>
-                <!-- <remapping>diffdrive_controller/odom:=odom</remapping> -->
             </ros>
         </plugin>
     </gazebo>
