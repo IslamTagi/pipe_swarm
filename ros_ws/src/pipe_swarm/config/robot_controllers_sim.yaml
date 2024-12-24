@@ -1,6 +1,7 @@
-/namespace_tag/controller_manager:
+/**/controller_manager:
   ros__parameters:
     update_rate: 50
+    use_sim_time: true
 
     position_controller:
       type: position_controllers/JointGroupPositionController
@@ -8,7 +9,7 @@
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
 
-/namespace_tag/position_controller:
+/**/position_controller:
   ros__parameters:
     joints:
       - base_female_joint
