@@ -1,9 +1,10 @@
 <?xml version="1.0"?>
-<robot name="pipe_robot" xmlns:xacro="http://www.ros.org/wiki/xacro">
-
+<robot name="pipe_robot" params="agent_namespace" xmlns:xacro="http://www.ros.org/wiki/xacro">
+     <xacro:property name="agent_namespace" value="$(arg agent_namespace)" />
     <xacro:include filename="common.xacro"/>
     <xacro:include filename="mobile_base.xacro"/>
     <xacro:include filename="camera.xacro"/>
     <xacro:include filename="wheels.xacro"/>
+    <xacro:include filename="linkage.xacro"/>
 
 </robot>

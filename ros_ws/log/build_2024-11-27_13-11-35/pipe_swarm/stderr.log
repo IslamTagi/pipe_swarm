@@ -1,8 +1,0 @@
-[31mCMake Error at ament_cmake_symlink_install/ament_cmake_symlink_install.cmake:178 (message):
-  ament_cmake_symlink_install_programs() called with unused/unsupported
-  arguments: DIRECTORY;urdf;launch
-Call Stack (most recent call first):
-  ament_cmake_symlink_install/ament_cmake_symlink_install.cmake:326 (ament_cmake_symlink_install_programs)
-  cmake_install.cmake:46 (include)
-
-[0m

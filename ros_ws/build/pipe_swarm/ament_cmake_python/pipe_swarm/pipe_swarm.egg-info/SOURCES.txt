@@ -1,7 +1,0 @@
-setup.py
-pipe_swarm/__init__.py
-pipe_swarm/python_chatter.py
-pipe_swarm.egg-info/PKG-INFO
-pipe_swarm.egg-info/SOURCES.txt
-pipe_swarm.egg-info/dependency_links.txt
-pipe_swarm.egg-info/top_level.txt
