@@ -1,3 +1,6 @@
 [submodule "ros_ws/src/gazebo_ros2_control"]
 	path = ros_ws/src/gazebo_ros2_control
 	url = https://github.com/ros-controls/gazebo_ros2_control.git
+[submodule "ros_ws/src/micro_ros_agent"]
+	path = ros_ws/src/micro_ros_agent
+	url = https://github.com/micro-ROS/micro-ROS-Agent.git
