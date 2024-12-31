@@ -12,4 +12,4 @@
 /**/position_controller:
   ros__parameters:
     joints:
-      - base_female_joint
+      - namespace_tag_base_female_joint

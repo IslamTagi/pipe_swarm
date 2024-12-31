@@ -9,20 +9,25 @@ import yaml
 
 import os
 
-def recursive_controllers_updater(controllers, key_tag, key_update):
+def recursive_controllers_updater(controllers, namespace_tag, updated_namespace):
     updated_controllers = {}
     for key, value in controllers.items():
-        updated_key = key.replace(key_tag, key_update)  # Replace key namespace
+        updated_key = key.replace(namespace_tag, updated_namespace)  # Replace key namespace
         if isinstance(value, dict):
-            updated_value = recursive_controllers_updater(value, key_tag, key_update)
+            updated_value = recursive_controllers_updater(value, namespace_tag, updated_namespace)
             updated_controllers[updated_key] = updated_value
         else:
-            updated_controllers[updated_key] = value
+            updated_value = value
+            if isinstance(value, list):
+                i = 0
+                for string in updated_value:
+                    updated_value[i] = string.replace(namespace_tag, updated_namespace)
+                    i+=1
+            updated_controllers[updated_key] = updated_value
     return updated_controllers
 
 
 def update_controllers_namespace(namespace):
-    print(f'Namespace is {namespace}')
     pipe_swarm_share = get_package_share_directory('pipe_swarm')
     controllers_yaml_path = os.path.join(pipe_swarm_share, 'config', 'robot_controllers_sim.yaml')
     controllers_temp_path = os.path.join(pipe_swarm_share, 'config', f'{namespace}_controllers_sim.yaml')
@@ -61,7 +66,7 @@ def generate_launch_description():
     for i in range(3):  # Launch 3 robots
         namespace = f'agent_{i}'
 
-        # update_controllers_namespace(namespace)
+        update_controllers_namespace(namespace)
 
         # Load and publish the robot state
         pipe_robot_state_publisher = Node(
@@ -117,12 +122,12 @@ def generate_launch_description():
             spawn_entity,
         ])
     
-    # # Launch RViz2 for visualization
-    # rviz_display = Node(
-    #     package='rviz2',
-    #     executable='rviz2',
-    #     output='screen'
-    # )
+    # Launch RViz2 for visualization
+    rviz_display = Node(
+        package='rviz2',
+        executable='rviz2',
+        output='screen'
+    )
 
-    # agents.append(rviz_display)
+    agents.append(rviz_display)
     return LaunchDescription(agents)

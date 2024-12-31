@@ -7,7 +7,7 @@
     <xacro:property name="camera_h" value="0.01" />  <!-- height /m -->
     
     <!-- LINKS -->
-    <link name="camera_link">
+    <link name="${agent_namespace}_camera_link">
         <visual>
             <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
             <geometry>
@@ -28,14 +28,14 @@
     </link>
 
     <!-- JOINTS -->
-    <joint name="base_camera_joint" type="fixed">
+    <joint name="${agent_namespace}_base_camera_joint" type="fixed">
         <origin xyz="${(base_w*0.5)} 0 ${(base_h*0.5)}" rpy="0 0 0"/>
-        <parent link="base_link"/>
-        <child link="camera_link"/>
+        <parent link="${agent_namespace}_base_link"/>
+        <child link="${agent_namespace}_camera_link"/>
     </joint>
 
     <!-- GAZEBO -->
-    <gazebo reference="camera_link">
+    <gazebo reference="${agent_namespace}_camera_link">
         <material>Gazebo/Green</material>
         <sensor name="camera_sensor" type="camera">
             <pose>0 0 0 0 0 0</pose>
@@ -45,7 +45,7 @@
                 <ros>
                     <namespace>${agent_namespace}</namespace>
                 </ros>
-                <frame_name>camera_link</frame_name>
+                <frame_name>${agent_namespace}_camera_link</frame_name>
             </plugin>
         </sensor>
     </gazebo>

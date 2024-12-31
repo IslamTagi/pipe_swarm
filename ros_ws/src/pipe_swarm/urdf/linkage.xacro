@@ -37,7 +37,7 @@
 
     
     <!-- LINKS -->
-    <link name="male_link">
+    <link name="${agent_namespace}_male_link">
         <visual>
             <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
             <geometry>
@@ -57,7 +57,7 @@
         <xacro:box_inertial m="${male_m}" w="${male_w}" l="${male_l}" h="${male_h}" xyz="0 0 0 " rpy="0 0 0"/>
     </link>
 
-    <link name="female_link">
+    <link name="${agent_namespace}_female_link">
         <visual>
             <xacro:female_rotation_shape />
             <material name="base">
@@ -119,33 +119,32 @@
     </link>
     
     <!-- JOINTS -->
-    <joint name="base_male_joint" type="fixed">
+    <joint name="${agent_namespace}_base_male_joint" type="fixed">
         <origin xyz="${(base_w*0.5) + (male_w*0.5)} 0 0" rpy="0 0 0"/>
-        <parent link="base_link"/>
-        <child link="male_link"/>
+        <parent link="${agent_namespace}_base_link"/>
+        <child link="${agent_namespace}_male_link"/>
     </joint>
 
-    <joint name="base_female_joint" type="revolute">
-        <!-- <origin xyz="${-(base_w*0.5) + 0.023} 0 0" rpy="0 0 0"/> -->
+    <joint name="${agent_namespace}_base_female_joint" type="revolute">
         <origin xyz="${-(base_w*0.5) + female_diameter/2} 0 0" rpy="0 0 0"/>
-        <parent link="base_link"/>
-        <child link="female_link"/>
+        <parent link="${agent_namespace}_base_link"/>
+        <child link="${agent_namespace}_female_link"/>
         <axis xyz="0 1 0"/>
         <limit lower="${-pi/2}" upper="${pi/2}" effort="1.0" velocity="1.0"/>
     </joint>
 
     <!-- GAZEBO -->
-    <gazebo reference="female_link">
+    <gazebo reference="${agent_namespace}_female_link">
         <material>Gazebo/White</material>
     </gazebo>
-    <gazebo reference="male_link">
+    <gazebo reference="${agent_namespace}_male_link">
         <material>Gazebo/White</material>
     </gazebo>
 
     <gazebo>
         <plugin name="${agent_namespace}_control" filename="libgazebo_ros2_control.so">
             <robot_param_node>/${agent_namespace}/robot_state_publisher</robot_param_node> 
-            <parameters>$(find pipe_swarm)/config/robot_controllers_sim.yaml</parameters>
+            <parameters>$(find pipe_swarm)/config/${agent_namespace}_controllers_sim.yaml</parameters>
             <ros>
                 <namespace>${agent_namespace}</namespace>
             </ros>
@@ -157,13 +156,13 @@
         <hardware>
             <plugin>gazebo_ros2_control/GazeboSystem</plugin>
         </hardware>
-        <joint name="base_female_joint">
+        <joint name="${agent_namespace}_base_female_joint">
             <command_interface name="position">
                 <param name="min">-pi/2</param>
                 <param name="max">pi/2</param>
             </command_interface>
             <state_interface name="position">
-                <param name="initial_value">1.0</param>
+                <param name="initial_value">0.0</param>
             </state_interface>
             <state_interface name="velocity"/>
             <state_interface name="effort"/>
