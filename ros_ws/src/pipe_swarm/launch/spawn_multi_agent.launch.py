@@ -66,7 +66,7 @@ def generate_launch_description():
     for i in range(3):  # Launch 3 robots
         namespace = f'agent_{i}'
 
-        update_controllers_namespace(namespace)
+        # update_controllers_namespace(namespace)
 
         # Load and publish the robot state
         pipe_robot_state_publisher = Node(

@@ -125,7 +125,7 @@
         <child link="${agent_namespace}_male_link"/>
     </joint>
 
-    <joint name="${agent_namespace}_base_female_joint" type="revolute">
+    <joint name="base_female_joint" type="revolute">
         <origin xyz="${-(base_w*0.5) + female_diameter/2} 0 0" rpy="0 0 0"/>
         <parent link="${agent_namespace}_base_link"/>
         <child link="${agent_namespace}_female_link"/>
@@ -144,7 +144,7 @@
     <gazebo>
         <plugin name="${agent_namespace}_control" filename="libgazebo_ros2_control.so">
             <robot_param_node>/${agent_namespace}/robot_state_publisher</robot_param_node> 
-            <parameters>$(find pipe_swarm)/config/${agent_namespace}_controllers_sim.yaml</parameters>
+            <parameters>$(find pipe_swarm)/config/robot_controllers_sim.yaml</parameters>
             <ros>
                 <namespace>${agent_namespace}</namespace>
             </ros>
@@ -156,7 +156,7 @@
         <hardware>
             <plugin>gazebo_ros2_control/GazeboSystem</plugin>
         </hardware>
-        <joint name="${agent_namespace}_base_female_joint">
+        <joint name="base_female_joint">
             <command_interface name="position">
                 <param name="min">-pi/2</param>
                 <param name="max">pi/2</param>
