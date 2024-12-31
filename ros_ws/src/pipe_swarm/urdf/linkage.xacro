@@ -3,30 +3,35 @@
     
     <xacro:property name="male_m" value="0.1" />  <!-- mass /kg -->
     <xacro:property name="male_w" value="0.04" />  <!-- width /m -->
-    <xacro:property name="male_l" value="0.01" />  <!-- length /m -->
     <xacro:property name="male_h" value="0.01" />  <!-- height /m -->
+    <xacro:property name="male_l" value="0.01" />  <!-- length /m -->
 
-    <xacro:property name="female_thickness_out" value="0.028" />  <!-- /m -->
+    
     <xacro:property name="female_diameter" value="0.04" />  <!-- /m -->
-    <xacro:property name="female_stopper_thickness" value="0.05" />  <!-- /m -->
+    <xacro:property name="female_stopper_width" value="0.05" />  <!-- /m -->
     <xacro:property name="female_hole_depth" value="0.03" />  <!-- /m -->
     <xacro:property name="female_wall_thickness" value="0.01" />  <!-- /m -->
     <xacro:property name="female_hole_thickness" value="0.01" />  <!-- /m -->
+    
+    <xacro:property name="female_m" value="0.1" />  <!-- mass /kg -->
+    <xacro:property name="female_w" value="${(female_diameter/2) + female_stopper_width + female_hole_depth}" />  <!-- width /m -->
+    <xacro:property name="female_h" value="${female_diameter}" />  <!-- height /m -->
+    <xacro:property name="female_l" value="0.028" />  <!-- /m -->
 
     <xacro:macro name="female_rotation_shape">
             <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
             <geometry>
-                <cylinder radius="${female_diameter/2}" length="${female_thickness_out}"/>
+                <cylinder radius="${female_diameter/2}" length="${female_l}"/>
             </geometry>
     </xacro:macro>
     <xacro:macro name="female_stopper_shape">
-            <origin xyz="${-female_stopper_thickness/2} 0 0" rpy="0 0 0"/>
+            <origin xyz="${-female_stopper_width/2} 0 0" rpy="0 0 0"/>
             <geometry>
-                <box size="${female_stopper_thickness} ${female_thickness_out} ${female_diameter}"/>
+                <box size="${female_stopper_width} ${female_l} ${female_diameter}"/>
             </geometry>
     </xacro:macro>
     <xacro:macro name="female_wall_shape" params="y_offset z_offset">
-            <origin xyz="${-(female_stopper_thickness + female_hole_depth/2)} 
+            <origin xyz="${-(female_stopper_width + female_hole_depth/2)} 
                         ${y_offset * (female_wall_thickness/2 + female_hole_thickness/2)} 
                         ${z_offset * (female_wall_thickness/2 + female_hole_thickness/2)}" 
                         rpy="0 0 0"/>
@@ -114,8 +119,7 @@
             <xacro:female_wall_shape y_offset="-1" z_offset="0"/>
         </collision>
 
-        <!-- TODO Fix inertia -->
-        <xacro:box_inertial m="${male_m}" w="${male_w}" l="${male_l}" h="${male_h}" xyz="0 0 0 " rpy="0 0 0"/>
+        <xacro:box_inertial m="${female_m}" w="${female_w}" l="${female_l}" h="${female_h}" xyz="${female_diameter/2 - female_w/2} 0 0 " rpy="0 0 0"/>
     </link>
     
     <!-- JOINTS -->
