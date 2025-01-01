@@ -1,0 +1,8 @@
+string parent_agent
+string parent_link
+string child_agent
+string child_link
+string joint_type  # e.g., "revolute", "fixed"
+---
+bool success
+string message
