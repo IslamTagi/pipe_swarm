@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 import rclpy
 from pipe_swarm.python_chatter import PyListener
-# from rclpy.node import Node
-# from py_cpp_pkg.python_imports import PythonNode
 
 QUE_SIZE = 10
 

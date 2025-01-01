@@ -3,18 +3,24 @@
 <package format="3">
   <name>pipe_swarm</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
+  <!-- TODO: Package description-->
+  <description> Temporary Package Description </description> 
   <maintainer email="islamtagi@hotmail.com">islam</maintainer>
   <license>Apache-2.0</license>
 
+  <!-- Build Tool Dependencies -->
   <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_python</buildtool_depend>
+
+  <!-- Build and Execution Dependencies -->
   <depend>rclpy</depend>
   <depend>rclcpp</depend>
   <depend>std_msgs</depend>
-  
+  <depend>geometry_msgs</depend>
   <depend>gazebo_ros</depend>
   <depend>robot_state_publisher</depend>
 
+  <!-- Testing Dependencies -->
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
 
