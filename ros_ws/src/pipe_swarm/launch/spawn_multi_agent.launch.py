@@ -50,6 +50,7 @@ def generate_launch_description():
     pipe_swarm_share = get_package_share_directory('pipe_swarm')
     gazebo_ros_share = get_package_share_directory('gazebo_ros')
     xacro_path = os.path.join(pipe_swarm_share, 'urdf', 'pipe_robot.urdf.xacro')
+    world_path = os.path.join(pipe_swarm_share, 'worlds', 'bookshelf.sdf')
 
     agents = []
 
@@ -57,7 +58,8 @@ def generate_launch_description():
     gazebo_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(gazebo_ros_share, 'launch', 'gazebo.launch.py')
-        )
+        ),
+        launch_arguments={'world': world_path}.items()
     )
 
     # Pre-Agent Setup
@@ -122,12 +124,12 @@ def generate_launch_description():
             spawn_entity,
         ])
     
-    # Launch RViz2 for visualization
-    rviz_display = Node(
-        package='rviz2',
-        executable='rviz2',
-        output='screen'
-    )
+    # # Launch RViz2 for visualization
+    # rviz_display = Node(
+    #     package='rviz2',
+    #     executable='rviz2',
+    #     output='screen'
+    # )
 
-    agents.append(rviz_display)
+    # agents.append(rviz_display)
     return LaunchDescription(agents)

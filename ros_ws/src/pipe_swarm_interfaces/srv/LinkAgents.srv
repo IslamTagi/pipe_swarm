@@ -3,7 +3,7 @@ string parent_link
 string child_agent
 string child_link
 string joint_type  # e.g., "revolute", "fixed"
-bool link
+bool link_agents
 ---
 bool success
 string message
