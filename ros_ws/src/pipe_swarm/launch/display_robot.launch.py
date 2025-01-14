@@ -11,7 +11,7 @@ def generate_launch_description():
         'pipe_robot.urdf.xacro'
     )
 
-    namespace = f'agent_n'
+    namespace = f'agent_0'
 
     return LaunchDescription([
         Node(
