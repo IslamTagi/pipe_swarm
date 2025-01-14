@@ -11,35 +11,28 @@ theta_global = 0
 
 def get_coordinate_representation(l_agent, theta):
     # world position
-    x = [x_global]
-    y = [y_global]
-    endpoints = [[x_global],[y_global]]
+    x = np.zeros(len(theta) + 1)
+    y = np.zeros(len(theta) + 1)
+    x[0] = x_global
+    y[0] = y_global
+    endpoints = [x.copy(),y.copy()]
     theta.insert(0,theta_global)
 
-    # calculate co-ordinate representation
-    for i in range(len(theta) - 1):
-        i+=1 #skip global reference link
-
+    # calculate co-ordinate representation skipping global coordinates
+    for i in range(1, len(theta)):
         theta_i = np.deg2rad(theta[i])
         theta_i_1 = np.deg2rad(theta[i-1])
         
         if(1 == i):
             # for first link, no previous link length to take into account
-            x_i = x[i-1] + (0.5 * l_agent * np.cos(theta_i))
-            x.append(x_i)
-            y_i = y[i-1] + (0.5 * l_agent * np.sin(theta_i))
-            y.append(y_i)
+            x[i] = x[i-1] + (0.5 * l_agent * np.cos(theta_i))
+            y[i] = y[i-1] + (0.5 * l_agent * np.sin(theta_i))
         else:
-            x_i = x[i-1] + (0.5 * l_agent * (np.cos(theta_i) + np.cos(theta_i_1)))
-            x.append(x_i)
-            y_i = y[i-1] + (0.5 * l_agent * (np.sin(theta_i) + np.sin(theta_i_1)))
-            y.append(y_i)
+            x[i] = x[i-1] + (0.5 * l_agent * (np.cos(theta_i) + np.cos(theta_i_1)))
+            y[i] = y[i-1] + (0.5 * l_agent * (np.sin(theta_i) + np.sin(theta_i_1)))
 
-        x_endpoint_i = endpoints[0][i-1] + (l_agent * np.cos(theta_i))
-        y_endpoint_i = endpoints[1][i-1] + (l_agent * np.sin(theta_i))
-
-        endpoints[0].append(x_endpoint_i)
-        endpoints[1].append(y_endpoint_i)
+        endpoints[0][i] = endpoints[0][i-1] + (l_agent * np.cos(theta_i)) #x
+        endpoints[1][i] = endpoints[1][i-1] + (l_agent * np.sin(theta_i)) #y
 
     # get average x,y position without global position reference
     x_com = np.mean(x[1:])
@@ -67,4 +60,4 @@ def visualize_agent_configuration(l_agent, theta):
     plt.legend()
     plt.show()
 
-visualize_agent_configuration(l_agent, [0, 0, 45])
+visualize_agent_configuration(l_agent, [0, 90, 0])
