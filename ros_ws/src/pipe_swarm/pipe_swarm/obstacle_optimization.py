@@ -91,16 +91,16 @@ def inverse_kinematics(x_target, y_target, n_agents, l_agent, max_iterations=100
         else:
             # Compute the gradient (partial derivatives with respect to each θ)
             gradient = np.zeros(n_agents)
-
+            
+            partial_sum_x = [0] # Sum for ∂x_i/∂θ_i
+            partial_sum_y = [0] # Sum for ∂y_i/∂θ_i
             for i in range(n_agents):
-                partial_sum_x = 0  # Sum for ∂x_i/∂θ_i
-                partial_sum_y = 0  # Sum for ∂y_i/∂θ_i
-                for j in range(i+1):
-                    partial_sum_x += -l_agent * np.sin(theta[j-1])
-                    partial_sum_y += (l_agent * np.cos(theta[j-1]))
-
+                sum_x = (-l_agent * np.sin(theta[i-1])) + partial_sum_x[i-1]
+                sum_y = (l_agent * np.cos(theta[i-1])) + partial_sum_y[i-1]
+                partial_sum_x.insert(i, sum_x)
+                partial_sum_y.insert(i, sum_y)
                 # Compute the gradient for θ_i
-                gradient[i] = (x_curr - x_target) * partial_sum_x + (y_curr - y_target) * partial_sum_y
+                gradient[i] = (x_curr - x_target) * partial_sum_x[i] + (y_curr - y_target) * partial_sum_y[i]
 
             # Update the angles using gradient descent
             theta -= learning_rate * gradient
