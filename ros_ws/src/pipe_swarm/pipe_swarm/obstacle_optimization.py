@@ -2,21 +2,25 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # define agent properties
-l_agent = 2    # agent length
+l_agent = 2     # agent length
+n_agents = 3    # number of agents
 
 # define global reference frame
 x_global = 0
 y_global = 0
 theta_global = 0
 
-def get_coordinate_representation(l_agent, theta):
+def get_coordinate_representation(l_agent, theta_np):
     # world position
-    x = np.zeros(len(theta) + 1)
-    y = np.zeros(len(theta) + 1)
+    theta = []
+    for i in range(len(theta_np)):
+        theta.append(theta_np[i])
+    theta.insert(0,theta_global)
+    x = np.zeros(len(theta))
+    y = np.zeros(len(theta))
     x[0] = x_global
     y[0] = y_global
     endpoints = [x.copy(),y.copy()]
-    theta.insert(0,theta_global)
 
     # calculate co-ordinate representation skipping global coordinates
     for i in range(1, len(theta)):
@@ -60,4 +64,56 @@ def visualize_agent_configuration(l_agent, theta):
     plt.legend()
     plt.show()
 
-visualize_agent_configuration(l_agent, [0, 90, 0])
+def inverse_kinematics(x_target, y_target, n_agents, l_agent, max_iterations=10000, learning_rate = 5, tolerance=5e-3):
+
+    theta = np.zeros(n_agents)  # Start with all joint angles at 0 radians
+    minimum_error = 10
+    minimum_error_iteration = 0
+
+    for iteration in range(max_iterations):
+        # Compute current end-effector position
+        x_, y_, endpoints, center_of_mass_ = get_coordinate_representation(l_agent, theta)
+        x_curr = endpoints[0][-1]
+        y_curr = endpoints[1][-1]
+
+        # Compute the pos error between current and target positions
+        p_error = np.array([x_target - x_curr, y_target - y_curr])
+        p_error_normalized = np.linalg.norm(p_error) 
+
+        # print(p_error_normalized)
+        if(p_error_normalized < minimum_error):
+            minimum_error = p_error_normalized
+            minimum_error_iteration = iteration
+
+        # Check if the normalized error is within tolerance
+        if p_error_normalized <= tolerance:
+            break
+        else:
+            # Compute the gradient (partial derivatives with respect to each θ)
+            gradient = np.zeros(n_agents)
+
+            for i in range(n_agents):
+                partial_sum_x = 0  # Sum for ∂x_i/∂θ_i
+                partial_sum_y = 0  # Sum for ∂y_i/∂θ_i
+                for j in range(i+1):
+                    partial_sum_x += -l_agent * np.sin(theta[j-1])
+                    partial_sum_y += (l_agent * np.cos(theta[j-1]))
+
+                # Compute the gradient for θ_i
+                gradient[i] = (x_curr - x_target) * partial_sum_x + (y_curr - y_target) * partial_sum_y
+
+            # Update the angles using gradient descent
+            theta -= learning_rate * gradient
+    
+    success = False
+    if p_error_normalized <= tolerance:
+        print(f"Hooray! Solution found in {iteration} iterations!")
+        success = True
+    else:
+        print("Maximum iterations reached without finding a solution.")
+    print(f'Minimum error: {minimum_error} at iteration : {minimum_error_iteration}')
+    
+    return success, theta, minimum_error, minimum_error_iteration
+
+success_, theta_solution, minimum_error_, minimum_error_iteration_ = inverse_kinematics(2, 4, n_agents, l_agent)
+visualize_agent_configuration(l_agent, theta_solution)
