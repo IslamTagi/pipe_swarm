@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.optimize import minimize
 
 # define agent properties
 l_agent = 2     # agent length
@@ -45,6 +46,9 @@ def get_coordinate_representation(l_agent, theta_np):
     return x, y, endpoints, (x_com, y_com)
 
 def visualize_agent_configuration(l_agent, theta):
+    if theta is None:
+        return
+
     x, y, endpoints, center_of_mass = get_coordinate_representation(l_agent, theta)
 
     # Add ground line
@@ -115,5 +119,55 @@ def inverse_kinematics(x_target, y_target, n_agents, l_agent, max_iterations=100
     
     return success, theta, minimum_error, minimum_error_iteration
 
-success_, theta_solution, minimum_error_, minimum_error_iteration_ = inverse_kinematics(2, 4, n_agents, l_agent)
+def inverse_kinematics_with_constraints(x_target, y_target, n_agents, l_agent, 
+                                        theta_min=-90, theta_max=90, 
+                                        max_iter=10000, tolerance=5e-3):
+    
+    def objective(theta):
+        # Compute current end-effector position
+        x_, y_, endpoints, com_ = get_coordinate_representation(l_agent, theta)
+        x = endpoints[0][-1]
+        y = endpoints[1][-1]
+        error = np.sqrt((x - x_target)**2 + (y - y_target)**2)  # Minimize position error
+        return error
+
+    # Define bounds for joint angles
+    bounds = [(theta_min, theta_max) for _ in range(n_agents)]
+    
+    def ground_constraint(theta):
+        x_, y_, endpoints, com_ = get_coordinate_representation(l_agent, theta)
+        return_val = 0
+        for i in endpoints[1]:
+            if i < 0:
+                return_val = -1 # fail if any endpoint below ground
+                # TODO: make sure no length along link underground
+                break
+        return return_val  # Torque <= max
+
+    constraints = [
+        {'type': 'ineq', 'fun': ground_constraint},
+    ]
+
+    # Initial guess
+    initial_theta = (10,20,30)
+
+    # Solve the optimization problem
+    result = minimize(
+        objective, 
+        initial_theta, 
+        bounds=bounds, 
+        constraints=constraints,
+        options={"maxiter": max_iter, "disp": True}
+    )
+
+    if result.success:
+        print("Optimization successful!")
+        print(result.x)
+        return result.x  # Optimal joint angles
+    else:
+        print("Optimization failed.")
+        return None
+
+# success_, theta_solution, minimum_error_, minimum_error_iteration_ = inverse_kinematics(4, 2, n_agents, l_agent)
+theta_solution = inverse_kinematics_with_constraints(0, 2, n_agents, l_agent)
 visualize_agent_configuration(l_agent, theta_solution)
