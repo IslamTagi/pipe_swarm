@@ -5,6 +5,7 @@
   <version>0.0.0</version>
   <!-- TODO (IT): Package description-->
   <description> Temporary Package Description </description> 
+  <description>TODO: Package description</description>
   <maintainer email="islamtagi@hotmail.com">islam</maintainer>
   <license>Apache-2.0</license>
 
@@ -19,6 +20,9 @@
   <depend>gazebo_msgs</depend>
   <depend>gazebo_ros</depend>
   <depend>robot_state_publisher</depend>
+  <depend>controller_manager</depend>
+  <depend>ros2_controllers</depend>
+  <depend>gazebo_ros_pkgs</depend>
   <depend>pipe_swarm_interfaces</depend>
 
   <!-- Testing Dependencies -->
