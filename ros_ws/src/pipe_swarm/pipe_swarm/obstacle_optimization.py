@@ -7,9 +7,11 @@ l_agent = 2     # agent length
 n_agents = 3    # number of agents
 
 # define global reference frame
-x_global = 0
-y_global = 0
+global_coordinates = (0, 0)
 theta_global = 0
+
+# define obstacle
+obstacle_endpoints = ((2, 2, 4, 4), (0, 2, 2, 0))
 
 def get_coordinate_representation(l_agent, theta_np, x_pos):
     # world position
@@ -20,7 +22,7 @@ def get_coordinate_representation(l_agent, theta_np, x_pos):
     x = np.zeros(len(theta))
     y = np.zeros(len(theta))
     x[0] = x_pos
-    y[0] = y_global
+    y[0] = global_coordinates[1]
     endpoints = [x.copy(),y.copy()]
 
     # calculate co-ordinate representation skipping global coordinates
@@ -45,19 +47,27 @@ def get_coordinate_representation(l_agent, theta_np, x_pos):
 
     return x, y, endpoints, (x_com, y_com)
 
-def visualize_agent_configuration(l_agent, theta):
+def visualize_agent_configuration(l_agent, theta, obstacle):
     if theta is None:
         return
 
     x, y, endpoints, center_of_mass = get_coordinate_representation(l_agent, theta[1:], theta[0])
 
-    # Add ground line
     plt.figure(figsize=(8, 6))
+    
+    # Ground line
     plt.axhline(0, color='black', linestyle='--', label='Ground')
     
-    # Plot configuration
+    # Links
     plt.plot(endpoints[0], endpoints[1], '-o', color='blue', markersize=8, linewidth=2, label='Link')
-    plt.plot(center_of_mass[0], center_of_mass[1], '-x', color='red', markersize=8, linewidth=2, label='Centre of Mass')
+    
+    # Center of Mass
+    plt.scatter(x[1:], y[1:], marker='x', color='green', label='Link Centre of Mass')
+    plt.plot(center_of_mass[0], center_of_mass[1], '-x', color='green', markersize=8, linewidth=2, label='Centre of Mass')
+    
+    # Obstacle
+    plt.plot(obstacle[0], obstacle[1], '-s', color='red', markersize=8, linewidth=2, label='Obstacle')
+    plt.fill_between(obstacle[0], obstacle[1], color='orange')
     
     # Formatting
     plt.title("Snake Robot Configuration (Centered Links)", fontsize=14)
@@ -89,12 +99,14 @@ def inverse_kinematics_with_constraints(x_target, y_target, n_agents, l_agent,
         for i in endpoints[1]:
             if i < 0:
                 return_val = -1 # fail if any endpoint below ground
-                # TODO: make sure no length along link underground
+                # TODO (IT): make sure no length along link underground
                 break
         return return_val  # endpoint > 0
 
     constraints = [
         {'type': 'ineq', 'fun': ground_constraint},
+        # TODO (IT): implement com constraint
+        # TODO (IT): implement obstacle constraint
     ]
 
     # Initial guess
@@ -117,9 +129,5 @@ def inverse_kinematics_with_constraints(x_target, y_target, n_agents, l_agent,
         print("Optimization failed.")
         return None
 
-theta_solution = inverse_kinematics_with_constraints(2, -4, n_agents, l_agent)
-visualize_agent_configuration(l_agent, theta_solution)
-
-
-# TODO: add x translation implementation
-# TODO: implement com constraint
+theta_solution = inverse_kinematics_with_constraints(5, 1, n_agents, l_agent)
+visualize_agent_configuration(l_agent, theta_solution, obstacle_endpoints)
