@@ -1,7 +1,5 @@
 # WSL ROS Package Setup
 
-</br>
-
 ## Setup ssh key
 
 You do not need a password. Click `enter` when prompted.
@@ -15,8 +13,6 @@ In Azure, open `User Settings` -> `SSH public keys` -> `Add`. Copy and paste the
 ```bash
 cat ~/.ssh/id_rsa.pub
 ```
-
-</br>
 
 ## Cloning Repo
 
@@ -42,8 +38,6 @@ colcon build
 source install/setup.bash
 ```
 
-</br>
-
 ## Test Build
 
 Once successfully built, run the spawn launch script
@@ -51,8 +45,6 @@ Once successfully built, run the spawn launch script
 ```bash
 ros2 launch pipe_swarm spawn_multi_agent.launch.py
 ```
-
-</br>
 
 ## Sourcing Packages on WSL Start-up
 
@@ -63,8 +55,6 @@ source /opt/ros/humble/setup.bash
 source ~/source_code/pipe_swarm/ros_ws/install/setup.bash
 source /usr/share/gazebo/setup.sh
 ```
-
-</br>
 
 ## Debugging tips
 
