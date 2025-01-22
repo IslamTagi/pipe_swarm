@@ -2,8 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import minimize
 
-# define agent properties
-
 # define obstacle
 obstacle_endpoints = ((2, 2, 4, 4), (0, 2, 2, 0))
 
@@ -90,57 +88,67 @@ class ModularConfiguration():
         plt.legend()
         plt.show()
 
-
 class ModelPredictiveControl():
 
-    def __init__(self, n_agents, l_agent):
+    def __init__(self, n_agents, l_agent, 
+                 x_pos_min=-100, x_pos_max=100, theta_min=-90, theta_max=90):
+
         # defining model
-            # x0 being the control parameters
-        theta = np.zeros(n_agents)
-        x_pos = 0
-        x0 = [x_pos]
-        x0.extend(theta)
-        self.model_config = ModularConfiguration(theta, x_pos, l_agent)
+        self.n_agents = n_agents
 
-    def inverse_kinematics_with_constraints(self, x_target, y_target, n_agents, 
-                                        theta_min=-90, theta_max=90, 
-                                        max_iter=10000, tolerance=5e-6):
-    
-        def objective(theta):
-            # Compute current end-effector position
-            x_, y_, endpoints, com_ = self.model_config.get_coordinate_representation(theta[1:], theta[0])
-            x = endpoints[0][-1]
-            y = endpoints[1][-1]
-            error = np.sqrt((x - x_target)**2 + (y - y_target)**2)  # Minimize position error
-            return error
-
-        # Define bounds for joint angles
-        bounds = [(theta_min, theta_max) for _ in range(n_agents+1)]
+            # initial theta0 guess -- control parameters
+        self.theta = (10, 20, 50) # TODO (IT): randomize based on n_agents
+        self.x_pos = 0
+        self.theta0 = [self.x_pos]
+        self.theta0.extend(self.theta)
+            
+            # define thetha0 boundaries
+        self.theta0_bounds = [(theta_min, theta_max) for _ in range(n_agents)] # theta bounds
+        self.theta0_bounds.insert(0, (x_pos_min, x_pos_max)) # x pos bounds
         
-        def ground_constraint(theta):
-            x_, y_, endpoints, com_ = self.model_config.get_coordinate_representation(theta[1:], theta[0])
-            return_val = 0
-            for i in endpoints[1]:
-                if i < 0:
-                    return_val = -1 # fail if any endpoint below ground
-                    # TODO (IT): make sure no length along link underground
-                    break
-            return return_val  # endpoint > 0
+        self.model_config = ModularConfiguration(self.theta, self.x_pos, l_agent)
 
+          # objective function
+        self.pos_desired = (0, 0)
+
+    def objective(self, theta0):
+        # Compute current end-effector position
+        self.model_config.get_coordinate_representation(theta0[1:], theta0[0])
+        x = self.model_config.endpoints[0][-1]
+        y = self.model_config.endpoints[1][-1]
+        error = np.sqrt((x - self.pos_desired[0])**2
+                        + (y - self.pos_desired[1])**2)  # Minimize position error
+        return error
+    
+    # Constraints
+    def ground_constraint(self, theta0):
+        self.model_config.get_coordinate_representation(theta0[1:], theta0[0])
+        return_val = 0
+        for i in self.model_config.endpoints[1]:
+            if i < 0:
+                return_val = -1 # fail if any endpoint below ground
+                # TODO (IT): make sure no length along link underground
+                break
+        return return_val  # endpoint > 0
+
+    def inverse_kinematics_with_constraints(self, pos_desired, 
+                                        max_iter=10000, tolerance=5e-6):
+        
+        # objective function
+        self.pos_desired = pos_desired
+        
         constraints = [
-            {'type': 'ineq', 'fun': ground_constraint},
+            {'type': 'ineq', 'fun': self.ground_constraint},
             # TODO (IT): implement com constraint
             # TODO (IT): implement obstacle constraint
+            # TODO (IT): implement torque constraint
         ]
-
-        # Initial guess
-        initial_theta = (0, 10,20,30)
 
         # Solve the optimization problem
         result = minimize(
-            objective, 
-            initial_theta, 
-            bounds=bounds, 
+            self.objective, 
+            self.theta0, 
+            bounds=self.theta0_bounds, 
             constraints=constraints,
             tol=tolerance,
             options={"maxiter": max_iter, "disp": True}
@@ -149,22 +157,14 @@ class ModelPredictiveControl():
         if result.success:
             print("Optimization successful!")
             print(result.x)
-            return result.x  # Optimal joint angles
+            return result.x
         else:
             print("Optimization failed.")
             return None
     
-
-    
-theta = [90, 0, 90]
-x_pos = 1
 l_agent = 2
 n_agents = 3    # number of agents
 
-# modular_config = ModularConfiguration(theta, x_pos, l_agent)
-# modular_config.visualize_agent_configuration(obstacle_endpoints)
-
 mpc = ModelPredictiveControl(n_agents, l_agent)
-theta_solution = mpc.inverse_kinematics_with_constraints(5, 1, n_agents, l_agent)
+theta_solution = mpc.inverse_kinematics_with_constraints((5, 3))
 mpc.model_config.visualize_agent_configuration(obstacle_endpoints)
-# visualize_agent_configuration(l_agent, theta_solution, obstacle_endpoints)
