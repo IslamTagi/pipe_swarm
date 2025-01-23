@@ -124,12 +124,10 @@
     </link>
     
     <!-- JOINTS -->
-    <joint name="${agent_namespace}_base_male_joint" type="revolute">
+    <joint name="${agent_namespace}_base_male_joint" type="fixed">
         <origin xyz="${(base_w*0.5) + (male_w*0.5)} 0 0" rpy="0 0 0"/>
         <parent link="${agent_namespace}_base_link"/>
         <child link="${agent_namespace}_male_link"/>
-        <axis xyz="0 1 0"/>
-        <limit lower="${0}" upper="${0}" effort="1.0" velocity="1.0"/>
     </joint>
 
     <joint name="base_female_joint" type="revolute">
