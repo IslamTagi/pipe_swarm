@@ -109,12 +109,22 @@ def generate_launch_description():
             arguments=['position_controller'],
             output='screen',
         )
+        
+        spawn_skid_steer_controller = Node(
+            package='controller_manager',
+            executable='spawner',
+            namespace=namespace,
+            arguments=['skid_steer_controller'],
+            output='screen',
+        )
 
         ros_controllers_event = RegisterEventHandler(
             event_handler=OnProcessExit(
                 target_action=spawn_entity,
                 on_exit=[spawn_joint_state_broadcaster,
-                         spawn_position_controller],
+                         spawn_position_controller,
+                         # spawn_skid_steer_controller,
+                        ],
             )
         )
 
@@ -124,12 +134,12 @@ def generate_launch_description():
             spawn_entity,
         ])
     
-    # # Launch RViz2 for visualization
-    # rviz_display = Node(
-    #     package='rviz2',
-    #     executable='rviz2',
-    #     output='screen'
-    # )
+    # Launch RViz2 for visualization
+    rviz_display = Node(
+        package='rviz2',
+        executable='rviz2',
+        output='screen'
+    )
 
-    # agents.append(rviz_display)
+    agents.append(rviz_display)
     return LaunchDescription(agents)
