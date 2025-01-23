@@ -67,50 +67,26 @@
 
     <!-- GAZEBO -->
     <gazebo>
-        <plugin name="${agent_namespace}_front_diff_drive" filename="libgazebo_ros_diff_drive.so">
+        <plugin name="${agent_namespace}_skid_steer_drive" filename="libgazebo_ros_diff_drive.so">
             <ros>
                 <namespace>${agent_namespace}</namespace>
             </ros>
             <!-- Update rate in Hz -->
             <update_rate>50</update_rate> 
             <!-- wheels -->
+            <num_wheel_pairs>2</num_wheel_pairs>
+             
             <right_joint>${agent_namespace}_base_wheel_front_right_joint</right_joint>
-            <left_joint>${agent_namespace}_base_wheel_front_left_joint</left_joint>
-            <!-- kinematics -->
-            <wheel_separation>0.85</wheel_separation>
-            <wheel_diameter>0.035</wheel_diameter>
-            <!-- limits -->
-            <max_wheel_torque>20</max_wheel_torque>
-            <max_wheel_acceleration>1.0</max_wheel_acceleration>
-            <!-- input -->
-            <command_topic>cmd_vel</command_topic>
-            <!-- output -->
-            <odometry_frame>odom</odometry_frame>
-            <robot_base_frame>${agent_namespace}_footprint_link</robot_base_frame>
-            
-            <odometry_topic>odom</odometry_topic>
-            <publish_odom>true</publish_odom>
-            <publish_odom_tf>true</publish_odom_tf>
-            <publish_wheel_tf>true</publish_wheel_tf>
-        </plugin>
-    </gazebo>
-    
-    <gazebo>
-        <plugin name="${agent_namespace}_back_diff_drive" filename="libgazebo_ros_diff_drive.so">
-            <ros>
-                <namespace>${agent_namespace}</namespace>
-            </ros>
-            <!-- Update rate in Hz -->
-            <update_rate>50</update_rate> 
-            <!-- wheels -->
             <right_joint>${agent_namespace}_base_wheel_back_right_joint</right_joint>
+            <left_joint>${agent_namespace}_base_wheel_front_left_joint</left_joint>
             <left_joint>${agent_namespace}_base_wheel_back_left_joint</left_joint>
             <!-- kinematics -->
-            <wheel_separation>0.85</wheel_separation>
-            <wheel_diameter>0.035</wheel_diameter>
+            <wheel_separation>${base_l + wheel_l}</wheel_separation>
+
+            <wheel_diameter>${wheel_r*2}</wheel_diameter>
             <!-- limits -->
             <max_wheel_torque>20</max_wheel_torque>
-            <max_wheel_acceleration>1.0</max_wheel_acceleration>
+            <max_wheel_acceleration>1</max_wheel_acceleration>
             <!-- input -->
             <command_topic>cmd_vel</command_topic>
             <!-- output -->
@@ -122,19 +98,18 @@
             <publish_odom_tf>true</publish_odom_tf>
             <publish_wheel_tf>true</publish_wheel_tf>
         </plugin>
-    </gazebo>
-    
+    </gazebo>    
 
-    <gazebo reference="wheel_front_right_link">
+    <gazebo reference="${agent_namespace}_wheel_front_right_link">
         <material>Gazebo/Black</material>
     </gazebo>
-    <gazebo reference="wheel_front_left_link">
+    <gazebo reference="${agent_namespace}_wheel_front_left_link">
         <material>Gazebo/Black</material>
     </gazebo>
-    <gazebo reference="wheel_back_right_link">
+    <gazebo reference="${agent_namespace}_wheel_back_right_link">
         <material>Gazebo/Black</material>
     </gazebo>
-    <gazebo reference="wheel_back_left_link">
+    <gazebo reference="${agent_namespace}_wheel_back_left_link">
         <material>Gazebo/Black</material>
     </gazebo>
 
