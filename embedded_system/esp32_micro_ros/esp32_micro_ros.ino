@@ -14,9 +14,6 @@
 
 rcl_publisher_t publisher;
 std_msgs__msg__Int32 msg;
-rclc_support_t support;
-rcl_allocator_t allocator;
-rcl_node_t node;
 
 #if defined(LED_BUILTIN)
   #define LED_PIN LED_BUILTIN
@@ -28,9 +25,13 @@ rcl_node_t node;
 #define RCSOFTCHECK(fn) { rcl_ret_t temp_rc = fn; if((temp_rc != RCL_RET_OK)){}}
 
 #define USE_WIFI true
+#define USE_SERIAL false
+
 bool init_comms();
 bool init_serial_comms();
 bool init_ros_comms(char* ssid, char* password, char* ip_address, uint32_t port, bool use_wifi);
+
+void init_node(char* node_name, char* node_namespace, rcl_node_t &node, rclc_support_t &support);
 
 void error_loop(){
   while(1){
@@ -127,27 +128,34 @@ bool init_ros_comms(char* ssid, char* password, char* ip_address, uint32_t port,
   return success;
 }
 
-void setup() {
-  init_comms();
-  pinMode(LED_PIN, OUTPUT);
-  digitalWrite(LED_PIN, HIGH);
-
-  delay(2000);
-
-  allocator = rcl_get_default_allocator();
+void init_node(char* node_name, char* node_namespace, rcl_node_t &node, rclc_support_t &support)
+{
+  rcl_allocator_t allocator = rcl_get_default_allocator();
 
   //create init_options
   RCCHECK(rclc_support_init(&support, 0, NULL, &allocator));
 
   // create node
-  RCCHECK(rclc_node_init_default(&node, "micro_ros_arduino_wifi_node", "agent_n", &support));
+  RCCHECK(rclc_node_init_default(&node, node_name, node_namespace, &support));
+}
+
+void setup() {
+  init_comms();
+  rclc_support_t main_support;
+  rcl_node_t main_node;
+
+  init_node("esp32_node", "agent_n", main_node, main_support)
+  pinMode(LED_PIN, OUTPUT);
+  digitalWrite(LED_PIN, HIGH);
+
+  delay(2000);
 
   // create publisher
   RCCHECK(rclc_publisher_init_best_effort(
     &publisher,
-    &node,
+    &main_node,
     ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Int32),
-    "topic_name"));
+    "counter_topic"));
 
   msg.data = 0;
 }
