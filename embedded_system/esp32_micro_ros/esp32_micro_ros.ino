@@ -144,7 +144,7 @@ void setup() {
   rclc_support_t main_support;
   rcl_node_t main_node;
 
-  init_node("esp32_node", "agent_n", main_node, main_support)
+  init_node("esp32_node", "agent_n", main_node, main_support);
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, HIGH);
 
@@ -155,7 +155,8 @@ void setup() {
     &publisher,
     &main_node,
     ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Int32),
-    "counter_topic"));
+    "counter_topic")
+  );
 
   msg.data = 0;
 }
