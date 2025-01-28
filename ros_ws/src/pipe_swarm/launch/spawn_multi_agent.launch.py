@@ -9,20 +9,25 @@ import yaml
 
 import os
 
-def recursive_controllers_updater(controllers, key_tag, key_update):
+def recursive_controllers_updater(controllers, namespace_tag, updated_namespace):
     updated_controllers = {}
     for key, value in controllers.items():
-        updated_key = key.replace(key_tag, key_update)  # Replace key namespace
+        updated_key = key.replace(namespace_tag, updated_namespace)  # Replace key namespace
         if isinstance(value, dict):
-            updated_value = recursive_controllers_updater(value, key_tag, key_update)
+            updated_value = recursive_controllers_updater(value, namespace_tag, updated_namespace)
             updated_controllers[updated_key] = updated_value
         else:
-            updated_controllers[updated_key] = value
+            updated_value = value
+            if isinstance(value, list):
+                i = 0
+                for string in updated_value:
+                    updated_value[i] = string.replace(namespace_tag, updated_namespace)
+                    i+=1
+            updated_controllers[updated_key] = updated_value
     return updated_controllers
 
 
 def update_controllers_namespace(namespace):
-    print(f'Namespace is {namespace}')
     pipe_swarm_share = get_package_share_directory('pipe_swarm')
     controllers_yaml_path = os.path.join(pipe_swarm_share, 'config', 'robot_controllers_sim.yaml')
     controllers_temp_path = os.path.join(pipe_swarm_share, 'config', f'{namespace}_controllers_sim.yaml')
@@ -45,6 +50,7 @@ def generate_launch_description():
     pipe_swarm_share = get_package_share_directory('pipe_swarm')
     gazebo_ros_share = get_package_share_directory('gazebo_ros')
     xacro_path = os.path.join(pipe_swarm_share, 'urdf', 'pipe_robot.urdf.xacro')
+    world_path = os.path.join(pipe_swarm_share, 'worlds', 'bookshelf.sdf')
 
     agents = []
 
@@ -52,7 +58,8 @@ def generate_launch_description():
     gazebo_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(gazebo_ros_share, 'launch', 'gazebo.launch.py')
-        )
+        ),
+        launch_arguments={'world': world_path}.items()
     )
 
     # Pre-Agent Setup
@@ -102,12 +109,22 @@ def generate_launch_description():
             arguments=['position_controller'],
             output='screen',
         )
+        
+        spawn_skid_steer_controller = Node(
+            package='controller_manager',
+            executable='spawner',
+            namespace=namespace,
+            arguments=['skid_steer_controller'],
+            output='screen',
+        )
 
         ros_controllers_event = RegisterEventHandler(
             event_handler=OnProcessExit(
                 target_action=spawn_entity,
                 on_exit=[spawn_joint_state_broadcaster,
-                         spawn_position_controller],
+                         spawn_position_controller,
+                         # spawn_skid_steer_controller,
+                        ],
             )
         )
 
@@ -117,12 +134,12 @@ def generate_launch_description():
             spawn_entity,
         ])
     
-    # # Launch RViz2 for visualization
-    # rviz_display = Node(
-    #     package='rviz2',
-    #     executable='rviz2',
-    #     output='screen'
-    # )
+    # Launch RViz2 for visualization
+    rviz_display = Node(
+        package='rviz2',
+        executable='rviz2',
+        output='screen'
+    )
 
-    # agents.append(rviz_display)
+    agents.append(rviz_display)
     return LaunchDescription(agents)
