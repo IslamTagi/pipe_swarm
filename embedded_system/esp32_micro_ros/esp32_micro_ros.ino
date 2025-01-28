@@ -27,6 +27,10 @@ rcl_node_t node;
 #define RCCHECK(fn) { rcl_ret_t temp_rc = fn; if((temp_rc != RCL_RET_OK)){error_loop();}}
 #define RCSOFTCHECK(fn) { rcl_ret_t temp_rc = fn; if((temp_rc != RCL_RET_OK)){}}
 
+#define USE_WIFI true
+bool init_comms();
+bool init_serial_comms();
+bool init_ros_comms(char* ssid, char* password, char* ip_address, uint32_t port, bool use_wifi);
 
 void error_loop(){
   while(1){
@@ -44,23 +48,87 @@ void timer_callback(rcl_timer_t * timer, int64_t last_call_time)
   }
 }
 
-void setup() {
-  Serial.begin(115200); // Initialize serial communication at 115200 baud rate
+bool init_comms()
+{
+  bool success = true;
+  success &= init_serial_comms();
+  success &= init_ros_comms("ssid", "password", "172.20.10.2", 8888, USE_WIFI);
+
+  return success;
+}
+
+bool init_serial_comms()
+{
+  bool success = true;
+
+  Serial.begin(115200);
   Serial.println("Serial communication started!");
 
-  Serial.print("Setting Wi-Fi Transports...");
-  set_microros_wifi_transports("WiFISSID", "WiFiPassword", "172.20.10.2", 8888);
-  // set_microros_transports();
-  Serial.print("done!\n");
-  
-  if (rmw_uros_ping_agent(1000, 1))
+  return success;
+}
+
+bool init_ros_comms(char* ssid, char* password, char* ip_address, uint32_t port, bool use_wifi = true)
+{
+  bool success = true;
+
+  if(true == use_wifi)
   {
-    Serial.println("Connected to micro-ROS agent!");
-  } 
-  else 
-  {
-    Serial.println("Failed to connect to micro-ROS agent.");
+    Serial.print("Setting Wi-Fi Transports...");
+    set_microros_wifi_transports(ssid, password, ip_address, port);
+    Serial.print("done!\n");
+
+    rmw_ret_t ping_response = rmw_uros_ping_agent(1000, 5);
+    switch(ping_response)
+    {
+      case RMW_RET_OK:
+        Serial.print("RMW_RET_OK...");
+        break;
+      case RMW_RET_ERROR:
+        Serial.print("RMW_RET_ERROR...");
+        break;
+      case RMW_RET_TIMEOUT:
+        Serial.print("RMW_RET_TIMEOUT...");
+        break;
+      case RMW_RET_UNSUPPORTED:
+        Serial.print("RMW_RET_UNSUPPORTED...");
+        break;
+      case RMW_RET_BAD_ALLOC:
+        Serial.print("RMW_RET_BAD_ALLOC...");
+        break;
+      case RMW_RET_INVALID_ARGUMENT:
+        Serial.print("RMW_RET_INVALID_ARGUMENT...");
+        break;
+      case RMW_RET_INCORRECT_RMW_IMPLEMENTATION:
+        Serial.print("RMW_RET_INCORRECT_RMW_IMPLEMENTATION...");
+        break;
+      case RMW_RET_NODE_NAME_NON_EXISTENT:
+        Serial.print("RMW_RET_NODE_NAME_NON_EXISTENT...");
+        break;
+      default:
+        break;
+    }
+
+    if (RMW_RET_OK == ping_response)
+    {
+      Serial.println("Connected to micro-ROS agent!");
+      success = true;
+    } 
+    else 
+    {
+      Serial.println("Failed to connect to micro-ROS agent.");
+      success = false;
+    }
   }
+  else
+  {
+    set_microros_transports();
+  }
+
+  return success;
+}
+
+void setup() {
+  init_comms();
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, HIGH);
 
@@ -88,3 +156,4 @@ void loop() {
     RCSOFTCHECK(rcl_publish(&publisher, &msg, NULL));
     msg.data++;
 }
+
