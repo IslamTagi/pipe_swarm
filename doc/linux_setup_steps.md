@@ -32,7 +32,7 @@ git clone --recurse-submodules git@ssh.dev.azure.com:v3/islamtagi/Pipe%20Swarm%2
 Once cloned, navigate into the ros_ws, build and source the workspace
 
 ```bash
-cd pipe_swarm/ros_ws
+cd ~/source_code/pipe_swarm/ros_ws
 colcon build --symlink-install
 colcon build
 source install/setup.bash
@@ -55,6 +55,8 @@ source /opt/ros/humble/setup.bash
 source ~/source_code/pipe_swarm/ros_ws/install/setup.bash
 source /usr/share/gazebo/setup.sh
 ```
+
+<br>
 
 ## Debugging tips
 
