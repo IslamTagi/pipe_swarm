@@ -48,9 +48,6 @@ def get_intersection_points(robot_links:LineString, obstacle_polygon:ShapelyPoly
             intersection_points[0].extend(downscaled_intersection.xy[0])
             intersection_points[1].extend(downscaled_intersection.xy[1])
 
-    print(f'Intersection Points: {get_combined_coordinates(intersection_points[0], intersection_points[1])}') 
-    print(f'Touching Points: {get_combined_coordinates(touching_points[0], touching_points[1])}') 
-
     return intersection_points, touching_points
 class Obstacle():
     def __init__(self, x_coordinates, y_coordinates):
@@ -168,15 +165,14 @@ class ModularConfiguration():
 
 class ModelPredictiveControl():
 
-    def __init__(self, n_agents, l_agent, 
+    def __init__(self, n_agents, l_agent, obstacle:Obstacle,
                  x_pos_min=-100, x_pos_max=100, theta_min=-90, theta_max=90):
 
         # defining model
         self.n_agents = n_agents
 
             # initial theta0 guess -- control parameters
-        self.theta = (40, 20, 30) # TODO (IT): randomize based on n_agents
-        # self.theta = np.random.uniform(low=theta_min, high=theta_max, size=n_agents)
+        self.theta = (40, 20, 30) # TODO (IT): randomize based on n_agents --> self.theta = np.random.uniform(low=theta_min, high=theta_max, size=n_agents)
         self.x_pos = 0
         self.theta0 = [self.x_pos]
         self.theta0.extend(self.theta)
@@ -189,6 +185,8 @@ class ModelPredictiveControl():
 
           # objective function
         self.pos_desired = (0, 0)
+
+        self.obstacle = obstacle
 
     def objective(self, theta0):
         # Compute current end-effector position
@@ -210,7 +208,13 @@ class ModelPredictiveControl():
                 break
         return return_val  # y endpoint coordinates > 0
     
-    def inverse_kinematics_with_constraints(self, pos_desired, 
+    def obstalce_collision_constraint(self, theta0):
+        self.model_config.get_coordinate_representation(theta0[1:], theta0[0])
+        intersection_points, touching_points_ = get_intersection_points(self.model_config.get_line_shape(), 
+                                                      self.obstacle.get_shapley_polygon())
+        return -len(intersection_points[0]) # if any intersection points
+    
+    def inverse_kinematics_with_constraints(self, pos_desired,
                                         max_iter=10000, tolerance=2e-6):
         
         # objective function
@@ -218,8 +222,8 @@ class ModelPredictiveControl():
         
         constraints = [
             {'type': 'ineq', 'fun': self.ground_constraint},
+            {'type': 'ineq', 'fun': self.obstalce_collision_constraint},
             # TODO (IT): implement com constraint
-            # TODO (IT): implement obstacle constraint
             # TODO (IT): implement torque constraint
         ]
 
@@ -245,9 +249,9 @@ l_agent = 2
 n_agents = 3    # number of agents
 
 # define obstacle
-obstacle_endpoints = ((2, 2, 3, 3), (0, 2, 2, 0))
+obstacle_endpoints = ((2, 3, 3), (0, 2, 0))
 obstacle = Obstacle(obstacle_endpoints[0], obstacle_endpoints[1])
 
-mpc = ModelPredictiveControl(n_agents, l_agent)
-theta_solution = mpc.inverse_kinematics_with_constraints((3, 2))
+mpc = ModelPredictiveControl(n_agents, l_agent, obstacle)
+theta_solution = mpc.inverse_kinematics_with_constraints((3,0))
 mpc.model_config.visualize_agent_configuration(obstacle)
