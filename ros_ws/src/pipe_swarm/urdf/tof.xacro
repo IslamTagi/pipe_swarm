@@ -41,20 +41,28 @@
             <pose>0 0 0 0 0 0</pose>
             <visualize>true</visualize>
             <update_rate>10.0</update_rate>
+            <ray>
+                <scan>
+                    <horizontal>
+                        <samples>10</samples>
+                        <resolution>1</resolution>
+                    </horizontal>
+                </scan>
+                <range>
+                    <min>0.1</min>
+                    <max>10.0</max>
+                    <resolution>0.01</resolution>
+                </range>
+            </ray>
             <plugin name="tof_controller" filename="libgazebo_ros_ray_sensor.so">
                 <ros>
                     <namespace>${agent_namespace}</namespace>
                     <remapping>~/out:=infrared_range</remapping>
                 </ros>
                 <output_type>sensor_msgs/Range</output_type>
-                <min_intensity>100.0</min_intensity>
                 <frame_name>${agent_namespace}_tof_link</frame_name>
             </plugin>
         </sensor>
-    </gazebo>
-
-    <gazebo reference="${agent_namespace}_tof_link">
-        <material>Gazebo/Red</material>
     </gazebo>
 
 </robot>
