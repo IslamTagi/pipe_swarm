@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import Polygon
-from shapely.geometry import LineString, Polygon as ShapelyPolygon, Point
+from shapely.geometry import LineString, Polygon as ShapelyPolygon
 from scipy.optimize import minimize
 
 def get_combined_coordinates(x_coordinates, y_coordinates):
@@ -9,25 +9,54 @@ def get_combined_coordinates(x_coordinates, y_coordinates):
         return None
     coordinates = []
     for i in range(len(x_coordinates)):
-        coordinates.append((x_coordinates[i], y_coordinates[i]))
+        coordinates.append((float(x_coordinates[i]), float(y_coordinates[i])))
     return coordinates
 
-def get_intersection_points(robot_links:LineString, obstacle_polygon:ShapelyPolygon):
-    intersection_points = [(),()]
-    for link in robot_links:
-        intersection = link.intersection(obstacle_polygon)
-        if intersection.is_empty:
-            continue
-        else:
-            intersection_points[0] = intersection.xy[0]
-            intersection_points[1] = intersection.xy[1]
+def get_intersection_points(robot_links:LineString, obstacle_polygon:ShapelyPolygon,
+                            tolerance=2e-5):
+    
+    intersection_points = [[],[]]
+    touching_points = [[],[]]
 
-    return intersection_points
+    # Define a tolerance for "touch"
+    upscaled_obstacle = obstacle_polygon.buffer(tolerance, cap_style="flat")
+    downscaled_obstacle = obstacle_polygon.buffer(-tolerance, cap_style="flat")
+
+    for link in robot_links:
+        link : LineString
+
+        intersection = link.intersection(obstacle_polygon)
+        upscaled_intersection = link.intersection(upscaled_obstacle)
+        downscaled_intersection = link.intersection(downscaled_obstacle)
+
+        if link.touches(obstacle_polygon) or link.touches(upscaled_obstacle) or link.touches(downscaled_obstacle) or \
+            link.equals(obstacle_polygon) or link.equals(upscaled_obstacle) or link.equals(downscaled_obstacle) or \
+            \
+            (link.disjoint(downscaled_obstacle) and link.intersects(obstacle_polygon) and not link.touches(obstacle_polygon)) or \
+            (link.disjoint(obstacle_polygon) and link.intersects(upscaled_obstacle) and not link.touches(upscaled_obstacle))\
+                :
+            touching_points[0].extend(intersection.xy[0])
+            touching_points[1].extend(intersection.xy[1])
+            
+            touching_points[0].extend(upscaled_intersection.xy[0])
+            touching_points[1].extend(upscaled_intersection.xy[1])
+
+            touching_points[0].extend(downscaled_intersection.xy[0])
+            touching_points[1].extend(downscaled_intersection.xy[1])
+
+        elif link.intersects(downscaled_obstacle) and not link.touches(downscaled_obstacle):
+            intersection_points[0].extend(downscaled_intersection.xy[0])
+            intersection_points[1].extend(downscaled_intersection.xy[1])
+
+    print(f'Intersection Points: {get_combined_coordinates(intersection_points[0], intersection_points[1])}') 
+    print(f'Touching Points: {get_combined_coordinates(touching_points[0], touching_points[1])}') 
+
+    return intersection_points, touching_points
 class Obstacle():
     def __init__(self, x_coordinates, y_coordinates):
         self.coordinates = [x_coordinates, y_coordinates]
 
-    def get_polygon(self, border_colour='red', fill_colour='orange'):
+    def get_polygon(self, border_colour='pink', fill_colour='orange'):
         return Polygon(
             get_combined_coordinates(self.coordinates[0], self.coordinates[1]),
             closed=True,
@@ -104,8 +133,8 @@ class ModularConfiguration():
         
         # ignore global theta coordinate
         self.get_coordinate_representation(self.theta[1:], self.x_pos)
-
-        intersection_points = get_intersection_points(self.get_line_shape(), 
+        
+        intersection_points, touching_points = get_intersection_points(self.get_line_shape(), 
                                                       obstacle.get_shapley_polygon())
 
         plt.figure(figsize=(8, 6))
@@ -118,13 +147,14 @@ class ModularConfiguration():
         
         # Center of Mass
         plt.scatter(self.x[1:], self.y[1:], marker='x', color='green', label='Link Centre of Mass')
-        plt.plot(self.com[0], self.com[1], '-x', color='green', markersize=8, linewidth=2, label='Centre of Mass')
+        plt.plot(self.com[0], self.com[1], 'x', color='green', markersize=8, linewidth=2, label='Centre of Mass')
         
         # Obstacle
         plt.plot(obstacle.coordinates[0], obstacle.coordinates[1], '-s', color='red', markersize=8, linewidth=2, label='Obstacle')
         plt.gca().add_patch(obstacle.get_polygon())
 
-        # Intersection
+        # Collision
+        plt.plot(touching_points[0], touching_points[1], 'v', color='purple', markersize=10, label='Touching Point')
         plt.plot(intersection_points[0], intersection_points[1], 'o', color='purple', markersize=10, label='Intersection Point')
 
         # Formatting
@@ -145,7 +175,8 @@ class ModelPredictiveControl():
         self.n_agents = n_agents
 
             # initial theta0 guess -- control parameters
-        self.theta = (10, 20, 50) # TODO (IT): randomize based on n_agents
+        self.theta = (40, 20, 30) # TODO (IT): randomize based on n_agents
+        # self.theta = np.random.uniform(low=theta_min, high=theta_max, size=n_agents)
         self.x_pos = 0
         self.theta0 = [self.x_pos]
         self.theta0.extend(self.theta)
@@ -177,10 +208,10 @@ class ModelPredictiveControl():
                 return_val = -1 # fail if any endpoint below ground
                 # TODO (IT): make sure no length along link underground
                 break
-        return return_val  # endpoint > 0
-
+        return return_val  # y endpoint coordinates > 0
+    
     def inverse_kinematics_with_constraints(self, pos_desired, 
-                                        max_iter=10000, tolerance=5e-6):
+                                        max_iter=10000, tolerance=2e-6):
         
         # objective function
         self.pos_desired = pos_desired
@@ -204,7 +235,7 @@ class ModelPredictiveControl():
 
         if result.success:
             print("Optimization successful!")
-            print(result.x)
+            print(f'Result theta0: {result.x}')
             return result.x
         else:
             print("Optimization failed.")
@@ -214,7 +245,7 @@ l_agent = 2
 n_agents = 3    # number of agents
 
 # define obstacle
-obstacle_endpoints = ((2.5, 3, 2), (0, 2, 2))
+obstacle_endpoints = ((2, 2, 3, 3), (0, 2, 2, 0))
 obstacle = Obstacle(obstacle_endpoints[0], obstacle_endpoints[1])
 
 mpc = ModelPredictiveControl(n_agents, l_agent)
