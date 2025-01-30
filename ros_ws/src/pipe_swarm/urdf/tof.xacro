@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<robot name="tof" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    
+    <xacro:property name="tof_m" value="0.1" />  <!-- mass /kg -->
+    <xacro:property name="tof_w" value="0.01" />  <!-- width /m -->
+    <xacro:property name="tof_l" value="0.01" />  <!-- length /m -->
+    <xacro:property name="tof_h" value="0.01" />  <!-- height /m -->
+    
+    <!-- LINKS -->
+    <link name="${agent_namespace}_tof_link">
+        <visual>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <geometry>
+                <box size="${tof_w} ${tof_l} ${tof_h}"/>
+            </geometry>
+            <material name="red">
+                <color rgba="1 0 0 1"/>
+            </material>
+        </visual>
+        
+        <collision>
+            <geometry>
+                <box size="${tof_w} ${tof_l} ${tof_h}"/>
+            </geometry>
+        </collision>
+
+        <xacro:box_inertial m="${tof_m}" w="${tof_w}" l="${tof_l}" h="${tof_h}" xyz="0 0 0 " rpy="0 0 0"/>
+    </link>
+
+    <!-- JOINTS -->
+    <joint name="${agent_namespace}_base_tof_joint" type="fixed">
+        <origin xyz="${-(base_w*0.5)} 0 ${(base_h*0.5)+(tof_h*0.5)}" rpy="0 0 ${pi}"/>
+        <parent link="${agent_namespace}_base_link"/>
+        <child link="${agent_namespace}_tof_link"/>
+    </joint>
+
+    <!-- GAZEBO -->
+    <gazebo reference="${agent_namespace}_tof_link">
+        <material>Gazebo/Green</material>
+        <sensor name="tof_sensor" type="ray">
+            <pose>0 0 0 0 0 0</pose>
+            <visualize>true</visualize>
+            <update_rate>10.0</update_rate>
+            <plugin name="tof_controller" filename="libgazebo_ros_ray_sensor.so">
+                <ros>
+                    <namespace>${agent_namespace}</namespace>
+                    <remapping>~/out:=infrared_range</remapping>
+                </ros>
+                <output_type>sensor_msgs/Range</output_type>
+                <min_intensity>100.0</min_intensity>
+                <frame_name>${agent_namespace}_tof_link</frame_name>
+            </plugin>
+        </sensor>
+    </gazebo>
+
+    <gazebo reference="${agent_namespace}_tof_link">
+        <material>Gazebo/Red</material>
+    </gazebo>
+
+</robot>
