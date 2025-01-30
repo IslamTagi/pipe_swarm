@@ -1,10 +1,70 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.patches import Polygon
+from shapely.geometry import LineString, Polygon as ShapelyPolygon
 from scipy.optimize import minimize
 
-# define obstacle
-obstacle_endpoints = ((2, 2, 4, 4), (0, 2, 2, 0))
+def get_combined_coordinates(x_coordinates, y_coordinates):
+    if len(x_coordinates) != len(y_coordinates):
+        return None
+    coordinates = []
+    for i in range(len(x_coordinates)):
+        coordinates.append((float(x_coordinates[i]), float(y_coordinates[i])))
+    return coordinates
 
+def get_intersection_points(robot_links:LineString, obstacle_polygon:ShapelyPolygon,
+                            tolerance=2e-5):
+    
+    intersection_points = [[],[]]
+    touching_points = [[],[]]
+
+    # Define a tolerance for "touch"
+    upscaled_obstacle = obstacle_polygon.buffer(tolerance, cap_style="flat")
+    downscaled_obstacle = obstacle_polygon.buffer(-tolerance, cap_style="flat")
+
+    for link in robot_links:
+        link : LineString
+
+        intersection = link.intersection(obstacle_polygon)
+        upscaled_intersection = link.intersection(upscaled_obstacle)
+        downscaled_intersection = link.intersection(downscaled_obstacle)
+
+        if link.touches(obstacle_polygon) or link.touches(upscaled_obstacle) or link.touches(downscaled_obstacle) or \
+            link.equals(obstacle_polygon) or link.equals(upscaled_obstacle) or link.equals(downscaled_obstacle) or \
+            \
+            (link.disjoint(downscaled_obstacle) and link.intersects(obstacle_polygon) and not link.touches(obstacle_polygon)) or \
+            (link.disjoint(obstacle_polygon) and link.intersects(upscaled_obstacle) and not link.touches(upscaled_obstacle))\
+                :
+            touching_points[0].extend(intersection.xy[0])
+            touching_points[1].extend(intersection.xy[1])
+            
+            touching_points[0].extend(upscaled_intersection.xy[0])
+            touching_points[1].extend(upscaled_intersection.xy[1])
+
+            touching_points[0].extend(downscaled_intersection.xy[0])
+            touching_points[1].extend(downscaled_intersection.xy[1])
+
+        elif link.intersects(downscaled_obstacle) and not link.touches(downscaled_obstacle):
+            intersection_points[0].extend(downscaled_intersection.xy[0])
+            intersection_points[1].extend(downscaled_intersection.xy[1])
+
+    return intersection_points, touching_points
+class Obstacle():
+    def __init__(self, x_coordinates, y_coordinates):
+        self.coordinates = [x_coordinates, y_coordinates]
+
+    def get_polygon(self, border_colour='pink', fill_colour='orange'):
+        return Polygon(
+            get_combined_coordinates(self.coordinates[0], self.coordinates[1]),
+            closed=True,
+            edgecolor=border_colour,
+            facecolor=fill_colour,
+            linewidth=2,
+            alpha=0.8
+        )
+    
+    def get_shapley_polygon(self):
+        return ShapelyPolygon(get_combined_coordinates(self.coordinates[0], self.coordinates[1]))
 
 class ModularConfiguration():
 
@@ -56,12 +116,23 @@ class ModularConfiguration():
 
         return self.x, self.y, self.endpoints, self.com
     
-    def visualize_agent_configuration(self, obstacle):
+    def get_line_shape(self):
+        endpoints = get_combined_coordinates(self.endpoints[0], self.endpoints[1])
+        links = []
+        for i in range(len(endpoints)-1):
+            links.append(LineString([endpoints[i], endpoints[i+1]]))
+        
+        return links
+    
+    def visualize_agent_configuration(self, obstacle: Obstacle):
         if self.theta is None:
             return
         
         # ignore global theta coordinate
         self.get_coordinate_representation(self.theta[1:], self.x_pos)
+        
+        intersection_points, touching_points = get_intersection_points(self.get_line_shape(), 
+                                                      obstacle.get_shapley_polygon())
 
         plt.figure(figsize=(8, 6))
         
@@ -73,12 +144,16 @@ class ModularConfiguration():
         
         # Center of Mass
         plt.scatter(self.x[1:], self.y[1:], marker='x', color='green', label='Link Centre of Mass')
-        plt.plot(self.com[0], self.com[1], '-x', color='green', markersize=8, linewidth=2, label='Centre of Mass')
+        plt.plot(self.com[0], self.com[1], 'x', color='green', markersize=8, linewidth=2, label='Centre of Mass')
         
-        # # Obstacle
-        plt.plot(obstacle[0], obstacle[1], '-s', color='red', markersize=8, linewidth=2, label='Obstacle')
-        plt.fill_between(obstacle[0], obstacle[1], color='orange')
-        
+        # Obstacle
+        plt.plot(obstacle.coordinates[0], obstacle.coordinates[1], '-s', color='red', markersize=8, linewidth=2, label='Obstacle')
+        plt.gca().add_patch(obstacle.get_polygon())
+
+        # Collision
+        plt.plot(touching_points[0], touching_points[1], 'v', color='purple', markersize=10, label='Touching Point')
+        plt.plot(intersection_points[0], intersection_points[1], 'o', color='purple', markersize=10, label='Intersection Point')
+
         # Formatting
         plt.title("Snake Robot Configuration (Centered Links)", fontsize=14)
         plt.xlabel("Horizontal Position (m)", fontsize=12)
@@ -90,14 +165,14 @@ class ModularConfiguration():
 
 class ModelPredictiveControl():
 
-    def __init__(self, n_agents, l_agent, 
+    def __init__(self, n_agents, l_agent, obstacle:Obstacle,
                  x_pos_min=-100, x_pos_max=100, theta_min=-90, theta_max=90):
 
         # defining model
         self.n_agents = n_agents
 
             # initial theta0 guess -- control parameters
-        self.theta = (10, 20, 50) # TODO (IT): randomize based on n_agents
+        self.theta = (40, 20, 30) # TODO (IT): randomize based on n_agents --> self.theta = np.random.uniform(low=theta_min, high=theta_max, size=n_agents)
         self.x_pos = 0
         self.theta0 = [self.x_pos]
         self.theta0.extend(self.theta)
@@ -110,6 +185,8 @@ class ModelPredictiveControl():
 
           # objective function
         self.pos_desired = (0, 0)
+
+        self.obstacle = obstacle
 
     def objective(self, theta0):
         # Compute current end-effector position
@@ -129,18 +206,24 @@ class ModelPredictiveControl():
                 return_val = -1 # fail if any endpoint below ground
                 # TODO (IT): make sure no length along link underground
                 break
-        return return_val  # endpoint > 0
-
-    def inverse_kinematics_with_constraints(self, pos_desired, 
-                                        max_iter=10000, tolerance=5e-6):
+        return return_val  # y endpoint coordinates > 0
+    
+    def obstalce_collision_constraint(self, theta0):
+        self.model_config.get_coordinate_representation(theta0[1:], theta0[0])
+        intersection_points, touching_points_ = get_intersection_points(self.model_config.get_line_shape(), 
+                                                      self.obstacle.get_shapley_polygon())
+        return -len(intersection_points[0]) # if any intersection points
+    
+    def inverse_kinematics_with_constraints(self, pos_desired,
+                                        max_iter=10000, tolerance=2e-6):
         
         # objective function
         self.pos_desired = pos_desired
         
         constraints = [
             {'type': 'ineq', 'fun': self.ground_constraint},
+            {'type': 'ineq', 'fun': self.obstalce_collision_constraint},
             # TODO (IT): implement com constraint
-            # TODO (IT): implement obstacle constraint
             # TODO (IT): implement torque constraint
         ]
 
@@ -156,7 +239,7 @@ class ModelPredictiveControl():
 
         if result.success:
             print("Optimization successful!")
-            print(result.x)
+            print(f'Result theta0: {result.x}')
             return result.x
         else:
             print("Optimization failed.")
@@ -165,6 +248,10 @@ class ModelPredictiveControl():
 l_agent = 2
 n_agents = 3    # number of agents
 
-mpc = ModelPredictiveControl(n_agents, l_agent)
-theta_solution = mpc.inverse_kinematics_with_constraints((5, 3))
-mpc.model_config.visualize_agent_configuration(obstacle_endpoints)
+# define obstacle
+obstacle_endpoints = ((2, 3, 3), (0, 2, 0))
+obstacle = Obstacle(obstacle_endpoints[0], obstacle_endpoints[1])
+
+mpc = ModelPredictiveControl(n_agents, l_agent, obstacle)
+theta_solution = mpc.inverse_kinematics_with_constraints((3,0))
+mpc.model_config.visualize_agent_configuration(obstacle)
