@@ -68,38 +68,41 @@ class Obstacle():
 
 class ModularConfiguration():
 
-    def __init__(self, theta_np, x_pos, l_agent):
+    def __init__(self, sigma_np, x_pos, l_agent):
 
         # global reference frame
         self.global_coordinates = (0, 0)
         self.theta_global = 0
 
         # modular robot parameters
-        self.n_agents = len(theta_np)
+        self.n_agents = len(sigma_np)
         self.l_agent = l_agent
-        self.get_coordinate_representation(theta_np, x_pos)
+        self.get_coordinate_representation(sigma_np, x_pos)
 
-    def reset_modular_robot(self, theta_np, x_pos):
+    def reset_modular_robot(self, sigma_np, x_pos):
         self.x_pos = x_pos
-        self.theta = []
-        for i in range(len(theta_np)):
-            self.theta.append(theta_np[i])
-        self.theta.insert(0,self.theta_global)
-        self.x = np.zeros(len(self.theta))
-        self.y = np.zeros(len(self.theta))
+
+        self.sigma = []
+        for i in range(len(sigma_np)):
+            self.sigma.append(sigma_np[i])
+        self.sigma.insert(0,self.theta_global)
+        self.theta = np.zeros(len(self.sigma))
+        self.x = np.zeros(len(self.sigma))
+        self.y = np.zeros(len(self.sigma))
         self.x[0] = self.global_coordinates[0] + self.x_pos
         self.y[0] = self.global_coordinates[1]
         self.endpoints = [self.x.copy(), self.y.copy()]
         self.com = []
 
-    def get_coordinate_representation(self, theta_np, x_pos):
-        self.reset_modular_robot(theta_np, x_pos)
+    def get_coordinate_representation(self, sigma_np, x_pos):
+        self.reset_modular_robot(sigma_np, x_pos)
 
         # calculate co-ordinate representation skipping global coordinates
-        for i in range(1, len(self.theta)):
-            theta_i = np.deg2rad(self.theta[i])
-            theta_i_1 = np.deg2rad(self.theta[i-1])
-            
+        for i in range(1, len(self.sigma)):
+            theta_i = np.deg2rad(self.sigma[i]) + np.deg2rad(self.theta[i-1])
+            theta_i_1 = np.deg2rad(self.sigma[i-1])
+            self.theta[i] = np.rad2deg(theta_i)
+
             if(1 == i):
                 # for first link, no previous link length to take into account
                 self.x[i] = self.x[i-1] + (0.5 * self.l_agent * np.cos(theta_i))
@@ -113,7 +116,6 @@ class ModularConfiguration():
 
         # get average x,y position without global position reference
         self.com = (np.mean(self.x[1:]), np.mean(self.y[1:]))
-
         return self.x, self.y, self.endpoints, self.com
     
     def get_line_shape(self):
@@ -125,11 +127,11 @@ class ModularConfiguration():
         return links
     
     def visualize_agent_configuration(self, obstacle: Obstacle):
-        if self.theta is None:
+        if self.sigma is None:
             return
         
         # ignore global theta coordinate
-        self.get_coordinate_representation(self.theta[1:], self.x_pos)
+        self.get_coordinate_representation(self.sigma[1:], self.x_pos)
         
         intersection_points, touching_points = get_intersection_points(self.get_line_shape(), 
                                                       obstacle.get_shapley_polygon())
