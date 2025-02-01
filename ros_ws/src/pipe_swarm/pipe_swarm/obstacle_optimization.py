@@ -100,7 +100,7 @@ class ModularConfiguration():
         # calculate co-ordinate representation skipping global coordinates
         for i in range(1, len(self.sigma)):
             theta_i = np.deg2rad(self.sigma[i]) + np.deg2rad(self.theta[i-1])
-            theta_i_1 = np.deg2rad(self.sigma[i-1])
+            theta_i_1 = np.deg2rad(self.theta[i-1])
             self.theta[i] = np.rad2deg(theta_i)
 
             if(1 == i):
