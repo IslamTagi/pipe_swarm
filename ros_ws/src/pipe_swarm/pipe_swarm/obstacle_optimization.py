@@ -174,7 +174,7 @@ class ModelPredictiveControl():
         self.n_agents = n_agents
 
             # initial theta0 guess -- control parameters
-        self.theta = (40, 20, 30) # TODO (IT): randomize based on n_agents --> self.theta = np.random.uniform(low=theta_min, high=theta_max, size=n_agents)
+        self.theta = np.zeros(n_agents) # TODO (IT): randomize based on n_agents --> self.theta = np.random.uniform(low=theta_min, high=theta_max, size=n_agents)
         self.x_pos = 0
         self.theta0 = [self.x_pos]
         self.theta0.extend(self.theta)
@@ -227,6 +227,7 @@ class ModelPredictiveControl():
             {'type': 'ineq', 'fun': self.obstalce_collision_constraint},
             # TODO (IT): implement com constraint
             # TODO (IT): implement torque constraint
+            # TODO (IT): implement x position constraint to not start past obstacle
         ]
 
         # Solve the optimization problem
