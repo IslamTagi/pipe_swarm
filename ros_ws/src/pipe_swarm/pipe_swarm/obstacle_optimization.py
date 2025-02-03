@@ -168,31 +168,31 @@ class ModularConfiguration():
 class ModelPredictiveControl():
 
     def __init__(self, n_agents, l_agent, obstacle:Obstacle,
-                 x_pos_min=-100, x_pos_max=100, theta_min=-90, theta_max=90):
+                 x_pos_min=-100, x_pos_max=100, sigma_min=-90, sigma_max=90):
 
         # defining model
         self.n_agents = n_agents
 
-            # initial theta0 guess -- control parameters
-        self.theta = np.zeros(n_agents) # TODO (IT): randomize based on n_agents --> self.theta = np.random.uniform(low=theta_min, high=theta_max, size=n_agents)
+            # initial sigma0 guess -- control parameters
+        self.sigma = np.zeros(n_agents) # TODO (IT): randomize based on n_agents --> self.sigma = np.random.uniform(low=sigma_min, high=sigma_max, size=n_agents)
         self.x_pos = 0
-        self.theta0 = [self.x_pos]
-        self.theta0.extend(self.theta)
+        self.sigma0 = [self.x_pos]
+        self.sigma0.extend(self.sigma)
             
             # define thetha0 boundaries
-        self.theta0_bounds = [(theta_min, theta_max) for _ in range(n_agents)] # theta bounds
+        self.theta0_bounds = [(sigma_min, sigma_max) for _ in range(n_agents)] # sigma bounds
         self.theta0_bounds.insert(0, (x_pos_min, x_pos_max)) # x pos bounds
         
-        self.model_config = ModularConfiguration(self.theta, self.x_pos, l_agent)
+        self.model_config = ModularConfiguration(self.sigma, self.x_pos, l_agent)
 
           # objective function
         self.pos_desired = (0, 0)
 
         self.obstacle = obstacle
 
-    def objective(self, theta0):
+    def objective(self, sigma0):
         # Compute current end-effector position
-        self.model_config.get_coordinate_representation(theta0[1:], theta0[0])
+        self.model_config.get_coordinate_representation(sigma0[1:], sigma0[0])
         x = self.model_config.endpoints[0][-1]
         y = self.model_config.endpoints[1][-1]
         error = np.sqrt((x - self.pos_desired[0])**2
@@ -200,8 +200,8 @@ class ModelPredictiveControl():
         return error
     
     # Constraints
-    def ground_constraint(self, theta0):
-        self.model_config.get_coordinate_representation(theta0[1:], theta0[0])
+    def ground_constraint(self, sigma0):
+        self.model_config.get_coordinate_representation(sigma0[1:], sigma0[0])
         return_val = 0
         for i in self.model_config.endpoints[1]:
             if i < 0:
@@ -210,8 +210,8 @@ class ModelPredictiveControl():
                 break
         return return_val  # y endpoint coordinates > 0
     
-    def obstalce_collision_constraint(self, theta0):
-        self.model_config.get_coordinate_representation(theta0[1:], theta0[0])
+    def obstalce_collision_constraint(self, sigma0):
+        self.model_config.get_coordinate_representation(sigma0[1:], sigma0[0])
         intersection_points, touching_points_ = get_intersection_points(self.model_config.get_line_shape(), 
                                                       self.obstacle.get_shapley_polygon())
         return -len(intersection_points[0]) # if any intersection points
@@ -233,7 +233,7 @@ class ModelPredictiveControl():
         # Solve the optimization problem
         result = minimize(
             self.objective, 
-            self.theta0, 
+            self.sigma0, 
             bounds=self.theta0_bounds, 
             constraints=constraints,
             tol=tolerance,
@@ -242,7 +242,7 @@ class ModelPredictiveControl():
 
         if result.success:
             print("Optimization successful!")
-            print(f'Result theta0: {result.x}')
+            print(f'Result sigma0: {result.x}')
             return result.x
         else:
             print("Optimization failed.")
