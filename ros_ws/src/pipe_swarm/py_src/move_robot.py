@@ -5,6 +5,7 @@ from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
 from functools import partial
 
+# Code to move 1x Robot
 class MyNode(Node):
 
     def __init__(self):
