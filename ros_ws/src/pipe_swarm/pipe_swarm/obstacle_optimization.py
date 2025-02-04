@@ -65,6 +65,11 @@ class Obstacle():
     
     def get_shapley_polygon(self):
         return ShapelyPolygon(get_combined_coordinates(self.coordinates[0], self.coordinates[1]))
+    
+    def get_combined_obstacle(self, obstacle_polygon:ShapelyPolygon):
+        combined_coordinates = list(self.get_shapley_polygon().union(obstacle_polygon).exterior.coords)
+        x_coordinates, y_coordinates = zip(*combined_coordinates)
+        return x_coordinates, y_coordinates
 
 class ModularConfiguration():
 
@@ -252,8 +257,14 @@ l_agent = 2
 n_agents = 3    # number of agents
 
 # define obstacle
-obstacle_endpoints = ((2, 3, 3), (0, 2, 0))
-obstacle = Obstacle(obstacle_endpoints[0], obstacle_endpoints[1])
+step_endpoints = ((2, 3, 3), (0, 2, 0))
+step = Obstacle(step_endpoints[0], step_endpoints[1])
+
+ground_endpoints = ((-5, -5, 5, 5), (0, -5, -5, 0))
+ground = Obstacle(ground_endpoints[0], ground_endpoints[1])
+
+obstacle_x, obstacle_y = ground.get_combined_obstacle(step.get_shapley_polygon())
+obstacle = Obstacle(obstacle_x, obstacle_y)
 
 mpc = ModelPredictiveControl(n_agents, l_agent, obstacle)
 theta_solution = mpc.inverse_kinematics_with_constraints((3,0))
