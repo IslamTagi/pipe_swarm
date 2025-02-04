@@ -3,3 +3,4 @@ ros_ws/log
 ros_ws/build/
 ros_ws/install/
 ros_ws/src/pipe_swarm/build
+ros_ws/src/pipe_swarm/.vscode/
