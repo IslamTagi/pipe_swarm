@@ -63,6 +63,7 @@ source /usr/share/gazebo/setup.sh
 If a package is not built due to missing dependencies use
 
 ```bash
+rosdep update
 rosdep install --from-paths src --ignore-src -r
 ```
 
