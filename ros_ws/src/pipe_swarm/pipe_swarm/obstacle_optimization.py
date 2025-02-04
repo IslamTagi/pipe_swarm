@@ -231,16 +231,6 @@ class ModelPredictiveControl():
         return error
     
     # Constraints
-    def ground_constraint(self, sigma0):
-        self.model_config.get_coordinate_representation(sigma0[1:], sigma0[0])
-        return_val = 0
-        for i in self.model_config.endpoints[1]:
-            if i < 0:
-                return_val = -1 # fail if any endpoint below ground
-                # TODO (IT): make sure no length along link underground
-                break
-        return return_val  # y endpoint coordinates > 0
-    
     def obstalce_collision_constraint(self, sigma0):
         self.model_config.get_coordinate_representation(sigma0[1:], sigma0[0])
         intersection_points, touching_points_ = get_intersection_points(self.model_config.get_line_shape(), 
@@ -254,7 +244,6 @@ class ModelPredictiveControl():
         self.pos_desired = pos_desired
         
         constraints = [
-            {'type': 'ineq', 'fun': self.ground_constraint},
             {'type': 'ineq', 'fun': self.obstalce_collision_constraint},
             # TODO (IT): implement com constraint
             # TODO (IT): implement torque constraint
