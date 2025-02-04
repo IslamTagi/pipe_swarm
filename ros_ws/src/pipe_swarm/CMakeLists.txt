@@ -44,6 +44,7 @@ install(
   PROGRAMS
     py_src/python_talker.py
     py_src/link_service.py
+    py_src/centre_robot.py
   DESTINATION lib/${PROJECT_NAME}/  
 )
 
