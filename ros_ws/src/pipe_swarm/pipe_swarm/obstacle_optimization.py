@@ -14,7 +14,29 @@ def get_combined_coordinates(x_coordinates, y_coordinates):
 
 def get_intersection_points(robot_links:LineString, obstacle_polygon:ShapelyPolygon,
                             tolerance=2e-5):
-    
+
+    def extract_coordinates(geometry):
+        coords_x, coords_y = [], []
+
+        if geometry.is_empty:
+            return coords_x, coords_y
+
+        if geometry.geom_type == "Point":
+            coords_x.append(geometry.x)
+            coords_y.append(geometry.y)
+
+        elif geometry.geom_type == "MultiPoint":
+            for point in geometry.geoms:
+                coords_x.append(point.x)
+                coords_y.append(point.y)
+        
+        elif geometry.geom_type == "LineString":
+            x_vals, y_vals = geometry.xy
+            coords_x.extend(x_vals)
+            coords_y.extend(y_vals)
+
+        return coords_x, coords_y
+
     intersection_points = [[],[]]
     touching_points = [[],[]]
 
@@ -35,18 +57,22 @@ def get_intersection_points(robot_links:LineString, obstacle_polygon:ShapelyPoly
             (link.disjoint(downscaled_obstacle) and link.intersects(obstacle_polygon) and not link.touches(obstacle_polygon)) or \
             (link.disjoint(obstacle_polygon) and link.intersects(upscaled_obstacle) and not link.touches(upscaled_obstacle))\
                 :
-            touching_points[0].extend(intersection.xy[0])
-            touching_points[1].extend(intersection.xy[1])
+            x_touch, y_touch = extract_coordinates(intersection)
+            touching_points[0].extend(x_touch)
+            touching_points[1].extend(y_touch)
             
-            touching_points[0].extend(upscaled_intersection.xy[0])
-            touching_points[1].extend(upscaled_intersection.xy[1])
+            upscaled_x, upscaled_y = extract_coordinates(upscaled_intersection)
+            touching_points[0].extend(upscaled_x)
+            touching_points[1].extend(upscaled_y)
 
-            touching_points[0].extend(downscaled_intersection.xy[0])
-            touching_points[1].extend(downscaled_intersection.xy[1])
+            downscaled_x, downscaled_y = extract_coordinates(downscaled_intersection)
+            touching_points[0].extend(downscaled_x)
+            touching_points[1].extend(downscaled_y)
 
         elif link.intersects(downscaled_obstacle) and not link.touches(downscaled_obstacle):
-            intersection_points[0].extend(downscaled_intersection.xy[0])
-            intersection_points[1].extend(downscaled_intersection.xy[1])
+            x_intersection, y_intersection = extract_coordinates(intersection)
+            intersection_points[0].extend(x_intersection)
+            intersection_points[1].extend(y_intersection)
 
     return intersection_points, touching_points
 class Obstacle():
