@@ -82,8 +82,10 @@ def get_intersection_points(robot_links:LineString, obstacle_polygon:ShapelyPoly
 
     return intersection_points, touching_points
 class Obstacle():
-    def __init__(self, x_coordinates, y_coordinates):
+
+    def __init__(self, x_coordinates, y_coordinates, obstacle_type='solid'):
         self.coordinates = [x_coordinates, y_coordinates]
+        self.type = obstacle_type
 
     def get_polygon(self, border_colour='pink', fill_colour='orange'):
         return Polygon(
@@ -107,6 +109,12 @@ class Obstacle():
         combined_coordinates = list(self.get_shapley_polygon().difference(obstacle_polygon).exterior.coords)
         x_coordinates, y_coordinates = zip(*combined_coordinates)
         return x_coordinates, y_coordinates
+
+    def get_overall_obstacle(self, obstacle, obstacle_type='solid'):
+        if 'solid' == obstacle.type:
+            return self.get_combined_obstacle(obstacle.get_shapley_polygon())
+        elif 'gap' == obstacle.type:
+            return self.get_difference_obstacle(obstacle.get_shapley_polygon())
 
 class ModularConfiguration():
 
@@ -284,13 +292,19 @@ l_agent = 2
 n_agents = 3    # number of agents
 
 # define obstacle
-step_endpoints = ((2, 3, 3), (0, 2, 0))
+step_endpoints = ((4, 3, 3), (0, 2, 0))
 step = Obstacle(step_endpoints[0], step_endpoints[1])
+
+gap_endpoints = ((0, 0, 2, 2), (0, -1, -1, 0))
+gap = Obstacle(gap_endpoints[0], gap_endpoints[1], 'gap')
 
 ground_endpoints = ((-5, -5, 5, 5), (0, -5, -5, 0))
 ground = Obstacle(ground_endpoints[0], ground_endpoints[1])
 
-obstacle_x, obstacle_y = ground.get_combined_obstacle(step.get_shapley_polygon())
+obstacle_x, obstacle_y = ground.get_overall_obstacle(step)
+obstacle = Obstacle(obstacle_x, obstacle_y)
+
+obstacle_x, obstacle_y = obstacle.get_overall_obstacle(gap, 'gap')
 obstacle = Obstacle(obstacle_x, obstacle_y)
 
 mpc = ModelPredictiveControl(n_agents, l_agent, obstacle)
