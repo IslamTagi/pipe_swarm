@@ -14,7 +14,35 @@ def get_combined_coordinates(x_coordinates, y_coordinates):
 
 def get_intersection_points(robot_links:LineString, obstacle_polygon:ShapelyPolygon,
                             tolerance=2e-5):
-    
+
+    def extract_coordinates(geometry):
+        coords_x, coords_y = [], []
+
+        if geometry.is_empty:
+            return coords_x, coords_y
+
+        if geometry.geom_type == "Point":
+            coords_x.append(geometry.x)
+            coords_y.append(geometry.y)
+
+        elif geometry.geom_type == "MultiPoint":
+            for point in geometry.geoms:
+                coords_x.append(point.x)
+                coords_y.append(point.y)
+        
+        elif geometry.geom_type == "LineString":
+            x_vals, y_vals = geometry.xy
+            coords_x.extend(x_vals)
+            coords_y.extend(y_vals)
+        
+        elif geometry.geom_type == "MultiLineString":
+            for line in geometry.geoms:
+                x_vals, y_vals = line.xy
+                coords_x.extend(x_vals)
+                coords_y.extend(y_vals)
+
+        return coords_x, coords_y
+
     intersection_points = [[],[]]
     touching_points = [[],[]]
 
@@ -35,23 +63,29 @@ def get_intersection_points(robot_links:LineString, obstacle_polygon:ShapelyPoly
             (link.disjoint(downscaled_obstacle) and link.intersects(obstacle_polygon) and not link.touches(obstacle_polygon)) or \
             (link.disjoint(obstacle_polygon) and link.intersects(upscaled_obstacle) and not link.touches(upscaled_obstacle))\
                 :
-            touching_points[0].extend(intersection.xy[0])
-            touching_points[1].extend(intersection.xy[1])
+            x_touch, y_touch = extract_coordinates(intersection)
+            touching_points[0].extend(x_touch)
+            touching_points[1].extend(y_touch)
             
-            touching_points[0].extend(upscaled_intersection.xy[0])
-            touching_points[1].extend(upscaled_intersection.xy[1])
+            upscaled_x, upscaled_y = extract_coordinates(upscaled_intersection)
+            touching_points[0].extend(upscaled_x)
+            touching_points[1].extend(upscaled_y)
 
-            touching_points[0].extend(downscaled_intersection.xy[0])
-            touching_points[1].extend(downscaled_intersection.xy[1])
+            downscaled_x, downscaled_y = extract_coordinates(downscaled_intersection)
+            touching_points[0].extend(downscaled_x)
+            touching_points[1].extend(downscaled_y)
 
         elif link.intersects(downscaled_obstacle) and not link.touches(downscaled_obstacle):
-            intersection_points[0].extend(downscaled_intersection.xy[0])
-            intersection_points[1].extend(downscaled_intersection.xy[1])
+            x_intersection, y_intersection = extract_coordinates(intersection)
+            intersection_points[0].extend(x_intersection)
+            intersection_points[1].extend(y_intersection)
 
     return intersection_points, touching_points
 class Obstacle():
-    def __init__(self, x_coordinates, y_coordinates):
+
+    def __init__(self, x_coordinates, y_coordinates, obstacle_type='solid'):
         self.coordinates = [x_coordinates, y_coordinates]
+        self.type = obstacle_type
 
     def get_polygon(self, border_colour='pink', fill_colour='orange'):
         return Polygon(
@@ -65,6 +99,22 @@ class Obstacle():
     
     def get_shapley_polygon(self):
         return ShapelyPolygon(get_combined_coordinates(self.coordinates[0], self.coordinates[1]))
+    
+    def get_combined_obstacle(self, obstacle_polygon:ShapelyPolygon):
+        combined_coordinates = list(self.get_shapley_polygon().union(obstacle_polygon).exterior.coords)
+        x_coordinates, y_coordinates = zip(*combined_coordinates)
+        return x_coordinates, y_coordinates
+    
+    def get_difference_obstacle(self, obstacle_polygon:ShapelyPolygon):
+        combined_coordinates = list(self.get_shapley_polygon().difference(obstacle_polygon).exterior.coords)
+        x_coordinates, y_coordinates = zip(*combined_coordinates)
+        return x_coordinates, y_coordinates
+
+    def get_overall_obstacle(self, obstacle, obstacle_type='solid'):
+        if 'solid' == obstacle.type:
+            return self.get_combined_obstacle(obstacle.get_shapley_polygon())
+        elif 'gap' == obstacle.type:
+            return self.get_difference_obstacle(obstacle.get_shapley_polygon())
 
 class ModularConfiguration():
 
@@ -200,16 +250,6 @@ class ModelPredictiveControl():
         return error
     
     # Constraints
-    def ground_constraint(self, sigma0):
-        self.model_config.get_coordinate_representation(sigma0[1:], sigma0[0])
-        return_val = 0
-        for i in self.model_config.endpoints[1]:
-            if i < 0:
-                return_val = -1 # fail if any endpoint below ground
-                # TODO (IT): make sure no length along link underground
-                break
-        return return_val  # y endpoint coordinates > 0
-    
     def obstalce_collision_constraint(self, sigma0):
         self.model_config.get_coordinate_representation(sigma0[1:], sigma0[0])
         intersection_points, touching_points_ = get_intersection_points(self.model_config.get_line_shape(), 
@@ -217,13 +257,12 @@ class ModelPredictiveControl():
         return -len(intersection_points[0]) # if any intersection points
     
     def inverse_kinematics_with_constraints(self, pos_desired,
-                                        max_iter=10000, tolerance=2e-6):
+                                        max_iter=750, tolerance=2e-6):
         
         # objective function
         self.pos_desired = pos_desired
         
         constraints = [
-            {'type': 'ineq', 'fun': self.ground_constraint},
             {'type': 'ineq', 'fun': self.obstalce_collision_constraint},
             # TODO (IT): implement com constraint
             # TODO (IT): implement torque constraint
@@ -240,9 +279,10 @@ class ModelPredictiveControl():
             options={"maxiter": max_iter, "disp": True}
         )
 
+        print(f'Result sigma0: {result.x}')
         if result.success:
             print("Optimization successful!")
-            print(f'Result sigma0: {result.x}')
+            print(f'Starting Conditions: {self.sigma0}')
             return result.x
         else:
             print("Optimization failed.")
@@ -252,9 +292,22 @@ l_agent = 2
 n_agents = 3    # number of agents
 
 # define obstacle
-obstacle_endpoints = ((2, 3, 3), (0, 2, 0))
-obstacle = Obstacle(obstacle_endpoints[0], obstacle_endpoints[1])
+step_endpoints = ((4, 3, 3), (0, 2, 0))
+step = Obstacle(step_endpoints[0], step_endpoints[1])
+
+gap_endpoints = ((0, 0, 2, 2), (0, -1, -1, 0))
+gap = Obstacle(gap_endpoints[0], gap_endpoints[1], 'gap')
+
+ground_endpoints = ((-5, -5, 5, 5), (0, -5, -5, 0))
+ground = Obstacle(ground_endpoints[0], ground_endpoints[1])
+
+obstacle_x, obstacle_y = ground.get_overall_obstacle(step)
+obstacle = Obstacle(obstacle_x, obstacle_y)
+
+obstacle_x, obstacle_y = obstacle.get_overall_obstacle(gap, 'gap')
+obstacle = Obstacle(obstacle_x, obstacle_y)
 
 mpc = ModelPredictiveControl(n_agents, l_agent, obstacle)
 theta_solution = mpc.inverse_kinematics_with_constraints((3,0))
+theta_solution = mpc.inverse_kinematics_with_constraints((2,-1))
 mpc.model_config.visualize_agent_configuration(obstacle)
