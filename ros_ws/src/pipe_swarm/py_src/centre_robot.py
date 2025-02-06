@@ -2,64 +2,55 @@
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
-from nav_msgs.msg import Odometry
-from functools import partial
+from sensor_msgs.msg import Range
 
-# Code to move 1x Robot
 class MyNode(Node):
 
     def __init__(self):
-        super().__init__("move_robot_node")
-        self.previous_x = 0.0
+        super().__init__("centre_robot_node")
         self.last_cmd = None
-        self.initialized = False
-
-        self.cmd_vel_publisher_ = self.create_publisher(Twist, "/agent_0/cmd_vel", 10)
-        self.odometry_subscriber_ = self.create_subscription(Odometry, "/agent_0/odom", self.odometry_callback, 10)
-        # self.timer = self.create_timer(0.5, self.send_velocity_command)
-        self.get_logger().info("Robot controller has started v8")
-
-    def send_velocity_command(self, linear_x):
-        cmd = Twist()
-        cmd.linear.x = linear_x
-        cmd.angular.z = 0.0
-
-        if self.last_cmd != linear_x:
-            self.cmd_vel_publisher_.publish(cmd)
-            self.last_cmd = linear_x
-            self.get_logger().info(f'Published command: linear_x = {linear_x}')
-
         
-    def odometry_callback(self, msg: Odometry):
-        cmd = Twist()
-        position = msg.pose.pose.position
-        x = position.x
-        y = position.y
-        z = position.z
-        self.get_logger().info(f'Position -> x: {x:.2f}, y: {y:.2f}, z: {z:.2f}')
+        # Create publisher for velocity commands
+        self.cmd_vel_publisher_ = self.create_publisher(Twist, "/agent_0/cmd_vel", 10)
+        
+        # Create subscriptions for ToF sensors
+        self.left_tof_subscriber_ = self.create_subscription(Range, "/agent_0/left_infrared_range", self.left_tof_callback, 10)
+        self.right_tof_subscriber_ = self.create_subscription(Range, "/agent_0/right_infrared_range", self.right_tof_callback, 10)
+        
+        self.left_distance = None
+        self.right_distance = None
+        self.get_logger().info("Robot centre controller has started")
 
-        if not self.initialized:
-            self.initialized = True
-            self.send_velocity_command(0.5)
-            self.get_logger().info("Initialized: Moving forward with intial velocity")
+    def left_tof_callback(self, msg: Range):
+        self.left_distance = msg.range
+        self.adjust_position()
+
+    def right_tof_callback(self, msg: Range):
+        self.right_distance = msg.range
+        self.adjust_position()
+
+    def adjust_position(self):
+        print(f'Left Distance: {self.left_distance}, Right Distance: {self.right_distance}')
+        
+        if self.left_distance is None or self.right_distance is None:
             return
+        
+        # Compute the error (difference between left and right distances)
+        error = self.left_distance - self.right_distance
+        
+        # Set a proportional gain
+        k_p = 1.0  # Adjust this value based on how aggressively you want to correct
+        angular_z = k_p * error  # Negative to turn towards the closer wall
+        print(f'Angular Velocity: {angular_z}') # +ve value means moving left, -ve means moving right
+        
+        # Publish velocity command
+        cmd = Twist()
+        cmd.linear.x = 0.4  # Move forward at a constant speed
+        cmd.angular.z = angular_z
+        
+        self.cmd_vel_publisher_.publish(cmd)
+        self.get_logger().info(f'Published command: linear_x = {cmd.linear.x}, angular_z = {cmd.angular.z}')
 
-        # Move forward until x >= 3
-        if x >= 3 and self.previous_x < 3:
-            self.previous_x = x
-            self.send_velocity_command(-0.5) 
-            self.get_logger().info("Reached x = 5, switching to move backwards")
-
-        # Move Backwards unitl x <= 0
-        elif x <= 0:
-            self.previous_x = x
-            self.send_velocity_command(0.5)
-            self.get_logger().info("Reached x = 0, switching to move forward")
-
-        # Update previous_x to track progress
-        else:
-            self.previous_x = x
-            
 
 def main(args=None):
     rclpy.init(args=args)
