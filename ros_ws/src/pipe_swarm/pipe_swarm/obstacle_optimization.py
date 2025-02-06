@@ -34,6 +34,12 @@ def get_intersection_points(robot_links:LineString, obstacle_polygon:ShapelyPoly
             x_vals, y_vals = geometry.xy
             coords_x.extend(x_vals)
             coords_y.extend(y_vals)
+        
+        elif geometry.geom_type == "MultiLineString":
+            for line in geometry.geoms:
+                x_vals, y_vals = line.xy
+                coords_x.extend(x_vals)
+                coords_y.extend(y_vals)
 
         return coords_x, coords_y
 
