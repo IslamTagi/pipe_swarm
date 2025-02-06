@@ -23,6 +23,7 @@
   <depend>ros2_controllers</depend>
   <depend>gazebo_ros_pkgs</depend>
   <depend>pipe_swarm_interfaces</depend>
+  <depend>nav_msgs</depend>
 
   <!-- Testing Dependencies -->
   <test_depend>ament_lint_auto</test_depend>
