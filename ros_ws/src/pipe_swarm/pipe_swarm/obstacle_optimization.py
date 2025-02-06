@@ -102,6 +102,11 @@ class Obstacle():
         combined_coordinates = list(self.get_shapley_polygon().union(obstacle_polygon).exterior.coords)
         x_coordinates, y_coordinates = zip(*combined_coordinates)
         return x_coordinates, y_coordinates
+    
+    def get_difference_obstacle(self, obstacle_polygon:ShapelyPolygon):
+        combined_coordinates = list(self.get_shapley_polygon().difference(obstacle_polygon).exterior.coords)
+        x_coordinates, y_coordinates = zip(*combined_coordinates)
+        return x_coordinates, y_coordinates
 
 class ModularConfiguration():
 
@@ -266,9 +271,10 @@ class ModelPredictiveControl():
             options={"maxiter": max_iter, "disp": True}
         )
 
+        print(f'Result sigma0: {result.x}')
         if result.success:
             print("Optimization successful!")
-            print(f'Result sigma0: {result.x}')
+            print(f'Starting Conditions: {self.sigma0}')
             return result.x
         else:
             print("Optimization failed.")
