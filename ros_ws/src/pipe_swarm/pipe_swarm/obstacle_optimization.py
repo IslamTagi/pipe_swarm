@@ -257,7 +257,7 @@ class ModelPredictiveControl():
         return -len(intersection_points[0]) # if any intersection points
     
     def inverse_kinematics_with_constraints(self, pos_desired,
-                                        max_iter=10000, tolerance=2e-6):
+                                        max_iter=750, tolerance=2e-6):
         
         # objective function
         self.pos_desired = pos_desired
@@ -309,4 +309,5 @@ obstacle = Obstacle(obstacle_x, obstacle_y)
 
 mpc = ModelPredictiveControl(n_agents, l_agent, obstacle)
 theta_solution = mpc.inverse_kinematics_with_constraints((3,0))
+theta_solution = mpc.inverse_kinematics_with_constraints((2,-1))
 mpc.model_config.visualize_agent_configuration(obstacle)
