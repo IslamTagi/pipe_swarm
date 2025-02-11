@@ -12,6 +12,7 @@ find_package(rclpy REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(gazebo_msgs REQUIRED)
+find_package(nav_msgs REQUIRED)
 find_package(pipe_swarm_interfaces REQUIRED)
 
   # if(BUILD_TESTING)
@@ -44,6 +45,7 @@ install(
   PROGRAMS
     py_src/python_talker.py
     py_src/link_service.py
+    py_src/move_robot.py
   DESTINATION lib/${PROJECT_NAME}/  
 )
 
