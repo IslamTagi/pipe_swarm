@@ -12,6 +12,7 @@ find_package(rclpy REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(gazebo_msgs REQUIRED)
+find_package(nav_msgs REQUIRED)
 find_package(pipe_swarm_interfaces REQUIRED)
 
   # if(BUILD_TESTING)
