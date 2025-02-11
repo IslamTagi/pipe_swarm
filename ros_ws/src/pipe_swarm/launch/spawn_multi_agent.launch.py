@@ -50,7 +50,7 @@ def generate_launch_description():
     pipe_swarm_share = get_package_share_directory('pipe_swarm')
     gazebo_ros_share = get_package_share_directory('gazebo_ros')
     xacro_path = os.path.join(pipe_swarm_share, 'urdf', 'pipe_robot.urdf.xacro')
-    world_path = os.path.join(pipe_swarm_share, 'worlds', 'hollow_pipe.sdf')
+    world_path = os.path.join(pipe_swarm_share, 'worlds', 'pipe_world.sdf')
 
     agents = []
 
@@ -65,7 +65,7 @@ def generate_launch_description():
     # Pre-Agent Setup
     agents.append(gazebo_launch)
 
-    for i in range(1):  # Launch 3 robots
+    for i in range(3):  # Launch 3 robots
         namespace = f'agent_{i}'
 
         # update_controllers_namespace(namespace)
@@ -88,7 +88,7 @@ def generate_launch_description():
             arguments=[ '-entity', namespace,
                         '-x', f'{i*2}',
                         '-y', '0',
-                        '-z', '0',
+                        '-z', '0.02',
                         '-robot_namespace', namespace,
                         '-topic', f'/{namespace}/robot_description'
                     ]
