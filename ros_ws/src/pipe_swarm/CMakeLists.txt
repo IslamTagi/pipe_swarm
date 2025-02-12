@@ -49,6 +49,7 @@ install(
     py_src/centre_robot.py
     py_src/move_robot.py
     py_src/move_using_lidar.py
+    py_src/move_robot_with_imu.py
   DESTINATION lib/${PROJECT_NAME}/  
 )
 
