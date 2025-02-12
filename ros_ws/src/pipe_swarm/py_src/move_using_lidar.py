@@ -44,13 +44,14 @@ class MyNode(Node):
 
         if not self.initialized:
             self.initialized = True
-            self.send_velocity_command(0.5, 0)
+            self.send_velocity_command(0.5, 0.0)
             self.get_logger().info("Initialized: Moving forward")
             return
 
     def lidar_callback(self, msg: LaserScan):
         if self.initial_scan is None:
             self.initial_scan = msg.ranges
+            self.send_velocity_command(0.5, 0.0)  # Start moving immediately
             self.get_logger().info("Initial LiDAR scan stored.")
             return
 
@@ -68,7 +69,7 @@ class MyNode(Node):
         else:
             self.obstacle_detected = False
 
-        self.send_velocity_command(self.last_cmd, 0)
+        self.send_velocity_command(self.last_cmd, 0.0)
         
 
 def main(args=None):
