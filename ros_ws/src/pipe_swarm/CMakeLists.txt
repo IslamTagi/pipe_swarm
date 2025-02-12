@@ -48,6 +48,7 @@ install(
     py_src/link_service.py
     py_src/centre_robot.py
     py_src/move_robot.py
+    py_src/move_using_lidar.py
   DESTINATION lib/${PROJECT_NAME}/  
 )
 
