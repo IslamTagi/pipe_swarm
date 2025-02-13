@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<robot name="pipe_agent" params="agent_namespace" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:property name="agent_namespace" value="$(arg agent_namespace)" />
+
+    <!-- Correct include syntax -->
+    <xacro:include filename="pipe_robot.xacro"/>
+
+    <!-- Call pipe_robot with agent_namespace -->
+    <xacro:pipe_robot namespace="${agent_namespace}" />
+</robot>

@@ -49,7 +49,7 @@ def generate_launch_description():
     # Paths to resources
     pipe_swarm_share = get_package_share_directory('pipe_swarm')
     gazebo_ros_share = get_package_share_directory('gazebo_ros')
-    xacro_path = os.path.join(pipe_swarm_share, 'urdf', 'pipe_robot.urdf.xacro')
+    xacro_path = os.path.join(pipe_swarm_share, 'urdf', 'pipe_agent.urdf.xacro')
     world_path = os.path.join(pipe_swarm_share, 'worlds', 'bookshelf.sdf')
 
     agents = []
