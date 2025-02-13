@@ -6,5 +6,5 @@
     <xacro:include filename="pipe_robot.xacro"/>
 
     <!-- Call pipe_robot with agent_namespace -->
-    <xacro:pipe_robot namespace="${agent_namespace}" />
+    <xacro:pipe_robot namespace="${agent_namespace}" include_gazebo="true"/>
 </robot>
