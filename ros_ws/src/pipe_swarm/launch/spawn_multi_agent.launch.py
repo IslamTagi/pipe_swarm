@@ -141,5 +141,5 @@ def generate_launch_description():
         output='screen'
     )
 
-    # agents.append(rviz_display)
+    agents.append(rviz_display)
     return LaunchDescription(agents)
