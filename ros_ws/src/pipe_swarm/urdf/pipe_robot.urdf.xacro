@@ -4,9 +4,10 @@
     <xacro:include filename="common.xacro"/>
     <xacro:include filename="mobile_base.xacro"/>
     <xacro:include filename="lidar.xacro"/>
-    <!-- <xacro:include filename="tof.xacro"/> -->
-    <!-- <xacro:include filename="camera.xacro"/> -->
+    <xacro:include filename="tof.xacro"/>
+    <xacro:include filename="camera.xacro"/>
     <xacro:include filename="wheels.xacro"/>
     <xacro:include filename="linkage.xacro"/>
+    <xacro:include filename="imu.xacro"/>
 
 </robot>
