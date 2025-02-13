@@ -1,0 +1,129 @@
+<?xml version="1.0"?>
+<robot name="wheels" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    
+    <!-- GAZEBO -->
+    <gazebo>
+        <plugin name="${agent_namespace}_diff_drive" filename="libgazebo_ros_diff_drive.so">
+            <ros>
+                <namespace>${agent_namespace}</namespace>
+            </ros>
+            <update_rate>50</update_rate> 
+             
+            <right_joint>base_wheel_back_right_joint</right_joint>
+            <left_joint>base_wheel_back_left_joint</left_joint>
+
+            <wheel_separation>${base_l + wheel_l}</wheel_separation>
+            <wheel_diameter>${wheel_r*2}</wheel_diameter>
+
+            <max_wheel_torque>20</max_wheel_torque>
+            <max_wheel_acceleration>1</max_wheel_acceleration>
+
+            <command_topic>cmd_vel</command_topic>
+
+            <odometry_frame>odom</odometry_frame>
+            <robot_base_frame>${agent_namespace}_footprint_link</robot_base_frame>
+            
+            <odometry_topic>odom</odometry_topic>
+            <publish_odom>true</publish_odom>
+            <publish_odom_tf>true</publish_odom_tf>
+            <publish_wheel_tf>true</publish_wheel_tf>
+        </plugin>
+    </gazebo>    
+    <gazebo>
+        <plugin name="${agent_namespace}_diff_drive_2" filename="libgazebo_ros_diff_drive.so">
+            <ros>
+                <namespace>${agent_namespace}</namespace>
+            </ros>
+            <update_rate>50</update_rate> 
+             
+            <right_joint>base_wheel_front_right_joint</right_joint>
+            <left_joint>base_wheel_front_left_joint</left_joint>
+
+            <wheel_separation>${base_l + wheel_l}</wheel_separation>
+            <wheel_diameter>${wheel_r*2}</wheel_diameter>
+
+            <max_wheel_torque>20</max_wheel_torque>
+            <max_wheel_acceleration>1</max_wheel_acceleration>
+
+            <command_topic>cmd_vel</command_topic>
+
+            <odometry_frame>odom</odometry_frame>
+            <robot_base_frame>${agent_namespace}_footprint_link</robot_base_frame>
+            
+            <odometry_topic>odom</odometry_topic>
+            <publish_odom>true</publish_odom>
+            <publish_odom_tf>true</publish_odom_tf>
+            <publish_wheel_tf>true</publish_wheel_tf>
+        </plugin>
+    </gazebo>    
+
+    <!-- <gazebo>
+        <plugin name="${agent_namespace}_control" filename="libgazebo_ros2_control.so">
+            <robot_param_node>/${agent_namespace}/robot_state_publisher</robot_param_node> 
+            <parameters>$(find pipe_swarm)/config/robot_controllers_sim.yaml</parameters>
+            <ros>
+                <namespace>${agent_namespace}</namespace>
+            </ros>
+        </plugin>
+    </gazebo>
+
+    <ros2_control name="GazeboSystem" type="system">
+        <hardware>
+            <plugin>gazebo_ros2_control/GazeboSystem</plugin>
+        </hardware>
+        <joint name="base_wheel_front_right_joint">
+            <command_interface name="velocity">
+                <param name="min">-2</param>
+                <param name="max">2</param>
+            </command_interface>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+        </joint>
+        <joint name="base_wheel_front_left_joint">
+            <command_interface name="velocity">
+                <param name="min">-2</param>
+                <param name="max">2</param>
+            </command_interface>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+        </joint>
+        <joint name="base_wheel_back_right_joint">
+            <command_interface name="velocity">
+                <param name="min">-2</param>
+                <param name="max">2</param>
+            </command_interface>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+        </joint>
+        <joint name="base_wheel_back_left_joint">
+            <command_interface name="velocity">
+                <param name="min">-2</param>
+                <param name="max">2</param>
+            </command_interface>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+        </joint>
+    </ros2_control> -->
+
+    <gazebo reference="${agent_namespace}_wheel_front_right_link">
+        <material>Gazebo/Black</material>
+        <mu1 value="1.0"/>
+        <mu2 value="1.0"/>
+    </gazebo>
+    <gazebo reference="${agent_namespace}_wheel_front_left_link">
+        <material>Gazebo/Black</material>
+        <mu1 value="1.0"/>
+        <mu2 value="1.0"/>
+    </gazebo>
+    <gazebo reference="${agent_namespace}_wheel_back_right_link">
+        <material>Gazebo/Black</material>
+        <mu1 value="1.0"/>
+        <mu2 value="1.0"/>
+    </gazebo>
+    <gazebo reference="${agent_namespace}_wheel_back_left_link">
+        <material>Gazebo/Black</material>
+        <mu1 value="1.0"/>
+        <mu2 value="1.0"/>
+    </gazebo>
+
+</robot>

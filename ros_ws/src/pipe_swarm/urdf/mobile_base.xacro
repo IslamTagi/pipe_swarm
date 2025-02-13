@@ -36,12 +36,4 @@
         <child link="${agent_namespace}_base_link"/>
     </joint>
     
-    <!-- GAZEBO -->
-    <gazebo reference="${agent_namespace}_footprint_link">
-        <material>Gazebo/Blue</material>
-    </gazebo>
-    <gazebo reference="${agent_namespace}_base_link">
-        <material>Gazebo/Blue</material>
-    </gazebo>
-
 </robot>

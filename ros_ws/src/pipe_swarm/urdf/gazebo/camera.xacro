@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<robot name="gazebo_camera" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    
+    <!-- GAZEBO -->
+    <gazebo reference="${agent_namespace}_camera_link">
+        <material>Gazebo/Green</material>
+        <sensor name="camera_sensor" type="camera">
+            <pose>0 0 0 0 0 0</pose>
+            <visualize>true</visualize>
+            <update_rate>10.0</update_rate> <!--update /Hz -->
+            <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+                <ros>
+                    <namespace>${agent_namespace}</namespace>
+                </ros>
+                <frame_name>${agent_namespace}_camera_link</frame_name>
+            </plugin>
+        </sensor>
+    </gazebo>
+
+</robot>
