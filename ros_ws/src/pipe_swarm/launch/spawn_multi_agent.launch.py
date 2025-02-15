@@ -86,7 +86,7 @@ def generate_launch_description():
             name=f'spawn_agent_{i}',
             output='screen',
             arguments=[ '-entity', namespace,
-                        '-x', f'{2*i}',
+                        '-x', f'{i*2}',
                         '-y', '0',
                         '-z', '0.03',
                         '-robot_namespace', namespace,

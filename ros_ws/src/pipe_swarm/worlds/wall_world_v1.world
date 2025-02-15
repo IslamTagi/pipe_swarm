@@ -94,40 +94,40 @@
       <real_time>267 868372700</real_time>
       <wall_time>1738687096 796292449</wall_time>
       <iterations>88518</iterations>
-      <model name='Walls_v1'>
+      <model name='walls_v1'>
         <pose>12.6967 0.133822 0 0 -0 0</pose>
         <scale>1 1 1</scale>
-        <link name='Wall_1'>
+        <link name='wall_1'>
           <pose>0.1967 1.93382 0 0 -0 3.14159</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
-        <link name='Wall_2'>
+        <link name='wall_2'>
           <pose>-1.8533 0.133822 0 0 0 -1.5708</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
-        <link name='Wall_3'>
+        <link name='wall_3'>
           <pose>12.6967 -1.66618 0 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
-        <link name='Wall_4'>
+        <link name='wall_4'>
           <pose>27.2467 0.008822 0 0 -0 1.5708</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
-        <link name='Wall_5'>
+        <link name='wall_5'>
           <pose>21.6967 1.68382 0 0 -0 3.14159</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
-        <link name='Wall_6'>
+        <link name='wall_6'>
           <pose>7.2217 1.68382 0 0 -0 3.14159</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
@@ -155,10 +155,10 @@
         <projection_type>perspective</projection_type>
       </camera>
     </gui>
-    <model name='Walls_v1'>
+    <model name='walls_v1'>
       <pose>12.6967 0.133822 0 0 -0 0</pose>
-      <link name='Wall_1'>
-        <collision name='Wall_1_Collision'>
+      <link name='wall_1'>
+        <collision name='wall_1_collision'>
           <geometry>
             <box>
               <size>4.25 0.15 2.5</size>
@@ -179,7 +179,7 @@
             </friction>
           </surface>
         </collision>
-        <visual name='Wall_1_Visual'>
+        <visual name='wall_1_visual'>
           <pose>0 0 1.25 0 -0 0</pose>
           <geometry>
             <box>
@@ -202,8 +202,8 @@
         <enable_wind>0</enable_wind>
         <kinematic>0</kinematic>
       </link>
-      <link name='Wall_2'>
-        <collision name='Wall_2_Collision'>
+      <link name='wall_2'>
+        <collision name='wall_2_collision'>
           <geometry>
             <box>
               <size>3.75 0.15 2.5</size>
@@ -224,7 +224,7 @@
             </friction>
           </surface>
         </collision>
-        <visual name='Wall_2_Visual'>
+        <visual name='wall_2_visual'>
           <pose>0 0 1.25 0 -0 0</pose>
           <geometry>
             <box>
@@ -247,8 +247,8 @@
         <enable_wind>0</enable_wind>
         <kinematic>0</kinematic>
       </link>
-      <link name='Wall_3'>
-        <collision name='Wall_3_Collision'>
+      <link name='wall_3'>
+        <collision name='wall_3_collision'>
           <geometry>
             <box>
               <size>29.25 0.15 2.5</size>
@@ -269,7 +269,7 @@
             </friction>
           </surface>
         </collision>
-        <visual name='Wall_3_Visual'>
+        <visual name='wall_3_visual'>
           <pose>0 0 1.25 0 -0 0</pose>
           <geometry>
             <box>
@@ -292,8 +292,8 @@
         <enable_wind>0</enable_wind>
         <kinematic>0</kinematic>
       </link>
-      <link name='Wall_4'>
-        <collision name='Wall_4_Collision'>
+      <link name='wall_4'>
+        <collision name='wall_4_collision'>
           <geometry>
             <box>
               <size>3.5 0.15 2.5</size>
@@ -314,7 +314,7 @@
             </friction>
           </surface>
         </collision>
-        <visual name='Wall_4_Visual'>
+        <visual name='wall_4_visual'>
           <pose>0 0 1.25 0 -0 0</pose>
           <geometry>
             <box>
@@ -337,8 +337,8 @@
         <enable_wind>0</enable_wind>
         <kinematic>0</kinematic>
       </link>
-      <link name='Wall_5'>
-        <collision name='Wall_5_Collision'>
+      <link name='wall_5'>
+        <collision name='wall_5_collision'>
           <geometry>
             <box>
               <size>11.25 0.15 2.5</size>
@@ -359,7 +359,7 @@
             </friction>
           </surface>
         </collision>
-        <visual name='Wall_5_Visual'>
+        <visual name='wall_5_visual'>
           <pose>0 0 1.25 0 -0 0</pose>
           <geometry>
             <box>
@@ -382,8 +382,8 @@
         <enable_wind>0</enable_wind>
         <kinematic>0</kinematic>
       </link>
-      <link name='Wall_6'>
-        <collision name='Wall_6_Collision'>
+      <link name='wall_6'>
+        <collision name='wall_6_collision'>
           <geometry>
             <box>
               <size>18 0.15 2.5</size>
@@ -404,7 +404,7 @@
             </friction>
           </surface>
         </collision>
-        <visual name='Wall_6_Visual'>
+        <visual name='wall_6_visual'>
           <pose>0 0 1.25 0 -0 0</pose>
           <geometry>
             <box>

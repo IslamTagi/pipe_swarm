@@ -1,9 +1,9 @@
 <?xml version='1.0'?>
 <sdf version='1.7'>
-  <model name='Walls_v1'>
+  <model name='walls_v1'>
     <pose>12.6967 0.133822 0 0 -0 0</pose>
-    <link name='Wall_1'>
-      <collision name='Wall_1_Collision'>
+    <link name='wall_1'>
+      <collision name='wall_1_collision'>
         <geometry>
           <box>
             <size>4.25 0.15 2.5</size>
@@ -11,7 +11,7 @@
         </geometry>
         <pose>0 0 1.25 0 -0 0</pose>
       </collision>
-      <visual name='Wall_1_Visual'>
+      <visual name='wall_1_visual'>
         <pose>0 0 1.25 0 -0 0</pose>
         <geometry>
           <box>
@@ -31,8 +31,8 @@
       </visual>
       <pose>-12.5 1.8 0 0 -0 3.14159</pose>
     </link>
-    <link name='Wall_2'>
-      <collision name='Wall_2_Collision'>
+    <link name='wall_2'>
+      <collision name='wall_2_collision'>
         <geometry>
           <box>
             <size>3.75 0.15 2.5</size>
@@ -40,7 +40,7 @@
         </geometry>
         <pose>0 0 1.25 0 -0 0</pose>
       </collision>
-      <visual name='Wall_2_Visual'>
+      <visual name='wall_2_visual'>
         <pose>0 0 1.25 0 -0 0</pose>
         <geometry>
           <box>
@@ -60,8 +60,8 @@
       </visual>
       <pose>-14.55 0 0 0 -0 -1.5708</pose>
     </link>
-    <link name='Wall_3'>
-      <collision name='Wall_3_Collision'>
+    <link name='wall_3'>
+      <collision name='wall_3_collision'>
         <geometry>
           <box>
             <size>29.25 0.15 2.5</size>
@@ -69,7 +69,7 @@
         </geometry>
         <pose>0 0 1.25 0 -0 0</pose>
       </collision>
-      <visual name='Wall_3_Visual'>
+      <visual name='wall_3_visual'>
         <pose>0 0 1.25 0 -0 0</pose>
         <geometry>
           <box>
@@ -89,8 +89,8 @@
       </visual>
       <pose>-0 -1.8 0 0 -0 0</pose>
     </link>
-    <link name='Wall_4'>
-      <collision name='Wall_4_Collision'>
+    <link name='wall_4'>
+      <collision name='wall_4_collision'>
         <geometry>
           <box>
             <size>3.5 0.15 2.5</size>
@@ -98,7 +98,7 @@
         </geometry>
         <pose>0 0 1.25 0 -0 0</pose>
       </collision>
-      <visual name='Wall_4_Visual'>
+      <visual name='wall_4_visual'>
         <pose>0 0 1.25 0 -0 0</pose>
         <geometry>
           <box>
@@ -118,8 +118,8 @@
       </visual>
       <pose>14.55 -0.125 0 0 -0 1.5708</pose>
     </link>
-    <link name='Wall_5'>
-      <collision name='Wall_5_Collision'>
+    <link name='wall_5'>
+      <collision name='wall_5_collision'>
         <geometry>
           <box>
             <size>11.25 0.15 2.5</size>
@@ -127,7 +127,7 @@
         </geometry>
         <pose>0 0 1.25 0 -0 0</pose>
       </collision>
-      <visual name='Wall_5_Visual'>
+      <visual name='wall_5_visual'>
         <pose>0 0 1.25 0 -0 0</pose>
         <geometry>
           <box>
@@ -147,8 +147,8 @@
       </visual>
       <pose>9 1.55 0 0 -0 3.14159</pose>
     </link>
-    <link name='Wall_6'>
-      <collision name='Wall_6_Collision'>
+    <link name='wall_6'>
+      <collision name='wall_6_collision'>
         <geometry>
           <box>
             <size>18 0.15 2.5</size>
@@ -156,7 +156,7 @@
         </geometry>
         <pose>0 0 1.25 0 -0 0</pose>
       </collision>
-      <visual name='Wall_6_Visual'>
+      <visual name='wall_6_visual'>
         <pose>0 0 1.25 0 -0 0</pose>
         <geometry>
           <box>
