@@ -4,3 +4,6 @@
 [submodule "ros_ws/src/micro_ros_agent"]
 	path = ros_ws/src/micro_ros_agent
 	url = https://github.com/micro-ROS/micro-ROS-Agent.git
+[submodule "embedded_ws"]
+	path = embedded_ws
+	url = https://islamtagi@dev.azure.com/islamtagi/Pipe%20Swarm%20Project/_git/embedded_system
