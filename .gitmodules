@@ -4,6 +4,3 @@
 [submodule "ros_ws/src/micro_ros_agent"]
 	path = ros_ws/src/micro_ros_agent
 	url = https://github.com/micro-ROS/micro-ROS-Agent.git
-[submodule "embedded_system/libraries/micro_ros_arduino"]
-	path = embedded_system/libraries/micro_ros_arduino
-	url = https://github.com/micro-ROS/micro_ros_arduino.git
