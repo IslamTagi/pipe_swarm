@@ -32,6 +32,7 @@ install(
     urdf
     launch
     rviz
+    models
     config
     worlds
   DESTINATION share/${PROJECT_NAME}/
@@ -45,7 +46,10 @@ install(
   PROGRAMS
     py_src/python_talker.py
     py_src/link_service.py
+    py_src/centre_robot.py
     py_src/move_robot.py
+    py_src/move_using_lidar.py
+    py_src/move_robot_with_imu.py
   DESTINATION lib/${PROJECT_NAME}/  
 )
 

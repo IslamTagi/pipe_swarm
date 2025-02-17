@@ -50,7 +50,7 @@ def generate_launch_description():
     pipe_swarm_share = get_package_share_directory('pipe_swarm')
     gazebo_ros_share = get_package_share_directory('gazebo_ros')
     xacro_path = os.path.join(pipe_swarm_share, 'urdf', 'pipe_robot.urdf.xacro')
-    world_path = os.path.join(pipe_swarm_share, 'worlds', 'bookshelf.sdf')
+    world_path = os.path.join(pipe_swarm_share, 'worlds', 'pipe_world.sdf')
 
     agents = []
 
@@ -88,7 +88,7 @@ def generate_launch_description():
             arguments=[ '-entity', namespace,
                         '-x', f'{i*2}',
                         '-y', '0',
-                        '-z', '0',
+                        '-z', '0.03',
                         '-robot_namespace', namespace,
                         '-topic', f'/{namespace}/robot_description'
                     ]

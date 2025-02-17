@@ -8,5 +8,6 @@
     <xacro:include filename="camera.xacro"/>
     <xacro:include filename="wheels.xacro"/>
     <xacro:include filename="linkage.xacro"/>
+    <xacro:include filename="imu.xacro"/>
 
 </robot>
