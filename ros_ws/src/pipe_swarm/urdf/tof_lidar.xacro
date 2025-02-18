@@ -47,7 +47,6 @@
                         <samples>3</samples>
                         <min_angle>${pi/6}</min_angle>
                         <max_angle>${-pi/6}</max_angle>
-                        <!-- <angle_increment>${pi/6}</angle_increment> -->
                     </horizontal>
                 </scan>
                 <range>
