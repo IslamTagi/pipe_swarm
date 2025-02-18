@@ -6,7 +6,6 @@ from launch.substitutions import Command
 from ament_index_python.packages import get_package_share_directory
 from launch.event_handlers import OnProcessExit
 import yaml
-import math
 
 import os
 
@@ -89,10 +88,7 @@ def generate_launch_description():
             arguments=[ '-entity', namespace,
                         '-x', f'{i*2}',
                         '-y', '0',
-                        '-z', '0.04',
-                        '-R', '0',  # Roll
-                        '-P', '0',  # Pitch 
-                        '-Y', f'{math.radians(0)}',  # Yaw
+                        '-z', '0.03',
                         '-robot_namespace', namespace,
                         '-topic', f'/{namespace}/robot_description'
                     ]
