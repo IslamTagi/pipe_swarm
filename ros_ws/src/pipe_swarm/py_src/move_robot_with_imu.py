@@ -6,6 +6,7 @@ from nav_msgs.msg import Odometry
 from functools import partial
 from sensor_msgs.msg import Imu
 import math
+from sensor_msgs.msg import Range
 
 # Code to move 1x Robot
 class MyNode(Node):
@@ -15,14 +16,26 @@ class MyNode(Node):
         self.previous_x = 0.0
         self.last_cmd = None
         self.initialized = False
+        self.left_distance = None
+        self.right_distance = None
         self.pitch = 0.0 # Store pitch
         self.roll = 0.0 # Store roll
 
         self.cmd_vel_publisher_ = self.create_publisher(Twist, "/agent_0/cmd_vel", 10)
         self.odometry_subscriber_ = self.create_subscription(Odometry, "/agent_0/odom", self.odometry_callback, 10)
         self.imu_subscriber_ = self.create_subscription(Imu, "/agent_0/imu/out", self.imu_callback, 10)
+
+        # Create subscriptions for ToF sensors
+        self.left_tof_subscriber_ = self.create_subscription(Range, "/agent_0/left_infrared_range", self.left_tof_callback, 10)
+        self.right_tof_subscriber_ = self.create_subscription(Range, "/agent_0/right_infrared_range", self.right_tof_callback, 10)
         
         self.get_logger().info("Robot controller with imu has started")
+
+    def left_tof_callback(self, msg: Range):
+        self.left_distance = msg.range
+
+    def right_tof_callback(self, msg: Range):
+        self.right_distance = msg.range
     
     def imu_callback(self, msg: Imu):
         # Calculate pitch and roll from acclerometer data
@@ -42,6 +55,7 @@ class MyNode(Node):
             self.cmd_vel_publisher_.publish(cmd)
             self.last_cmd = linear_x
             self.get_logger().info(f'Published command: linear_x = {linear_x}, roll = {math.degrees(self.roll):.2f}°, pitch = {math.degrees(self.pitch):.2f}°')
+            print(f'Left Distance: {self.left_distance}, Right Distance: {self.right_distance}')
             self.get_logger().info(f'Position -> x: {self.x:.2f}, y: {self.y:.2f}, z: {self.z:.2f}')
 
         
@@ -54,25 +68,22 @@ class MyNode(Node):
 
         if not self.initialized:
             self.initialized = True
+            self.moving_forward = True
             self.send_velocity_command(0.1, 0.0)
             self.get_logger().info("Initialized: Moving forward with intial velocity")
             return
 
         # Move forward until x >= 3
-        if self.x >= 1.0 and self.previous_x < 1.0:
-            self.previous_x = self.x
+        if self.x >= 1.0 and self.moving_forward:
+            self.moving_forward = False
             self.send_velocity_command(-0.1, 0.0) 
             self.get_logger().info("Reached x = 5, switching to move backwards")
 
         # Move Backwards unitl x <= 0
-        elif self.x <= 0:
-            self.previous_x = self.x
+        elif self.x <= 0 and not self.moving_forward:
+            self.moving_forward = True
             self.send_velocity_command(0.1, 0.0)
             self.get_logger().info("Reached x = 0, switching to move forward")
-
-        # Update previous_x to track progress
-        else:
-            self.previous_x = self.x
             
 
 def main(args=None):
