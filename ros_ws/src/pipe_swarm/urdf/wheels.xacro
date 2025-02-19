@@ -35,34 +35,34 @@
     <xacro:wheel_link prefix="back_left" />
 
     <!-- JOINTS -->
-    <joint name="base_wheel_front_right_joint" type="continuous">
+    <joint name="${agent_namespace}_base_wheel_front_right_joint" type="continuous">
         <origin xyz="${(base_w)/2 - wheel_r} ${-((base_l/2) + (wheel_l/2))} ${-base_h/2}" rpy="${-pi/2} 0 0"/>
         <parent link="${agent_namespace}_base_link"/>
         <child link="${agent_namespace}_wheel_front_right_link"/>
         <axis xyz="0 0 1"/>
     </joint>
     
-    <joint name="base_wheel_front_left_joint" type="continuous">
+    <joint name="${agent_namespace}_base_wheel_front_left_joint" type="continuous">
         <origin xyz="${(base_w)/2 - wheel_r} ${(base_l/2) + (wheel_l/2)} ${-base_h/2}" rpy="${-pi/2} 0 0"/>
         <parent link="${agent_namespace}_base_link"/>
         <child link="${agent_namespace}_wheel_front_left_link"/>
         <axis xyz="0 0 1"/>
     </joint>
     
-    <joint name="base_wheel_back_right_joint" type="continuous">
+    <joint name="${agent_namespace}_base_wheel_back_right_joint" type="continuous">
         <origin xyz="${-((base_w)/2 - wheel_r)} ${-((base_l/2) + (wheel_l/2))} ${-base_h/2}" rpy="${-pi/2} 0 0"/>
         <parent link="${agent_namespace}_base_link"/>
         <child link="${agent_namespace}_wheel_back_right_link"/>
         <axis xyz="0 0 1"/>
-        <!-- <mimic joint="base_wheel_front_right_joint" multiplier="1.0"/> -->
+        <!-- <mimic joint="${agent_namespace}_base_wheel_front_right_joint" multiplier="1.0"/> -->
     </joint>
 
-    <joint name="base_wheel_back_left_joint" type="continuous">
+    <joint name="${agent_namespace}_base_wheel_back_left_joint" type="continuous">
         <origin xyz="${-((base_w)/2 - wheel_r)} ${(base_l/2) + (wheel_l/2)} ${-base_h/2}" rpy="${-pi/2} 0 0"/>
         <parent link="${agent_namespace}_base_link"/>
         <child link="${agent_namespace}_wheel_back_left_link"/>
         <axis xyz="0 0 1"/>
-        <!-- <mimic joint="base_wheel_front_left_joint" multiplier="1.0"/> -->
+        <!-- <mimic joint="${agent_namespace}_base_wheel_front_left_joint" multiplier="1.0"/> -->
     </joint>
 
 </robot>

@@ -30,10 +30,10 @@
     </link>
 
     <!-- JOINTS -->
-    <joint name="${agent_namespace}_base_footprint" type="fixed">
+    <!-- <joint name="${agent_namespace}_base_footprint" type="fixed">
         <origin xyz="0 0 0.035" rpy="0 0 0"/>
         <parent link="${agent_namespace}_footprint_link"/>
         <child link="${agent_namespace}_base_link"/>
-    </joint>
+    </joint> -->
     
 </robot>

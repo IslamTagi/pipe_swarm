@@ -130,12 +130,18 @@
         <child link="${agent_namespace}_male_link"/>
     </joint>
 
-    <joint name="base_female_joint" type="revolute">
-        <origin xyz="${-(base_w*0.5) + female_diameter/2} 0 0" rpy="0 0 0"/>
-        <parent link="${agent_namespace}_base_link"/>
-        <child link="${agent_namespace}_female_link"/>
-        <axis xyz="0 1 0"/>
-        <limit lower="${-pi/2}" upper="${pi/2}" effort="1.0" velocity="1.0"/>
+    <joint name="${agent_namespace}_female_footprint_joint" type="fixed">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <parent link="${agent_namespace}_female_link"/>
+        <child link="${agent_namespace}_footprint_link"/>
+        <!-- <axis xyz="0 1 0"/>
+        <limit lower="${-pi/2}" upper="${pi/2}" effort="1.0" velocity="1.0"/> -->
+    </joint>
+    
+    <joint name="${agent_namespace}_footprint_base_joint" type="fixed">
+        <origin xyz="${(base_w*0.5) - female_diameter/2} 0 0" rpy="0 0 0"/>
+        <parent link="${agent_namespace}_footprint_link"/>
+        <child link="${agent_namespace}_base_link"/>
     </joint>
 
 </robot>

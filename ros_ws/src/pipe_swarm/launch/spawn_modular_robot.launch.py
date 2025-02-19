@@ -49,7 +49,7 @@ def generate_launch_description():
     # Paths to resources
     pipe_swarm_share = get_package_share_directory('pipe_swarm')
     gazebo_ros_share = get_package_share_directory('gazebo_ros')
-    xacro_path = os.path.join(pipe_swarm_share, 'urdf', 'pipe_agent.urdf.xacro')
+    xacro_path = os.path.join(pipe_swarm_share, 'urdf', 'modular_robot.urdf.xacro')
     world_path = os.path.join(pipe_swarm_share, 'worlds', 'bookshelf.sdf')
 
     agents = []
@@ -65,7 +65,7 @@ def generate_launch_description():
     # Pre-Agent Setup
     agents.append(gazebo_launch)
 
-    for i in range(2):  # Launch 3 robots
+    for i in range(1):  # Launch 3 robots
         namespace = f'agent_{i}'
 
         # update_controllers_namespace(namespace)
@@ -75,8 +75,7 @@ def generate_launch_description():
             package='robot_state_publisher',
             executable='robot_state_publisher',
             output='screen',
-            namespace=namespace,
-            parameters=[{'robot_description': Command(['xacro ', xacro_path, ' agent_namespace:=', namespace])}]
+            parameters=[{'robot_description': Command(['xacro ', xacro_path])}]
         )
 
         # Spawn the robot entity in Gazebo
@@ -89,8 +88,8 @@ def generate_launch_description():
                         '-x', f'{i*2}',
                         '-y', '0',
                         '-z', '0',
-                        '-robot_namespace', namespace,
-                        '-topic', f'/{namespace}/robot_description'
+                        # '-robot_namespace', namespace,
+                        '-topic', f'/robot_description'
                     ]
         )
 
