@@ -65,7 +65,7 @@ def generate_launch_description():
     # Pre-Agent Setup
     agents.append(gazebo_launch)
 
-    for i in range(2):  # Launch 3 robots
+    for i in range(3):  # Launch 3 robots
         namespace = f'agent_{i}'
 
         # update_controllers_namespace(namespace)
@@ -129,7 +129,7 @@ def generate_launch_description():
         )
 
         agents.extend([
-            # ros_controllers_event,
+            ros_controllers_event,
             pipe_robot_state_publisher,
             spawn_entity,
         ])

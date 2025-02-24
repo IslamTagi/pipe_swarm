@@ -8,11 +8,11 @@
     <!-- Call pipe_robot with agent_namespace -->
     <xacro:pipe_robot namespace="${agent_namespace}" base_agent="${agent_namespace}" include_gazebo="true"/>
 
-    <link name="${agent_namespace}_footprint" />
-
+    <!-- <link name="${agent_namespace}_footprint" /> -->
+<!-- 
     <joint name="${agent_namespace}_footprint_joint" type="fixed">
         <parent link="${agent_namespace}_footprint"/>
         <child link="${agent_namespace}_female_link"/>
-    </joint>
+    </joint> -->
 
 </robot>
