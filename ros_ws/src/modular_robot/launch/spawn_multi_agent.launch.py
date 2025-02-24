@@ -71,9 +71,15 @@ def generate_launch_description():
         )
     )
 
+    joint_state_publisher = Node(
+            package='joint_state_publisher_gui',
+            executable='joint_state_publisher_gui'
+    )
+
     agents.extend([
         ros_controllers_event,
         modular_robot_state_publisher,
+        # joint_state_publisher,
         spawn_entity,
     ])
     
