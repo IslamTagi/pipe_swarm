@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<robot name="modular_robot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <!-- Correct include syntax -->
+    <xacro:include filename="pipe_robot.xacro"/>
+
+    <!-- Call pipe_robot with agent_namespace -->
+    <xacro:pipe_robot agent_namespace="agent_n" include_gazebo="true"/>
+
+    <!-- <link name="${agent_namespace}_footprint" /> -->
+<!-- 
+    <joint name="${agent_namespace}_footprint_joint" type="fixed">
+        <parent link="${agent_namespace}_footprint"/>
+        <child link="${agent_namespace}_female_link"/>
+    </joint> -->
+
+</robot>
