@@ -7,3 +7,6 @@
 [submodule "embedded_system/libraries/micro_ros_arduino"]
 	path = embedded_system/libraries/micro_ros_arduino
 	url = https://github.com/micro-ROS/micro_ros_arduino.git
+[submodule "mechanical_design"]
+	path = mechanical_design
+	url = git@ssh.dev.azure.com:v3/islamtagi/Pipe%20Swarm%20Project/mechanical_design
