@@ -41,6 +41,18 @@
             <pose>0 0 0 0 0 0</pose>
             <visualize>true</visualize>
             <update_rate>10.0</update_rate> <!--update /Hz -->
+            <camera>
+                <horizontal_fov>0.05</horizontal_fov>
+                <image>
+                    <width>480</width>
+                    <height>640</height>
+                    <format>R8G8B8</format>
+                </image>
+                <clip>
+                    <near>0.1</near>
+                    <far>1.0</far>
+                </clip>
+            </camera>
             <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
                 <ros>
                     <namespace>${agent_namespace}</namespace>
