@@ -53,6 +53,7 @@ install(
     py_src/move_robot.py
     py_src/move_using_lidar.py
     py_src/move_robot_with_imu.py
+    py_src/joint_control.py
     py_src/alignment_topic.py
   DESTINATION lib/${PROJECT_NAME}/  
 )
