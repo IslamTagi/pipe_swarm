@@ -130,7 +130,7 @@
         <child link="${agent_namespace}_male_link"/>
     </joint>
 
-    <joint name="female_base_joint" type="revolute">
+    <joint name="${agent_namespace}_female_base_joint" type="revolute">
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <parent link="${agent_namespace}_female_link"/>
         <child link="${agent_namespace}_base_link"/>

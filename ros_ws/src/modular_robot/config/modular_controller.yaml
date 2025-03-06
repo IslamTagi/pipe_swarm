@@ -8,8 +8,10 @@
 
     position_controller:
       type: position_controllers/JointGroupPositionController
-
+ 
 /position_controller:
   ros__parameters:
     joints:
-      - female_base_joint
+      - agent_n_female_base_joint
+      - agent_n2_female_base_joint
+      - agent_n3_female_base_joint
