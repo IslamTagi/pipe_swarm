@@ -3,8 +3,8 @@
     
     <xacro:property name="male_m" value="0.3" />  <!-- mass /kg -->
     <xacro:property name="male_w" value="0.04" />  <!-- width /m -->
-    <xacro:property name="male_h" value="0.01" />  <!-- height /m -->
-    <xacro:property name="male_l" value="0.01" />  <!-- length /m -->
+    <xacro:property name="male_h" value="0.005" />  <!-- height /m -->
+    <xacro:property name="male_l" value="0.005" />  <!-- length /m -->
 
     
     <xacro:property name="female_diameter" value="0.04" />  <!-- /m -->
