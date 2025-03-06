@@ -34,4 +34,36 @@
         <child link="${agent_namespace}_lidar_link"/>
     </joint>
 
+    <!-- GAZEBO -->
+    <gazebo reference="${agent_namespace}_lidar_link">
+        <material>Gazebo/Green</material>
+        <sensor name="lidar_sensor" type="lidar">
+            <pose>0 0 0 0 0 0</pose>
+            <visualize>true</visualize>
+            <update_rate>10.0</update_rate>
+            <ray> 
+                <scan>
+                    <horizontal>
+                        <samples>3</samples>
+                        <min_angle>${pi/6}</min_angle>
+                        <max_angle>${-pi/6}</max_angle>
+                    </horizontal>
+                </scan>
+                <range>
+                    <min>0.1</min>
+                    <max>1</max>
+                </range>
+            </ray>
+            <plugin name="lidar_controller" filename="libgazebo_ros_ray_sensor.so">
+                <ros>
+                    <namespace>${agent_namespace}</namespace>
+                    <remapping>~/out:=laserscan</remapping>
+                </ros>
+                <output_type>sensor_msgs/LaserScan</output_type>
+                <min_intensity>100.0</min_intensity>
+                <frame_name>${agent_namespace}_lidar_link</frame_name>
+            </plugin>
+        </sensor>
+    </gazebo>
+
 </robot>

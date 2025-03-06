@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<sdf version="1.7">
+  <model name="hollow_pipe">
+    <static>false</static>
+    <link name="hollow_pipe_link">
+      <visual name="hollow_pipe_visual">
+        <geometry>
+          <mesh>
+            <uri>model://hollow_pipe/meshes/hollow_pipe.stl</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+      </visual>
+
+      <collision name="hollow_pipe_collision">
+        <geometry>
+          <mesh>
+            <uri>model://hollow_pipe/meshes/hollow_pipe.stl</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+      </collision>
+
+      <inertial>
+        <mass>1.0</mass>
+        <inertia>
+          <ixx>0.01</ixx> <iyy>0.01</iyy> <izz>0.01</izz>
+          <ixy>0.0</ixy> <ixz>0.0</ixz> <iyz>0.0</iyz>
+        </inertia>
+      </inertial>
+    </link>
+  </model>
+</sdf>
