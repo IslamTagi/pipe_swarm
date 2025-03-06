@@ -3,7 +3,8 @@
     <xacro:macro name="gazebo_pipe_robot" params="namespace">
         <!-- Include shared components -->
         <xacro:include filename="mobile_base.xacro"/>
-        <xacro:include filename="lidar.xacro"/>
+        <!-- <xacro:include filename="lidar.xacro"/> -->
+        <xacro:include filename="imu.xacro"/>
         <xacro:include filename="tof.xacro"/>
         <xacro:include filename="camera.xacro"/>
         <xacro:include filename="linkage.xacro"/>
