@@ -7,7 +7,30 @@
     <xacro:property name="wheel_o" value="0.002" />  <!-- length /m -->
 
     <xacro:macro name="wheel_link" params="prefix">
-        <link name="${agent_namespace}_wheel_${prefix}_link">
+        <link name="${agent_namespace}_wheel_${prefix}_left_link">
+            <visual>
+                <origin xyz="0.0 0.0 0.0" rpy="0 0.0 0.0"/>
+                <geometry>
+                    <mesh filename="model://hollow_pipe/meshes/wheel_right.stl" scale="0.001 0.001 0.001"/>
+                    <!-- <cylinder radius="${wheel_r}" length="${wheel_l}"/> -->
+                </geometry>
+                <material name="wheel">
+                    <color rgba="0 0 0 1.0"/>
+                </material>
+            </visual>
+            
+            <collision>
+                <origin xyz="0.0 0.0 0.0" rpy="0 0.0 0.0"/>
+                <geometry>
+                    <mesh filename="model://hollow_pipe/meshes/wheel_right.stl" scale="0.001 0.001 0.001"/>
+                    <!-- <cylinder radius="${wheel_r}" length="${wheel_l}"/> -->
+                </geometry>
+            </collision>
+
+            <xacro:cylinder_solid_inertial m="${wheel_m}" r="${wheel_r}" l="${wheel_l}" xyz="0 0 0 " rpy="0 0 0"/>
+        </link>
+        
+        <link name="${agent_namespace}_wheel_${prefix}_right_link">
             <visual>
                 <origin xyz="0.0 0.0 0.0" rpy="0 0.0 0.0"/>
                 <geometry>
@@ -32,10 +55,9 @@
     </xacro:macro>
 
     <!-- LINKS -->
-    <xacro:wheel_link prefix="front_right" />
-    <xacro:wheel_link prefix="front_left" />
-    <xacro:wheel_link prefix="back_right" />
-    <xacro:wheel_link prefix="back_left" />
+    <xacro:wheel_link prefix="front" />
+    <xacro:wheel_link prefix="back" />
+
 
     <!-- JOINTS -->
     <joint name="base_wheel_front_right_joint" type="continuous">
@@ -175,22 +197,22 @@
     <gazebo reference="${agent_namespace}_wheel_front_right_link">
         <material>Gazebo/Black</material>
         <mu1 value="1.0"/>
-        <mu2 value="0.0"/>
+        <mu2 value="1.0"/>
     </gazebo>
     <gazebo reference="${agent_namespace}_wheel_front_left_link">
         <material>Gazebo/Black</material>
         <mu1 value="1.0"/>
-        <mu2 value="0.0"/>
+        <mu2 value="1.0"/>
     </gazebo>
     <gazebo reference="${agent_namespace}_wheel_back_right_link">
         <material>Gazebo/Black</material>
         <mu1 value="1.0"/>
-        <mu2 value="0.0"/>
+        <mu2 value="1.0"/>
     </gazebo>
     <gazebo reference="${agent_namespace}_wheel_back_left_link">
         <material>Gazebo/Black</material>
         <mu1 value="1.0"/>
-        <mu2 value="0.0"/>
+        <mu2 value="1.0"/>
     </gazebo>
 
 </robot>
