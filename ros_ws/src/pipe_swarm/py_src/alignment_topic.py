@@ -10,16 +10,20 @@ from cv_bridge import CvBridge
 class RedDetector(Node):
     def __init__(self):
         super().__init__('red_detector')
+
+        self.declare_parameter('agent_namespace','agent_0')
+
+        self.namespace = self.get_parameter('agent_namespace').get_parameter_value().string_value
         
         # Subscribe to camera feed
         self.subscription = self.create_subscription(
             Image,
-            '/agent_0/camera_sensor/image_raw',
+            f'/{self.namespace}/camera_sensor/image_raw',
             self.image_callback,
             10)
         
         # Publisher for red detection result
-        self.publisher = self.create_publisher(Bool, '/agent_0/alignment', 10)
+        self.publisher = self.create_publisher(Bool, f'/{self.namespace}/alignment', 10)
         
         self.bridge = CvBridge()
 
@@ -49,7 +53,7 @@ class RedDetector(Node):
         msg = Bool()
         msg.data = bool(red_detected)
         self.publisher.publish(msg)
-        self.get_logger().info(f'Red detected: {red_detected}')
+        # self.get_logger().info(f'Red detected: {red_detected}')
 
 def main(args=None):
     rclpy.init(args=args)
