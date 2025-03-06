@@ -5,6 +5,7 @@
         <xacro:include filename="mobile_base.xacro"/>
         <!-- <xacro:include filename="lidar.xacro"/> -->
         <xacro:include filename="imu.xacro"/>
+        <xacro:include filename="tof_lidar.xacro"/>
         <xacro:include filename="tof.xacro"/>
         <xacro:include filename="camera.xacro"/>
         <xacro:include filename="linkage.xacro"/>
