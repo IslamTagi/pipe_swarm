@@ -55,7 +55,7 @@ source /opt/ros/humble/setup.bash
 source ~/source_code/pipe_swarm/ros_ws/install/setup.bash
 source /usr/share/gazebo/setup.sh
 source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash
-export GAZEBO_MODEL_PATH=$GAZEBO_MODEL_PATH:/home/$(whoami)/source_code/pipe_swarm/ros_ws/src/pipe_swarm/models
+export GAZEBO_MODEL_PATH=$GAZEBO_MODEL_PATH:/home/$(whoami)/source_code/pipe_swarm/ros_ws/src
 ```
 
 <br>
