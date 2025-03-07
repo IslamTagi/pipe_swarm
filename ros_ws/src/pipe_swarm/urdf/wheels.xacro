@@ -11,7 +11,7 @@
             <visual>
                 <origin xyz="0.0 0.0 0.0" rpy="0 0.0 0.0"/>
                 <geometry>
-                    <mesh filename="model://hollow_pipe/meshes/wheel_right.stl" scale="0.001 0.001 0.001"/>
+                    <mesh filename="package://pipe_swarm/models/hollow_pipe/meshes/wheel_right.stl" scale="0.001 0.001 0.001"/>
                     <!-- <cylinder radius="${wheel_r}" length="${wheel_l}"/> -->
                 </geometry>
                 <material name="wheel">
@@ -22,7 +22,7 @@
             <collision>
                 <origin xyz="0.0 0.0 0.0" rpy="0 0.0 0.0"/>
                 <geometry>
-                    <mesh filename="model://hollow_pipe/meshes/wheel_right.stl" scale="0.001 0.001 0.001"/>
+                    <mesh filename="package://pipe_swarm/models/hollow_pipe/meshes/wheel_right.stl" scale="0.001 0.001 0.001"/>
                     <!-- <cylinder radius="${wheel_r}" length="${wheel_l}"/> -->
                 </geometry>
             </collision>
@@ -34,7 +34,7 @@
             <visual>
                 <origin xyz="0.0 0.0 0.0" rpy="0 0.0 0.0"/>
                 <geometry>
-                    <mesh filename="model://hollow_pipe/meshes/wheel.stl" scale="0.001 0.001 0.001"/>
+                    <mesh filename="package://pipe_swarm/models/hollow_pipe/meshes/wheel.stl" scale="0.001 0.001 0.001"/>
                     <!-- <cylinder radius="${wheel_r}" length="${wheel_l}"/> -->
                 </geometry>
                 <material name="wheel">
@@ -45,7 +45,7 @@
             <collision>
                 <origin xyz="0.0 0.0 0.0" rpy="0 0.0 0.0"/>
                 <geometry>
-                    <mesh filename="model://hollow_pipe/meshes/wheel.stl" scale="0.001 0.001 0.001"/>
+                    <mesh filename="package://pipe_swarm/models/hollow_pipe/meshes/wheel.stl" scale="0.001 0.001 0.001"/>
                     <!-- <cylinder radius="${wheel_r}" length="${wheel_l}"/> -->
                 </geometry>
             </collision>
