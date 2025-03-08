@@ -102,11 +102,11 @@ def generate_launch_description():
             output='screen',
         )
         
-        spawn_position_controller = Node(
+        spawn_joint_trajectory_controller = Node(
             package='controller_manager',
             executable='spawner',
             namespace=namespace,
-            arguments=['position_controller'],
+            arguments=['joint_trajectory_controller'],
             output='screen',
         )
         
@@ -122,7 +122,7 @@ def generate_launch_description():
             event_handler=OnProcessExit(
                 target_action=spawn_entity,
                 on_exit=[spawn_joint_state_broadcaster,
-                         spawn_position_controller,
+                         spawn_joint_trajectory_controller,
                          # spawn_skid_steer_controller,
                         ],
             )
