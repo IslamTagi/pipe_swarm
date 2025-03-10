@@ -1,0 +1,104 @@
+<?xml version="1.0"?>
+<robot name="obstacle" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    
+    <xacro:property name="obstacle_m" value="0.1" />  <!-- mass /kg -->
+    <xacro:property name="obstacle_w" value="0.01" />  <!-- width /m -->
+    <xacro:property name="obstacle_l" value="0.01" />  <!-- length /m -->
+    <xacro:property name="obstacle_h" value="0.01" />  <!-- height /m -->
+
+    <!-- LINKS -->
+    <!-- Red Box -->
+    <link name="${agent_namespace}_obstacle_link">
+        <visual>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <geometry>
+                <box size="${obstacle_w} ${obstacle_l} ${obstacle_h}"/>
+            </geometry>
+            <material name="red">
+                <color rgba="1 0 0 1"/>
+            </material>
+        </visual>
+        
+        <collision>
+            <geometry>
+                <box size="${obstacle_w} ${obstacle_l} ${obstacle_h}"/>
+            </geometry>
+        </collision>
+
+        <xacro:box_inertial m="${obstacle_m}" w="${obstacle_w}" l="${obstacle_l}" h="${obstacle_h}" xyz="0 0 0 " rpy="0 0 0"/>
+    </link>
+
+    <!-- White Box 1 -->
+    <link name="${agent_namespace}_white_box_1_link">
+        <visual>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <geometry>
+                <box size="${obstacle_w} ${obstacle_l} ${obstacle_h}"/>
+            </geometry>
+            <material name="white">
+                <color rgba="1 1 1 1"/>
+            </material>
+        </visual>
+        
+        <collision>
+            <geometry>
+                <box size="${obstacle_w} ${obstacle_l} ${obstacle_h}"/>
+            </geometry>
+        </collision>
+
+        <xacro:box_inertial m="${obstacle_m}" w="${obstacle_w}" l="${obstacle_l}" h="${obstacle_h}" xyz="0 0 0 " rpy="0 0 0"/>
+    </link>
+
+    <!-- White Box 2 -->
+    <link name="${agent_namespace}_white_box_2_link">
+        <visual>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <geometry>
+                <box size="${obstacle_w} ${obstacle_l} ${obstacle_h}"/>
+            </geometry>
+            <material name="white">
+                <color rgba="1 1 1 1"/>
+            </material>
+        </visual>
+        
+        <collision>
+            <geometry>
+                <box size="${obstacle_w} ${obstacle_l} ${obstacle_h}"/>
+            </geometry>
+        </collision>
+
+        <xacro:box_inertial m="${obstacle_m}" w="${obstacle_w}" l="${obstacle_l}" h="${obstacle_h}" xyz="0 0 0 " rpy="0 0 0"/>
+    </link>
+
+    <!-- JOINTS -->
+    <joint name="${agent_namespace}_base_obstacle_joint" type="fixed">
+        <origin xyz="${(-base_w*0.5)+(obstacle_w)} 0 ${(base_h*0.5)}" rpy="${pi/2} 0 0"/>
+        <parent link="${agent_namespace}_base_link"/>
+        <child link="${agent_namespace}_obstacle_link"/>
+    </joint>
+
+    <joint name="${agent_namespace}_base_white_box_1_joint" type="fixed">
+        <origin xyz="${(-base_w*0.5)} ${(obstacle_l*0.65)} ${(base_h*0.5)+(obstacle_w*0.5)}" rpy="0.0 0.0 0.0"/>
+        <parent link="${agent_namespace}_base_link"/>
+        <child link="${agent_namespace}_white_box_1_link"/>
+    </joint>
+
+    <joint name="${agent_namespace}_base_white_box_2_joint" type="fixed">
+        <origin xyz="${(-base_w*0.5)} ${(-obstacle_l*0.65)} ${(base_h*0.5)+(obstacle_w*0.5)}" rpy="0.0 0.0 0.0"/>
+        <parent link="${agent_namespace}_base_link"/>
+        <child link="${agent_namespace}_white_box_2_link"/>
+    </joint>
+
+    <!-- GAZEBO -->
+    <gazebo reference="${agent_namespace}_obstacle_link">
+        <material>Gazebo/Red</material>
+    </gazebo>
+
+    <gazebo reference="${agent_namespace}_white_box_1_link">
+        <material>Gazebo/White</material>
+    </gazebo>
+
+    <gazebo reference="${agent_namespace}_white_box_2_link">
+        <material>Gazebo/White</material>
+    </gazebo>
+</robot>

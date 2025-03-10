@@ -24,6 +24,12 @@
   <depend>gazebo_ros_pkgs</depend>
   <depend>pipe_swarm_interfaces</depend>
   <depend>nav_msgs</depend>
+  <depend>cv_bridge</depend>
+  <depend>sensor_msgs</depend>
+  <depend>vision_opencv</depend> <!-- Needed for cv_bridge -->
+  <depend>image_transport</depend>
+  <depend>numpy</depend>
+  <depend>opencv</depend>
 
   <!-- Testing Dependencies -->
   <test_depend>ament_lint_auto</test_depend>
