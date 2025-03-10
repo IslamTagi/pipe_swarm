@@ -5,6 +5,7 @@
     <xacro:property name="male_w" value="0.04" />  <!-- width /m -->
     <xacro:property name="male_h" value="0.005" />  <!-- height /m -->
     <xacro:property name="male_l" value="0.005" />  <!-- length /m -->
+    <xacro:property name="male_o" value="0.007" />  <!-- offset /m -->
 
     
     <xacro:property name="female_diameter" value="0.04" />  <!-- /m -->
@@ -44,9 +45,9 @@
     <!-- LINKS -->
     <link name="${agent_namespace}_male_link">
         <visual>
-            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 ${pi/2} ${-pi/2}"/>
             <geometry>
-                <box size="${male_w} ${male_l} ${male_h}"/>
+                <mesh filename="package://modular_robot/meshes/key.stl" scale="0.001 0.001 0.001"/>
             </geometry>
             <material name="base">
                 <color rgba="1.0 1.0 1.0 1.0"/>
@@ -54,9 +55,30 @@
         </visual>
         
         <collision>
-            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 ${pi/2} ${-pi/2}"/>
             <geometry>
-                <box size="${male_w} ${male_l} ${male_h}"/>
+                <mesh filename="package://modular_robot/meshes/key.stl" scale="0.001 0.001 0.001"/>
+            </geometry>
+        </collision>
+
+        <xacro:box_inertial m="${male_m}" w="${male_w}" l="${male_l}" h="${male_h}" xyz="0 0 0 " rpy="0 0 0"/>
+    </link>
+
+    <link name="${agent_namespace}_cover_link">
+        <visual>
+            <origin xyz="0.0 0.0 0.0" rpy="${pi/2} 0.0 ${pi/2}"/>
+            <geometry>
+                <mesh filename="package://modular_robot/meshes/cover.stl" scale="0.001 0.001 0.001"/>
+            </geometry>
+            <material name="base">
+                <color rgba="1.0 1.0 1.0 1.0"/>
+            </material>
+        </visual>
+        
+        <collision>
+            <origin xyz="0.0 0.0 0.0" rpy="${pi/2} 0.0 ${pi/2}"/>
+            <geometry>
+                <mesh filename="package://modular_robot/meshes/cover.stl" scale="0.001 0.001 0.001"/>
             </geometry>
         </collision>
 
@@ -125,9 +147,15 @@
     
     <!-- JOINTS -->
     <joint name="${agent_namespace}_base_male_joint" type="fixed">
-        <origin xyz="${(base_w - 0.02) + (male_w*0.5) } 0 0" rpy="0 0 0"/>
+        <origin xyz="${base_w - 0.02 + male_o} 0 0" rpy="0 0 0"/>
         <parent link="${agent_namespace}_base_link"/>
         <child link="${agent_namespace}_male_link"/>
+    </joint>
+
+    <joint name="${agent_namespace}_base_cover_joint" type="fixed">
+        <origin xyz="${base_w - 0.02 + male_o } 0.0 0.0" rpy="0 0 0"/>
+        <parent link="${agent_namespace}_base_link"/>
+        <child link="${agent_namespace}_cover_link"/>
     </joint>
 
     <joint name="${agent_namespace}_female_base_joint" type="revolute">
