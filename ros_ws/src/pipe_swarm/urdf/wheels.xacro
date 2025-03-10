@@ -4,7 +4,7 @@
     <xacro:property name="wheel_m" value="0.1" />  <!-- mass /kg -->
     <xacro:property name="wheel_r" value="0.0175" />  <!-- radius /m -->
     <xacro:property name="wheel_l" value="0.01" />  <!-- length /m -->
-    <xacro:property name="wheel_o" value="0.002" />  <!-- length /m -->
+    <xacro:property name="wheel_o" value="0.002" />  <!-- offset /m -->
 
     <xacro:macro name="wheel_link" params="prefix">
         <link name="${agent_namespace}_wheel_${prefix}_left_link">
