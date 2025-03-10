@@ -89,16 +89,4 @@
         <child link="${agent_namespace}_white_box_2_link"/>
     </joint>
 
-    <!-- GAZEBO -->
-    <gazebo reference="${agent_namespace}_obstacle_link">
-        <material>Gazebo/Red</material>
-    </gazebo>
-
-    <gazebo reference="${agent_namespace}_white_box_1_link">
-        <material>Gazebo/White</material>
-    </gazebo>
-
-    <gazebo reference="${agent_namespace}_white_box_2_link">
-        <material>Gazebo/White</material>
-    </gazebo>
 </robot>
