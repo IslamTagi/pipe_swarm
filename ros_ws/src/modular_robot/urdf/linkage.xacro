@@ -17,7 +17,8 @@
     <xacro:property name="female_m" value="0.1" />  <!-- mass /kg -->
     <xacro:property name="female_w" value="${(female_diameter/2) + female_stopper_width + female_hole_depth}" />  <!-- width /m -->
     <xacro:property name="female_h" value="${female_diameter}" />  <!-- height /m -->
-    <xacro:property name="female_l" value="0.028" />  <!-- /m -->
+    <xacro:property name="female_l" value="0.028" />  <!-- length /m -->
+    <xacro:property name="pivot_l" value="0.055" />  <!-- length /m -->
 
     <xacro:macro name="female_rotation_shape">
             <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
@@ -144,6 +145,27 @@
 
         <xacro:box_inertial m="${female_m}" w="${female_w}" l="${female_l}" h="${female_h}" xyz="${female_diameter/2 - female_w/2} 0 0 " rpy="0 0 0"/>
     </link>
+
+    <link name="${agent_namespace}_pivot_link">
+       <visual>
+            <origin xyz="0 ${pivot_l/2} 0" rpy="${pi/2} 0.0 ${-pi/2}"/>
+            <geometry>
+                <mesh filename="package://modular_robot/meshes/pivot.stl" scale="0.001 0.001 0.001"/>
+            </geometry>
+            <material name="base">
+                <color rgba="1.0 1.0 1.0 1.0"/>
+            </material>
+        </visual>
+        
+        <collision>
+            <origin xyz="0 0 0" rpy="${pi/2} 0.0 ${-pi/2}"/>
+            <geometry>
+                <mesh filename="package://modular_robot/meshes/pivot.stl" scale="0.001 0.001 0.001"/>
+            </geometry>
+        </collision>
+
+        <xacro:box_inertial m="${female_m}" w="0.05" l="0.05" h="0.05" xyz="0 0 0" rpy="0 0 0"/>
+    </link>
     
     <!-- JOINTS -->
     <joint name="${agent_namespace}_base_male_joint" type="fixed">
@@ -161,10 +183,18 @@
     <joint name="${agent_namespace}_female_base_joint" type="revolute">
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <parent link="${agent_namespace}_female_link"/>
-        <child link="${agent_namespace}_base_link"/>
+        <child link="${agent_namespace}_pivot_link"/>
         <axis xyz="0 1 0"/>
         <limit lower="${-pi/2}" upper="${pi/2}" effort="1.0" velocity="1.0"/>
         <dynamics damping="0.3" friction="0.5"/>  <!-- Add damping -->
+    </joint>
+
+    <joint name="${agent_namespace}_pivot_base_joint" type="revolute">
+        <origin xyz="${0.02-0.014} 0 0" rpy="0 0 0"/>
+        <parent link="${agent_namespace}_pivot_link"/>
+        <child link="${agent_namespace}_base_link"/>
+        <axis xyz="0 1 0"/>
+        <limit lower="${-pi/4}" upper="${pi/4}" effort="1.0" velocity="1.0"/>
     </joint>
     
     <!-- <joint name="${agent_namespace}_footprint_base_joint" type="fixed">

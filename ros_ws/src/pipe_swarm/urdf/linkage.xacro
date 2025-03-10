@@ -18,6 +18,7 @@
     <xacro:property name="female_w" value="${(female_diameter/2) + female_stopper_width + female_hole_depth}" />  <!-- width /m -->
     <xacro:property name="female_h" value="${female_diameter}" />  <!-- height /m -->
     <xacro:property name="female_l" value="0.028" />   <!-- length /m -->
+    <xacro:property name="pivot_l" value="0.055" />  <!-- length /m -->
 
     <xacro:macro name="female_rotation_shape">
             <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
@@ -107,7 +108,7 @@
 
     <link name="${agent_namespace}_pivot_link">
        <visual>
-            <origin xyz="0 0 0" rpy="${pi/2} 0.0 ${-pi/2}"/>
+            <origin xyz="0 ${pivot_l/2} 0" rpy="${pi/2} 0.0 ${-pi/2}"/>
             <geometry>
                 <mesh filename="package://pipe_swarm/models/hollow_pipe/meshes/pivot.stl" scale="0.001 0.001 0.001"/>
             </geometry>
@@ -140,7 +141,7 @@
     </joint>
 
     <joint name="base_female_joint" type="revolute">
-        <origin xyz="${-(base_w*0.5)+0.014} 0.0275 0.0" rpy="0 0 0"/>
+        <origin xyz="${-(base_w*0.5)+0.014} 0 0" rpy="0 0 0"/>
         <parent link="${agent_namespace}_base_link"/>
         <child link="${agent_namespace}_pivot_link"/>
         <axis xyz="0 1 0"/>
@@ -154,7 +155,7 @@
     </joint> -->
 
     <joint name="${agent_namespace}_base_neutral_joint" type="fixed">
-        <origin xyz="-0.0665 -0.0275 0.0" rpy="0 0 0"/>
+        <origin xyz="-0.0665 0 0.0" rpy="0 0 0"/>
         <parent link="${agent_namespace}_pivot_link"/>
         <child link="${agent_namespace}_female_link"/>
     </joint>
