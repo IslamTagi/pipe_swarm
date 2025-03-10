@@ -6,6 +6,7 @@ from launch.substitutions import Command
 from ament_index_python.packages import get_package_share_directory
 from launch.event_handlers import OnProcessExit
 import yaml
+import math
 
 import os
 
@@ -89,6 +90,9 @@ def generate_launch_description():
                         '-x', f'{i*2}',
                         '-y', '0',
                         '-z', '0.03',
+                        '-R', '0',  # Roll
+                        '-P', '0',  # Pitch 
+                        '-Y', f'{math.radians(0)}',  # Yaw
                         '-robot_namespace', namespace,
                         '-topic', f'/{namespace}/robot_description'
                     ]
@@ -133,6 +137,16 @@ def generate_launch_description():
             pipe_robot_state_publisher,
             spawn_entity,
         ])
+
+        red_detector_node = Node(
+            package='pipe_swarm',
+            executable='alignment_topic.py',
+            output='screen',
+            name=f'red_detector_node_{1}',
+            parameters=[{'agent_namespace':namespace}]
+        )
+
+        agents.append(red_detector_node)
     
     # Launch RViz2 for visualization
     rviz_display = Node(

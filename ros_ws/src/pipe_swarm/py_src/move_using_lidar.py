@@ -26,7 +26,7 @@ class MyNode(Node):
     def send_velocity_command(self, linear_x, angular_z):
         cmd = Twist()
         if self.obstacle_detected:
-            cmd.linear.x = 0.0  # Stop when obstacle is detected
+            cmd.linear.x = 0.01  # Stop when obstacle is detected
             self.get_logger().info("Obstacle detected! Stopping robot.")
         else:
             cmd.linear.x = linear_x
@@ -44,14 +44,14 @@ class MyNode(Node):
 
         if not self.initialized:
             self.initialized = True
-            self.send_velocity_command(0.5, 0.0)
+            self.send_velocity_command(0.1, 0.0)
             self.get_logger().info("Initialized: Moving forward")
             return
 
     def lidar_callback(self, msg: LaserScan):
         if self.initial_scan is None:
             self.initial_scan = msg.ranges
-            self.send_velocity_command(0.5, 0.0)  # Start moving immediately
+            self.send_velocity_command(0.1, 0.0)  # Start moving immediately
             self.get_logger().info("Initial LiDAR scan stored.")
             return
 

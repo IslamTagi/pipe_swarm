@@ -19,11 +19,11 @@
 
 /**/skid_steer_controller:
   ros__parameters:
-    left_wheel_names: ["base_wheel_front_left_joint", "base_wheel_back_left_joint"]
-    right_wheel_names: ["base_wheel_front_right_joint", "base_wheel_back_right_joint"]
+    left_wheel_names: ["base_wheel_front_left_joint"]
+    right_wheel_names: ["base_wheel_front_right_joint"]
 
-    wheel_separation: 0.06
-    wheel_radius: 0.0175
+    wheel_separation: 0.0845
+    wheel_radius: 0.015
 
     use_stamped_vel: false
 

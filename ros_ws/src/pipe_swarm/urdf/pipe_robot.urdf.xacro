@@ -10,5 +10,6 @@
     <xacro:include filename="wheels.xacro"/>
     <xacro:include filename="linkage.xacro"/>
     <xacro:include filename="imu.xacro"/>
+    <xacro:include filename="detection_object.xacro"/>
 
 </robot>
