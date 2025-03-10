@@ -4,7 +4,7 @@
     <xacro:property name="male_m" value="0.1" />  <!-- mass /kg -->
     <xacro:property name="male_w" value="0.04" />  <!-- width /m -->
     <xacro:property name="male_h" value="0.005" />  <!-- height /m -->
-    <xacro:property name="male_l" value="0.005" />  <!-- length /m -->
+    <xacro:property name="male_l" value="0.0575" />  <!-- length /m -->
 
     
     <xacro:property name="female_diameter" value="0.04" />  <!-- /m -->
@@ -16,12 +16,12 @@
     <xacro:property name="female_m" value="0.1" />  <!-- mass /kg -->
     <xacro:property name="female_w" value="${(female_diameter/2) + female_stopper_width + female_hole_depth}" />  <!-- width /m -->
     <xacro:property name="female_h" value="${female_diameter}" />  <!-- height /m -->
-    <xacro:property name="female_l" value="0.028" />  <!-- /m -->
+    <xacro:property name="female_l" value="0.028" />   <!-- length /m -->
 
     <xacro:macro name="female_rotation_shape">
             <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
             <geometry>
-                <cylinder radius="${female_diameter/2}" length="${female_l}"/>
+                <mesh filename="model://hollow_pipe/meshes/lock.stl"/>
             </geometry>
     </xacro:macro>
     <xacro:macro name="female_stopper_shape">
@@ -44,9 +44,9 @@
     <!-- LINKS -->
     <link name="${agent_namespace}_male_link">
         <visual>
-            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 ${pi/2} ${-pi/2}"/>
             <geometry>
-                <box size="${male_w} ${male_l} ${male_h}"/>
+                <mesh filename="package://pipe_swarm/models/hollow_pipe/meshes/key.stl" scale="0.001 0.001 0.001"/>
             </geometry>
             <material name="base">
                 <color rgba="1.0 1.0 1.0 1.0"/>
@@ -54,86 +54,94 @@
         </visual>
         
         <collision>
-            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 ${pi/2} ${-pi/2}"/>
             <geometry>
-                <box size="${male_w} ${male_l} ${male_h}"/>
+                <mesh filename="package://pipe_swarm/models/hollow_pipe/meshes/key.stl" scale="0.001 0.001 0.001"/>
             </geometry>
         </collision>
 
         <xacro:box_inertial m="${male_m}" w="${male_w}" l="${male_l}" h="${male_h}" xyz="0 0 0 " rpy="0 0 0"/>
     </link>
 
-    <link name="${agent_namespace}_female_link">
+    <link name="${agent_namespace}_cover_link">
         <visual>
-            <xacro:female_rotation_shape />
-            <material name="base">
-                <color rgba="1.0 1.0 1.0 1.0"/>
-            </material>
-        </visual>
-        <visual>
-            <xacro:female_stopper_shape />
-            <material name="base">
-                <color rgba="1.0 1.0 1.0 1.0"/>
-            </material>
-        </visual>
-        <visual>
-            <xacro:female_wall_shape y_offset="0" z_offset="1"/>
-            <material name="base">
-                <color rgba="1.0 1.0 1.0 1.0"/>
-            </material>
-        </visual>
-        <visual>
-            <xacro:female_wall_shape y_offset="1" z_offset="0"/>
-            <material name="base">
-                <color rgba="1.0 1.0 1.0 1.0"/>
-            </material>
-        </visual>
-        <visual>
-            <xacro:female_wall_shape y_offset="-1" z_offset="0"/>
-            <material name="base">
-                <color rgba="1.0 1.0 1.0 1.0"/>
-            </material>
-        </visual>
-        <visual>
-            <xacro:female_wall_shape y_offset="0" z_offset="-1"/>
+            <origin xyz="0.0 0.0 0.0" rpy="${pi/2} 0.0 ${pi/2}"/>
+            <geometry>
+                <mesh filename="package://pipe_swarm/models/hollow_pipe/meshes/cover.stl" scale="0.001 0.001 0.001"/>
+            </geometry>
             <material name="base">
                 <color rgba="1.0 1.0 1.0 1.0"/>
             </material>
         </visual>
         
         <collision>
-            <xacro:female_rotation_shape />
-        </collision>
-        <collision>
-            <xacro:female_stopper_shape />
-        </collision>
-        <collision>
-            <xacro:female_wall_shape y_offset="0" z_offset="1"/>
-        </collision>
-        <collision>
-            <xacro:female_wall_shape y_offset="0" z_offset="-1"/>
-        </collision>
-        <collision>
-            <xacro:female_wall_shape y_offset="1" z_offset="0"/>
-        </collision>
-        <collision>
-            <xacro:female_wall_shape y_offset="-1" z_offset="0"/>
+            <origin xyz="0.0 0.0 0.0" rpy="${pi/2} 0.0 ${pi/2}"/>
+            <geometry>
+                <mesh filename="package://pipe_swarm/models/hollow_pipe/meshes/cover.stl" scale="0.001 0.001 0.001"/>
+            </geometry>
         </collision>
 
-        <xacro:box_inertial m="${female_m}" w="${female_w}" l="${female_l}" h="${female_h}" xyz="${female_diameter/2 - female_w/2} 0 0 " rpy="0 0 0"/>
+        <xacro:box_inertial m="${male_m}" w="${male_w}" l="${male_l}" h="${male_h}" xyz="0 0 0 " rpy="0 0 0"/>
+    </link>
+
+
+    <link name="${agent_namespace}_female_link">
+       <visual>
+            <origin xyz="0 0 0" rpy="0.0 ${pi/2} ${pi/2}"/>
+            <geometry>
+                <mesh filename="package://pipe_swarm/models/hollow_pipe/meshes/lock.stl" scale="0.001 0.001 0.001"/>
+            </geometry>
+            <material name="base">
+                <color rgba="1.0 1.0 1.0 1.0"/>
+            </material>
+        </visual>
+        
+        <collision>
+            <origin xyz="0 0 0" rpy="0.0 ${pi/2} ${pi/2}"/>
+            <geometry>
+                <mesh filename="package://pipe_swarm/models/hollow_pipe/meshes/lock.stl" scale="0.001 0.001 0.001"/>
+            </geometry>
+        </collision>
+    </link>
+
+    <link name="${agent_namespace}_pivot_link">
+       <visual>
+            <origin xyz="0 0 0" rpy="${pi/2} 0.0 ${-pi/2}"/>
+            <geometry>
+                <mesh filename="package://pipe_swarm/models/hollow_pipe/meshes/pivot.stl" scale="0.001 0.001 0.001"/>
+            </geometry>
+            <material name="base">
+                <color rgba="1.0 1.0 1.0 1.0"/>
+            </material>
+        </visual>
+        
+        <collision>
+            <origin xyz="0 0 0" rpy="${pi/2} 0.0 ${-pi/2}"/>
+            <geometry>
+                <mesh filename="package://pipe_swarm/models/hollow_pipe/meshes/pivot.stl" scale="0.001 0.001 0.001"/>
+            </geometry>
+        </collision>
+
+        <xacro:box_inertial m="${female_m}" w="0.05" l="0.05" h="0.05" xyz="0 0 0" rpy="0 0 0"/>
     </link>
     
     <!-- JOINTS -->
+    <joint name="${agent_namespace}_base_cover_joint" type="fixed">
+        <origin xyz="${(base_w*0.5)+0.007} 0.0 0.0" rpy="0 0 0"/>
+        <parent link="${agent_namespace}_base_link"/>
+        <child link="${agent_namespace}_cover_link"/>
+    </joint>
+
     <joint name="${agent_namespace}_base_male_joint" type="fixed">
-        <origin xyz="${(base_w*0.5) + (male_w*0.5)} 0 0" rpy="0 0 0"/>
+        <origin xyz="${(base_w*0.5)+0.007} 0.0 0.0" rpy="0 0 0"/>
         <parent link="${agent_namespace}_base_link"/>
         <child link="${agent_namespace}_male_link"/>
     </joint>
 
     <joint name="base_female_joint" type="revolute">
-        <origin xyz="${-(base_w*0.5) + female_diameter/2} 0 0" rpy="0 0 0"/>
+        <origin xyz="${-(base_w*0.5)+0.014} 0.0275 0.0" rpy="0 0 0"/>
         <parent link="${agent_namespace}_base_link"/>
-        <child link="${agent_namespace}_female_link"/>
+        <child link="${agent_namespace}_pivot_link"/>
         <axis xyz="0 1 0"/>
         <limit lower="${-pi/2}" upper="${pi/2}" effort="1.0" velocity="1.0"/>
     </joint>
@@ -143,5 +151,53 @@
         <parent link="${agent_namespace}_footprint_link"/>
         <child link="${agent_namespace}_base_link"/>
     </joint> -->
+
+    <joint name="${agent_namespace}_base_neutral_joint" type="fixed">
+        <origin xyz="-0.0665 -0.0275 0.0" rpy="0 0 0"/>
+        <parent link="${agent_namespace}_pivot_link"/>
+        <child link="${agent_namespace}_female_link"/>
+    </joint>
+
+    <!-- GAZEBO -->
+    <gazebo reference="${agent_namespace}_female_link">
+        <material>Gazebo/White</material>
+    </gazebo>
+    <gazebo reference="${agent_namespace}_male_link">
+        <material>Gazebo/White</material>
+    </gazebo>
+    <gazebo reference="${agent_namespace}_pivot_link">
+        <material>Gazebo/White</material>
+    </gazebo>
+        <gazebo reference="${agent_namespace}_neutral_link">
+        <material>Gazebo/White</material>
+    </gazebo>
+
+    <gazebo>
+        <plugin name="${agent_namespace}_control" filename="libgazebo_ros2_control.so">
+            <robot_param_node>/${agent_namespace}/robot_state_publisher</robot_param_node> 
+            <parameters>$(find pipe_swarm)/config/robot_controllers_sim.yaml</parameters>
+            <ros>
+                <namespace>${agent_namespace}</namespace>
+            </ros>
+        </plugin>
+    </gazebo>
+
+    <!-- ros2_control Plugin -->
+    <ros2_control name="GazeboSystem" type="system">
+        <hardware>
+            <plugin>gazebo_ros2_control/GazeboSystem</plugin>
+        </hardware>
+        <joint name="base_female_joint">
+            <command_interface name="position">
+                <param name="min">-pi/2</param>
+                <param name="max">pi/2</param>
+            </command_interface>
+            <state_interface name="position">
+                <param name="initial_value">0.0</param>
+            </state_interface>
+            <state_interface name="velocity"/>
+            <state_interface name="effort"/>
+        </joint>
+    </ros2_control>
 
 </robot>
