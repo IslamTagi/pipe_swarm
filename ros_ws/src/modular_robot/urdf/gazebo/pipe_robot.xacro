@@ -4,6 +4,7 @@
         <!-- Include shared components -->
         <xacro:include filename="mobile_base.xacro"/>
         <xacro:include filename="linkage.xacro"/>
+        <xacro:include filename="wheels.xacro"/>
     </xacro:macro>
 
     <xacro:gazebo_pipe_robot namespace="${agent_namespace}" />

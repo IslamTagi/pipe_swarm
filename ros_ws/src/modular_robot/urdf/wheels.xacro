@@ -4,13 +4,17 @@
     <xacro:property name="wheel_m" value="0.1" />  <!-- mass /kg -->
     <xacro:property name="wheel_r" value="0.0175" />  <!-- radius /m -->
     <xacro:property name="wheel_l" value="0.01" />  <!-- length /m -->
+    <xacro:property name="wheel_y_offset" value="0.002" />  <!-- length /m -->
+    <xacro:property name="wheel_x_offset_front" value="0.008" />  <!-- length /m -->
+    <xacro:property name="wheel_x_offset_back" value="0.012" />  <!-- length /m -->
 
     <xacro:macro name="wheel_link" params="prefix">
-        <link name="${agent_namespace}_wheel_${prefix}_link">
+        <link name="${agent_namespace}_wheel_${prefix}_left_link">
             <visual>
                 <origin xyz="0.0 0.0 0.0" rpy="0 0.0 0.0"/>
                 <geometry>
-                    <cylinder radius="${wheel_r}" length="${wheel_l}"/>
+                    <mesh filename="package://modular_robot/meshes/wheel_right.stl" scale="0.001 0.001 0.001"/>
+                    <!-- <cylinder radius="${wheel_r}" length="${wheel_l}"/> -->
                 </geometry>
                 <material name="wheel">
                     <color rgba="0 0 0 1.0"/>
@@ -20,7 +24,31 @@
             <collision>
                 <origin xyz="0.0 0.0 0.0" rpy="0 0.0 0.0"/>
                 <geometry>
-                    <cylinder radius="${wheel_r}" length="${wheel_l}"/>
+                    <mesh filename="package://modular_robot/meshes/wheel_right.stl" scale="0.001 0.001 0.001"/>
+                    <!-- <cylinder radius="${wheel_r}" length="${wheel_l}"/> -->
+                </geometry>
+            </collision>
+
+            <xacro:cylinder_solid_inertial m="${wheel_m}" r="${wheel_r}" l="${wheel_l}" xyz="0 0 0 " rpy="0 0 0"/>
+        </link>
+        
+        <link name="${agent_namespace}_wheel_${prefix}_right_link">
+            <visual>
+                <origin xyz="0.0 0.0 0.0" rpy="0 0.0 0.0"/>
+                <geometry>
+                    <mesh filename="package://modular_robot/meshes/wheel.stl" scale="0.001 0.001 0.001"/>
+                    <!-- <cylinder radius="${wheel_r}" length="${wheel_l}"/> -->
+                </geometry>
+                <material name="wheel">
+                    <color rgba="0 0 0 1.0"/>
+                </material>
+            </visual>
+            
+            <collision>
+                <origin xyz="0.0 0.0 0.0" rpy="0 0.0 0.0"/>
+                <geometry>
+                    <mesh filename="package://modular_robot/meshes/wheel.stl" scale="0.001 0.001 0.001"/>
+                    <!-- <cylinder radius="${wheel_r}" length="${wheel_l}"/> -->
                 </geometry>
             </collision>
 
@@ -29,28 +57,27 @@
     </xacro:macro>
 
     <!-- LINKS -->
-    <xacro:wheel_link prefix="front_right" />
-    <xacro:wheel_link prefix="front_left" />
-    <xacro:wheel_link prefix="back_right" />
-    <xacro:wheel_link prefix="back_left" />
+    <xacro:wheel_link prefix="front" />
+    <xacro:wheel_link prefix="back" />
+
 
     <!-- JOINTS -->
     <joint name="${agent_namespace}_base_wheel_front_right_joint" type="fixed">
-        <origin xyz="${base_w - wheel_r - 0.02} ${-((base_l/2) + (wheel_l/2))} ${-base_h/2}" rpy="${-pi/2} 0 0"/>
+        <origin xyz="${base_w - wheel_x_offset_front - 0.02} ${-((base_l/2) + wheel_y_offset)} ${-base_h/2}" rpy="${-pi/2} 0 0"/>
         <parent link="${agent_namespace}_base_link"/>
         <child link="${agent_namespace}_wheel_front_right_link"/>
         <!-- <axis xyz="0 0 1"/> -->
     </joint>
     
     <joint name="${agent_namespace}_base_wheel_front_left_joint" type="fixed">
-        <origin xyz="${base_w - wheel_r - 0.02} ${(base_l/2) + (wheel_l/2)} ${-base_h/2}" rpy="${-pi/2} 0 0"/>
+        <origin xyz="${base_w - wheel_x_offset_front - 0.02} ${(base_l/2) + wheel_y_offset} ${-base_h/2}" rpy="${-pi/2} 0 0"/>
         <parent link="${agent_namespace}_base_link"/>
         <child link="${agent_namespace}_wheel_front_left_link"/>
         <!-- <axis xyz="0 0 1"/> -->
     </joint>
     
     <joint name="${agent_namespace}_base_wheel_back_right_joint" type="fixed">
-        <origin xyz="${wheel_r - 0.02} ${-((base_l/2) + (wheel_l/2))} ${-base_h/2}" rpy="${-pi/2} 0 0"/>
+        <origin xyz="${wheel_x_offset_back - 0.02} ${-((base_l/2) + wheel_y_offset)} ${-base_h/2}" rpy="${-pi/2} 0 0"/>
         <parent link="${agent_namespace}_base_link"/>
         <child link="${agent_namespace}_wheel_back_right_link"/>
         <!-- <axis xyz="0 0 1"/> -->
@@ -58,7 +85,7 @@
     </joint>
 
     <joint name="${agent_namespace}_base_wheel_back_left_joint" type="fixed">
-        <origin xyz="${wheel_r - 0.02} ${(base_l/2) + (wheel_l/2)} ${-base_h/2}" rpy="${-pi/2} 0 0"/>
+        <origin xyz="${wheel_x_offset_back - 0.02} ${(base_l/2) + wheel_y_offset} ${-base_h/2}" rpy="${-pi/2} 0 0"/>
         <parent link="${agent_namespace}_base_link"/>
         <child link="${agent_namespace}_wheel_back_left_link"/>
         <!-- <axis xyz="0 0 1"/> -->
