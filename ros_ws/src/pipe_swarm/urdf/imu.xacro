@@ -34,27 +34,4 @@
         <child link="${agent_namespace}_imu_link"/>
     </joint>
 
-    <!-- GAZEBO -->
-    <gazebo reference="${agent_namespace}_imu_link">
-        <material>Gazebo/Red</material>
-        <sensor name="${agent_namespace}_imu_sensor" type="imu">
-            <always_on>true</always_on>
-            <visualize>true</visualize>
-            <update_rate>100</update_rate>
-            <topic>__default_topic__</topic>
-            <plugin name="imu" filename="libgazebo_ros_imu_sensor.so">
-                <topicName>imu</topicName>
-                <serviceName>imu_service</serviceName>
-                <bodyName>${agent_namespace}_imu_link</bodyName>
-                <updateRateHZ>10.0</updateRateHZ>
-                <gaussianNoise>0.0</gaussianNoise>
-                <xyzOffset>0 0 0</xyzOffset>
-                <rpyOffset>0 0 0</rpyOffset>
-                <frameName>${agent_namespace}_imu_link</frameName>
-                <initialOrientationAsReference>false</initialOrientationAsReference>
-            </plugin>
-            <pose>0 0 0 0 0 0</pose>
-        </sensor>
-    </gazebo>
-
 </robot>

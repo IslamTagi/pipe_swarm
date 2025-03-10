@@ -6,7 +6,6 @@ from launch.substitutions import Command
 from ament_index_python.packages import get_package_share_directory
 from launch.event_handlers import OnProcessExit
 import yaml
-import math
 
 import os
 
@@ -50,7 +49,7 @@ def generate_launch_description():
     # Paths to resources
     pipe_swarm_share = get_package_share_directory('pipe_swarm')
     gazebo_ros_share = get_package_share_directory('gazebo_ros')
-    xacro_path = os.path.join(pipe_swarm_share, 'urdf', 'pipe_agent.urdf.xacro')
+    xacro_path = os.path.join(pipe_swarm_share, 'urdf', 'modular_robot.urdf.xacro')
     world_path = os.path.join(pipe_swarm_share, 'worlds', 'bookshelf.sdf')
 
     agents = []
@@ -66,7 +65,7 @@ def generate_launch_description():
     # Pre-Agent Setup
     agents.append(gazebo_launch)
 
-    for i in range(3):  # Launch 3 robots
+    for i in range(1):  # Launch 3 robots
         namespace = f'agent_{i}'
 
         # update_controllers_namespace(namespace)
@@ -76,8 +75,7 @@ def generate_launch_description():
             package='robot_state_publisher',
             executable='robot_state_publisher',
             output='screen',
-            namespace=namespace,
-            parameters=[{'robot_description': Command(['xacro ', xacro_path, ' agent_namespace:=', namespace])}]
+            parameters=[{'robot_description': Command(['xacro ', xacro_path])}]
         )
 
         # Spawn the robot entity in Gazebo
@@ -89,12 +87,9 @@ def generate_launch_description():
             arguments=[ '-entity', namespace,
                         '-x', f'{i*2}',
                         '-y', '0',
-                        '-z', '0.03',
-                        '-R', '0',  # Roll
-                        '-P', '0',  # Pitch 
-                        '-Y', f'{math.radians(0)}',  # Yaw
-                        '-robot_namespace', namespace,
-                        '-topic', f'/{namespace}/robot_description'
+                        '-z', '0',
+                        # '-robot_namespace', namespace,
+                        '-topic', f'/robot_description'
                     ]
         )
 
@@ -106,11 +101,11 @@ def generate_launch_description():
             output='screen',
         )
         
-        spawn_joint_trajectory_controller = Node(
+        spawn_position_controller = Node(
             package='controller_manager',
             executable='spawner',
             namespace=namespace,
-            arguments=['joint_trajectory_controller'],
+            arguments=['position_controller'],
             output='screen',
         )
         
@@ -126,27 +121,17 @@ def generate_launch_description():
             event_handler=OnProcessExit(
                 target_action=spawn_entity,
                 on_exit=[spawn_joint_state_broadcaster,
-                         spawn_joint_trajectory_controller,
+                         spawn_position_controller,
                          # spawn_skid_steer_controller,
                         ],
             )
         )
 
         agents.extend([
-            ros_controllers_event,
+            # ros_controllers_event,
             pipe_robot_state_publisher,
             spawn_entity,
         ])
-
-        red_detector_node = Node(
-            package='pipe_swarm',
-            executable='alignment_topic.py',
-            output='screen',
-            name=f'red_detector_node_{1}',
-            parameters=[{'agent_namespace':namespace}]
-        )
-
-        agents.append(red_detector_node)
     
     # Launch RViz2 for visualization
     rviz_display = Node(
