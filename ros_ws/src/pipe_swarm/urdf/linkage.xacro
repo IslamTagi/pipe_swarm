@@ -16,7 +16,7 @@
     <xacro:property name="female_m" value="0.1" />  <!-- mass /kg -->
     <xacro:property name="female_w" value="${(female_diameter/2) + female_stopper_width + female_hole_depth}" />  <!-- width /m -->
     <xacro:property name="female_h" value="${female_diameter}" />  <!-- height /m -->
-    <xacro:property name="female_l" value="0.028" />  /m
+    <xacro:property name="female_l" value="0.028" />   <!-- length /m -->
 
     <xacro:macro name="female_rotation_shape">
             <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
