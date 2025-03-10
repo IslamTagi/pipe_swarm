@@ -12,7 +12,7 @@
             <right_joint>${agent_namespace}_base_wheel_back_right_joint</right_joint>
             <left_joint>${agent_namespace}_base_wheel_back_left_joint</left_joint>
 
-            <wheel_separation>${base_l + wheel_l}</wheel_separation>
+            <wheel_separation>${base_l + wheel_l+ 2*wheel_y_offset}</wheel_separation>
             <wheel_diameter>${wheel_r*2}</wheel_diameter>
 
             <max_wheel_torque>20</max_wheel_torque>
@@ -21,7 +21,7 @@
             <command_topic>cmd_vel</command_topic>
 
             <odometry_frame>odom</odometry_frame>
-            <robot_base_frame>${base_agent}_footprint_link</robot_base_frame>
+            <robot_base_frame>${agent_namespace}_footprint_link</robot_base_frame>
             
             <odometry_topic>odom</odometry_topic>
             <publish_odom>true</publish_odom>
@@ -34,12 +34,12 @@
             <ros>
                 <namespace>${agent_namespace}</namespace>
             </ros>
-            <update_rate>50</update_rate>
+            <update_rate>50</update_rate> 
              
             <right_joint>${agent_namespace}_base_wheel_front_right_joint</right_joint>
             <left_joint>${agent_namespace}_base_wheel_front_left_joint</left_joint>
 
-            <wheel_separation>${base_l + wheel_l}</wheel_separation>
+            <wheel_separation>${base_l + wheel_l+ 2*wheel_y_offset}</wheel_separation>
             <wheel_diameter>${wheel_r*2}</wheel_diameter>
 
             <max_wheel_torque>20</max_wheel_torque>
@@ -48,7 +48,7 @@
             <command_topic>cmd_vel</command_topic>
 
             <odometry_frame>odom</odometry_frame>
-            <robot_base_frame>${base_agent}_footprint_link</robot_base_frame>
+            <robot_base_frame>${agent_namespace}_footprint_link</robot_base_frame>
             
             <odometry_topic>odom</odometry_topic>
             <publish_odom>true</publish_odom>

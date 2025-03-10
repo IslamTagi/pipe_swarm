@@ -8,6 +8,12 @@
     <gazebo reference="${agent_namespace}_male_link">
         <material>Gazebo/White</material>
     </gazebo>
+    <gazebo reference="${agent_namespace}_pivot_link">
+        <material>Gazebo/White</material>
+    </gazebo>
+        <gazebo reference="${agent_namespace}_neutral_link">
+        <material>Gazebo/White</material>
+    </gazebo>
 
     <gazebo>
         <plugin name="${agent_namespace}_control" filename="libgazebo_ros2_control.so">
@@ -26,14 +32,14 @@
         </hardware>
         <joint name="base_female_joint">
             <command_interface name="position">
-                <param name="min">-pi/2</param>
-                <param name="max">pi/2</param>
+                <param name="min">-pi/4</param>
+                <param name="max">pi/4</param>
             </command_interface>
             <state_interface name="position">
                 <param name="initial_value">0.0</param>
             </state_interface>
             <state_interface name="velocity"/>
+            <state_interface name="effort"/>
         </joint>
     </ros2_control>
-
 </robot>
