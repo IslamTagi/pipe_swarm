@@ -53,6 +53,60 @@
       </link>
     </model>
 
+    <!-- Add the half hollow pipe model -->
+    <model name="half_hollow_pipe">
+      <static>true</static>  <!-- Pipe is static, it's not going to move -->
+      <pose>4.8 -0.08 0.12 1.5708 0 1.5708</pose>
+      <link name="hollow_pipe_link">
+        <visual name="hollow_pipe_visual">
+          <geometry>
+            <mesh>
+              <!-- Path to the hollow pipe mesh -->
+              <uri>model://pipe_swarm/models/hollow_pipe/meshes/half_hollow_pipe.stl</uri>
+              <scale>0.001 0.001 0.001</scale>  <!-- Scale if needed -->
+            </mesh>
+          </geometry>
+        </visual>
+
+        <collision name="half_hollow_pipe_collision">
+          <geometry>
+            <mesh>
+              <!-- Path to the hollow pipe mesh for collision -->
+              <uri>model://pipe_swarm/models/hollow_pipe/meshes/half_hollow_pipe.stl</uri>
+              <scale>0.001 0.001 0.001</scale>  <!-- Scale for collision geometry -->
+            </mesh>
+          </geometry>
+        </collision>
+      </link>
+    </model>
+
+    <!-- Add the pipe end model -->
+    <model name="pipe_end">
+      <static>true</static>  <!-- Pipe is static, it's not going to move -->
+      <pose>4.8 -0.08 -0.12 1.5708 0 1.5708</pose>
+      <link name="hollow_pipe_link">
+        <visual name="hollow_pipe_visual">
+          <geometry>
+            <mesh>
+              <!-- Path to the hollow pipe mesh -->
+              <uri>model://pipe_swarm/models/hollow_pipe/meshes/pipe_end.stl</uri>
+              <scale>0.001 0.001 0.001</scale>  <!-- Scale if needed -->
+            </mesh>
+          </geometry>
+        </visual>
+
+        <collision name="pipe_end_collision">
+          <geometry>
+            <mesh>
+              <!-- Path to the hollow pipe mesh for collision -->
+              <uri>model://pipe_swarm/models/hollow_pipe/meshes/pipe_end.stl</uri>
+              <scale>0.001 0.001 0.001</scale>  <!-- Scale for collision geometry -->
+            </mesh>
+          </geometry>
+        </collision>
+      </link>
+    </model>
+
     <!-- Ground plane (optional) -->
     <model name="ground_plane">
       <static>true</static>

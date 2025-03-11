@@ -89,7 +89,7 @@ def generate_launch_description():
             arguments=[ '-entity', namespace,
                         '-x', f'{i*2}',
                         '-y', '0',
-                        '-z', '0.03',
+                        '-z', '0.1',
                         '-R', '0',  # Roll
                         '-P', '0',  # Pitch 
                         '-Y', f'{math.radians(0)}',  # Yaw
