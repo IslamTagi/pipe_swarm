@@ -132,12 +132,6 @@ def generate_launch_description():
             )
         )
 
-        agents.extend([
-            ros_controllers_event,
-            pipe_robot_state_publisher,
-            spawn_entity,
-        ])
-
         red_detector_node = Node(
             package='pipe_swarm',
             executable='alignment_topic.py',
@@ -145,9 +139,15 @@ def generate_launch_description():
             name=f'red_detector_node_{1}',
             parameters=[{'agent_namespace':namespace}]
         )
+        
+        agents.extend([
+            ros_controllers_event,
+            pipe_robot_state_publisher,
+            spawn_entity,
+            red_detector_node
+        ])
 
-        agents.append(red_detector_node)
-    
+
     # Launch RViz2 for visualization
     rviz_display = Node(
         package='rviz2',
