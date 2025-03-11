@@ -29,14 +29,14 @@
     </joint>
 
     <gazebo>
-        <plugin name="ros_control" filename="libgazebo_ros2_control.so">
+        <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
             <robot_param_node>robot_state_publisher</robot_param_node> 
             <parameters>$(find modular_robot)/config/modular_controller.yaml</parameters>
         </plugin>
     </gazebo>
 
     <!-- ros2_control Plugin -->
-    <ros2_control name="GazeboSystem" type="system">
+    <ros2_control name="GazeboSimSystem" type="system">
         <hardware>
             <plugin>gazebo_ros2_control/GazeboSystem</plugin>
         </hardware>
