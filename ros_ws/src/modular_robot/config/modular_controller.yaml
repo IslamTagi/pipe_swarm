@@ -12,10 +12,9 @@
 /joint_trajectory_controller:
   ros__parameters:
     joints:
-      - agent_n_female_base_joint
-      - agent_n2_female_base_joint
-      - agent_n3_female_base_joint
-      - agent_n4_female_base_joint
+      - agent_n_pivot_base_joint
+      - agent_n2_pivot_base_joint
+      - agent_n3_pivot_base_joint
 
     command_interfaces:
       - position
