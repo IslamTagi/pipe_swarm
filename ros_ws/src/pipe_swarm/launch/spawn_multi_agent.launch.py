@@ -145,7 +145,7 @@ def generate_launch_description():
             package='pipe_swarm',
             executable='alignment_topic.py',
             output='screen',
-            name=f'red_detector_node_{1}',
+            name=f'red_detector_node_{i}',
             parameters=[{'agent_namespace':namespace}]
         )
 
