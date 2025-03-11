@@ -8,7 +8,7 @@ def generate_launch_description():
     xacro_path = os.path.join(
         get_package_share_directory('pipe_swarm'),
         'urdf',
-        'pipe_robot.urdf.xacro'
+        'pipe_agent.urdf.xacro'
     )
 
     namespace = f'agent_0'

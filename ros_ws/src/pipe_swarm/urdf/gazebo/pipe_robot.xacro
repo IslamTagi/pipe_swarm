@@ -10,6 +10,7 @@
         <xacro:include filename="camera.xacro"/>
         <xacro:include filename="linkage.xacro"/>
         <xacro:include filename="wheels.xacro"/>
+        <xacro:include filename="detection_object.xacro"/>
     </xacro:macro>
 
     <xacro:gazebo_pipe_robot namespace="${agent_namespace}" />

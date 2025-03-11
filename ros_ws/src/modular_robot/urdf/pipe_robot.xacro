@@ -6,6 +6,7 @@
         <xacro:include filename="common.xacro"/>
         <xacro:include filename="mobile_base.xacro"/>
         <xacro:include filename="linkage.xacro"/>
+        <xacro:include filename="wheels.xacro"/>
         <xacro:if value="${include_gazebo}">
             <xacro:include filename="gazebo/pipe_robot.xacro"/>
         </xacro:if>

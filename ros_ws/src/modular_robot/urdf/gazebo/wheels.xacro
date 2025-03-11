@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<robot name="gazebo_wheels" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    
+    <gazebo reference="${agent_namespace}_wheel_front_right_link">
+        <material>Gazebo/Black</material>
+        <mu1 value="1.0"/>
+        <mu2 value="1.0"/>
+    </gazebo>
+    <gazebo reference="${agent_namespace}_wheel_front_left_link">
+        <material>Gazebo/Black</material>
+        <mu1 value="1.0"/>
+        <mu2 value="1.0"/>
+    </gazebo>
+    <gazebo reference="${agent_namespace}_wheel_back_right_link">
+        <material>Gazebo/Black</material>
+        <mu1 value="1.0"/>
+        <mu2 value="1.0"/>
+    </gazebo>
+    <gazebo reference="${agent_namespace}_wheel_back_left_link">
+        <material>Gazebo/Black</material>
+        <mu1 value="1.0"/>
+        <mu2 value="1.0"/>
+    </gazebo>
+
+</robot>
