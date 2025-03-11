@@ -106,11 +106,19 @@ def generate_launch_description():
             output='screen',
         )
         
-        spawn_joint_trajectory_controller = Node(
+        spawn_female_joint_trajectory_controller = Node(
             package='controller_manager',
             executable='spawner',
             namespace=namespace,
-            arguments=['joint_trajectory_controller'],
+            arguments=['female_joint_trajectory_controller'],
+            output='screen',
+        )
+
+        spawn_male_joint_trajectory_controller = Node(
+            package='controller_manager',
+            executable='spawner',
+            namespace=namespace,
+            arguments=['male_joint_trajectory_controller'],
             output='screen',
         )
         
@@ -126,7 +134,8 @@ def generate_launch_description():
             event_handler=OnProcessExit(
                 target_action=spawn_entity,
                 on_exit=[spawn_joint_state_broadcaster,
-                         spawn_joint_trajectory_controller,
+                         spawn_female_joint_trajectory_controller,
+                         spawn_male_joint_trajectory_controller,
                          # spawn_skid_steer_controller,
                         ],
             )
@@ -139,7 +148,7 @@ def generate_launch_description():
             name=f'red_detector_node_{1}',
             parameters=[{'agent_namespace':namespace}]
         )
-        
+
         agents.extend([
             ros_controllers_event,
             pipe_robot_state_publisher,
