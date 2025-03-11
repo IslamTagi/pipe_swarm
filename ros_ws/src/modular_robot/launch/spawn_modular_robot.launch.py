@@ -58,7 +58,7 @@ def generate_launch_description():
     spawn_joint_trajectory_controller = Node(
         package='controller_manager',
         executable='spawner',
-        arguments=['joint_trajectory_controller'],
+        arguments=['chain_joint_trajectory_controller'],
         output='screen',
     )
     
