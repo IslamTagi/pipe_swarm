@@ -3,10 +3,10 @@
     
     <!-- GAZEBO -->
     <gazebo reference="${agent_namespace}_footprint_link">
-        <material>Gazebo/Blue</material>
+        <material>Gazebo/Grey</material>
     </gazebo>
     <gazebo reference="${agent_namespace}_base_link">
-        <material>Gazebo/Blue</material>
+        <material>Gazebo/Grey</material>
     </gazebo>
 
 </robot>
