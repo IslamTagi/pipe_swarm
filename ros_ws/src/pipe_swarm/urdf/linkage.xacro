@@ -20,7 +20,7 @@
     <xacro:property name="female_l" value="0.028" />   <!-- length /m -->
     
     <xacro:property name="pivot_l" value="0.055" />  <!-- length /m -->
-    <xacro:property name="lock_w" value="0.0665" />  <!-- width /m -->
+    <xacro:property name="lock_w" value="0.02" />  <!-- width /m -->
 
     <xacro:macro name="female_rotation_shape">
             <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
@@ -71,7 +71,7 @@
         <visual>
             <origin xyz="0.0 0.0 0.0" rpy="${pi/2} 0.0 ${pi/2}"/>
             <geometry>
-                <mesh filename="package://pipe_swarm/models/hollow_pipe/meshes/cover.stl" scale="0.001 0.001 0.001"/>
+                <mesh filename="package://pipe_swarm/models/hollow_pipe/meshes/cover_v2.stl" scale="0.001 0.001 0.001"/>
             </geometry>
             <material name="base">
                 <color rgba="1.0 1.0 1.0 1.0"/>
@@ -81,7 +81,7 @@
         <collision>
             <origin xyz="0.0 0.0 0.0" rpy="${pi/2} 0.0 ${pi/2}"/>
             <geometry>
-                <mesh filename="package://pipe_swarm/models/hollow_pipe/meshes/cover.stl" scale="0.001 0.001 0.001"/>
+                <mesh filename="package://pipe_swarm/models/hollow_pipe/meshes/cover_v2.stl" scale="0.001 0.001 0.001"/>
             </geometry>
         </collision>
 
@@ -93,7 +93,7 @@
        <visual>
             <origin xyz="${-lock_w/2} 0 0" rpy="0.0 ${pi/2} ${pi/2}"/>
             <geometry>
-                <mesh filename="package://pipe_swarm/models/hollow_pipe/meshes/lock.stl" scale="0.001 0.001 0.001"/>
+                <mesh filename="package://pipe_swarm/models/hollow_pipe/meshes/lock_v2.stl" scale="0.001 0.001 0.001"/>
             </geometry>
             <material name="base">
                 <color rgba="1.0 1.0 1.0 1.0"/>
@@ -103,7 +103,7 @@
         <collision>
             <origin xyz="${-lock_w/2} 0 0" rpy="0.0 ${pi/2} ${pi/2}"/>
             <geometry>
-                <mesh filename="package://pipe_swarm/models/hollow_pipe/meshes/lock.stl" scale="0.001 0.001 0.001"/>
+                <mesh filename="package://pipe_swarm/models/hollow_pipe/meshes/lock_v2.stl" scale="0.001 0.001 0.001"/>
             </geometry>
         </collision>
     </link>
@@ -131,7 +131,7 @@
     
     <!-- JOINTS -->
     <joint name="${agent_namespace}_base_cover_joint" type="fixed">
-        <origin xyz="${(base_w*0.5)+male_o} 0.0 0.0" rpy="0 0 0"/>
+        <origin xyz="${(base_w*0.5)-0.003} 0.0 0.0" rpy="0 0 0"/>
         <parent link="${agent_namespace}_base_link"/>
         <child link="${agent_namespace}_cover_link"/>
     </joint>
@@ -145,7 +145,7 @@
     </joint>
 
     <joint name="base_female_joint" type="revolute">
-        <origin xyz="${-(base_w*0.5)+0.014} 0 0" rpy="0 0 0"/>
+        <origin xyz="${-(base_w*0.5)} 0 0" rpy="0 0 0"/>
         <parent link="${agent_namespace}_base_link"/>
         <child link="${agent_namespace}_pivot_link"/>
         <axis xyz="0 1 0"/>
@@ -159,7 +159,7 @@
     </joint> -->
 
     <joint name="${agent_namespace}_base_neutral_joint" type="fixed">
-        <origin xyz="${-lock_w/2} 0 0.0" rpy="0 0 0"/>
+        <origin xyz="${-0.01-pivot_l/2} 0 0.0" rpy="0 0 0"/>
         <parent link="${agent_namespace}_pivot_link"/>
         <child link="${agent_namespace}_female_link"/>
     </joint>
