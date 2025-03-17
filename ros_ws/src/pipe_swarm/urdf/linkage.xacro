@@ -21,6 +21,9 @@
     
     <xacro:property name="pivot_l" value="0.055" />  <!-- length /m -->
     <xacro:property name="lock_w" value="0.02" />  <!-- width /m -->
+    <xacro:property name="lock_o" value="0.01" />  <!-- offset /m -->
+    <xacro:property name="cover_o" value="0.003" />  <!-- offset /m -->
+
 
     <xacro:macro name="female_rotation_shape">
             <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
@@ -131,7 +134,7 @@
     
     <!-- JOINTS -->
     <joint name="${agent_namespace}_base_cover_joint" type="fixed">
-        <origin xyz="${(base_w*0.5)-0.003} 0.0 0.0" rpy="0 0 0"/>
+        <origin xyz="${(base_w*0.5)-cover_o} 0.0 0.0" rpy="0 0 0"/>
         <parent link="${agent_namespace}_base_link"/>
         <child link="${agent_namespace}_cover_link"/>
     </joint>
@@ -159,7 +162,7 @@
     </joint> -->
 
     <joint name="${agent_namespace}_base_neutral_joint" type="fixed">
-        <origin xyz="${-0.01-pivot_l/2} 0 0.0" rpy="0 0 0"/>
+        <origin xyz="${-lock_o-pivot_l/2} 0 0.0" rpy="0 0 0"/>
         <parent link="${agent_namespace}_pivot_link"/>
         <child link="${agent_namespace}_female_link"/>
     </joint>
