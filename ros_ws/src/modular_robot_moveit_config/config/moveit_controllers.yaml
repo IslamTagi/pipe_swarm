@@ -9,7 +9,6 @@ moveit_simple_controller_manager:
   chain_joint_trajectory_controller:
     type: FollowJointTrajectory
     joints:
-      - agent_n_pivot_base_joint
       - agent_n2_pivot_base_joint
       - agent_n3_pivot_base_joint
     action_ns: follow_joint_trajectory

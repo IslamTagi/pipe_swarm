@@ -8,13 +8,6 @@
                 <!-- By default, set up controllers for simulation. This won't work on real hardware -->
                 <plugin>mock_components/GenericSystem</plugin>
             </hardware>
-            <joint name="agent_n_pivot_base_joint">
-                <command_interface name="position"/>
-                <state_interface name="position">
-                  <param name="initial_value">${initial_positions['agent_n_pivot_base_joint']}</param>
-                </state_interface>
-                <state_interface name="velocity"/>
-            </joint>
             <joint name="agent_n2_pivot_base_joint">
                 <command_interface name="position"/>
                 <state_interface name="position">
