@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<robot name="pipe_robot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:macro name="pipe_robot" params="agent_namespace include_gazebo">
+
+        <!-- Include shared components -->
+        <xacro:include filename="common.xacro"/>
+        <xacro:include filename="mobile_base.xacro"/>
+        <xacro:include filename="linkage.xacro"/>
+        <xacro:include filename="wheels.xacro"/>
+        <xacro:if value="${include_gazebo}">
+            <xacro:include filename="gazebo/pipe_robot.xacro"/>
+        </xacro:if>
+    </xacro:macro>
+</robot>

@@ -4,13 +4,17 @@
     <xacro:property name="wheel_m" value="0.1" />  <!-- mass /kg -->
     <xacro:property name="wheel_r" value="0.0175" />  <!-- radius /m -->
     <xacro:property name="wheel_l" value="0.01" />  <!-- length /m -->
+    <xacro:property name="wheel_y_offset" value="0.002" />  <!-- length /m -->
+    <xacro:property name="wheel_x_offset_front" value="0.012" />  <!-- length /m -->
+    <xacro:property name="wheel_x_offset_back" value="0.008" />  <!-- length /m -->
 
     <xacro:macro name="wheel_link" params="prefix">
-        <link name="${agent_namespace}_wheel_${prefix}_link">
+        <link name="${agent_namespace}_wheel_${prefix}_left_link">
             <visual>
                 <origin xyz="0.0 0.0 0.0" rpy="0 0.0 0.0"/>
                 <geometry>
-                    <cylinder radius="${wheel_r}" length="${wheel_l}"/>
+                    <mesh filename="package://pipe_swarm/models/hollow_pipe/meshes/wheel_right.stl" scale="0.001 0.001 0.001"/>
+                    <!-- <cylinder radius="${wheel_r}" length="${wheel_l}"/> -->
                 </geometry>
                 <material name="wheel">
                     <color rgba="0 0 0 1.0"/>
@@ -20,7 +24,31 @@
             <collision>
                 <origin xyz="0.0 0.0 0.0" rpy="0 0.0 0.0"/>
                 <geometry>
-                    <cylinder radius="${wheel_r}" length="${wheel_l}"/>
+                    <mesh filename="package://pipe_swarm/models/hollow_pipe/meshes/wheel_right.stl" scale="0.001 0.001 0.001"/>
+                    <!-- <cylinder radius="${wheel_r}" length="${wheel_l}"/> -->
+                </geometry>
+            </collision>
+
+            <xacro:cylinder_solid_inertial m="${wheel_m}" r="${wheel_r}" l="${wheel_l}" xyz="0 0 0 " rpy="0 0 0"/>
+        </link>
+        
+        <link name="${agent_namespace}_wheel_${prefix}_right_link">
+            <visual>
+                <origin xyz="0.0 0.0 0.0" rpy="0 0.0 0.0"/>
+                <geometry>
+                    <mesh filename="package://pipe_swarm/models/hollow_pipe/meshes/wheel.stl" scale="0.001 0.001 0.001"/>
+                    <!-- <cylinder radius="${wheel_r}" length="${wheel_l}"/> -->
+                </geometry>
+                <material name="wheel">
+                    <color rgba="0 0 0 1.0"/>
+                </material>
+            </visual>
+            
+            <collision>
+                <origin xyz="0.0 0.0 0.0" rpy="0 0.0 0.0"/>
+                <geometry>
+                    <mesh filename="package://pipe_swarm/models/hollow_pipe/meshes/wheel.stl" scale="0.001 0.001 0.001"/>
+                    <!-- <cylinder radius="${wheel_r}" length="${wheel_l}"/> -->
                 </geometry>
             </collision>
 
@@ -29,165 +57,39 @@
     </xacro:macro>
 
     <!-- LINKS -->
-    <xacro:wheel_link prefix="front_right" />
-    <xacro:wheel_link prefix="front_left" />
-    <xacro:wheel_link prefix="back_right" />
-    <xacro:wheel_link prefix="back_left" />
+    <xacro:wheel_link prefix="front" />
+    <xacro:wheel_link prefix="back" />
+
 
     <!-- JOINTS -->
-    <joint name="base_wheel_front_right_joint" type="continuous">
-        <origin xyz="${(base_w)/2 - wheel_r} ${-((base_l/2) + (wheel_l/2))} ${-base_h/2}" rpy="${-pi/2} 0 0"/>
+    <joint name="${agent_namespace}_base_wheel_front_right_joint" type="continuous">
+        <origin xyz="${(base_w)/2 - wheel_x_offset_front} ${-((base_l/2) + wheel_y_offset)} ${-base_h/2}" rpy="${-pi/2} 0 0"/>
         <parent link="${agent_namespace}_base_link"/>
         <child link="${agent_namespace}_wheel_front_right_link"/>
         <axis xyz="0 0 1"/>
     </joint>
     
-    <joint name="base_wheel_front_left_joint" type="continuous">
-        <origin xyz="${(base_w)/2 - wheel_r} ${(base_l/2) + (wheel_l/2)} ${-base_h/2}" rpy="${-pi/2} 0 0"/>
+    <joint name="${agent_namespace}_base_wheel_front_left_joint" type="continuous">
+        <origin xyz="${(base_w)/2 - wheel_x_offset_front} ${(base_l/2) + wheel_y_offset} ${-base_h/2}" rpy="${-pi/2} 0 0"/>
         <parent link="${agent_namespace}_base_link"/>
         <child link="${agent_namespace}_wheel_front_left_link"/>
         <axis xyz="0 0 1"/>
     </joint>
     
-    <joint name="base_wheel_back_right_joint" type="continuous">
-        <origin xyz="${-((base_w)/2 - wheel_r)} ${-((base_l/2) + (wheel_l/2))} ${-base_h/2}" rpy="${-pi/2} 0 0"/>
+    <joint name="${agent_namespace}_base_wheel_back_right_joint" type="continuous">
+        <origin xyz="${-((base_w)/2 - wheel_x_offset_back)} ${-((base_l/2) + wheel_y_offset)} ${-base_h/2}" rpy="${-pi/2} 0 0"/>
         <parent link="${agent_namespace}_base_link"/>
         <child link="${agent_namespace}_wheel_back_right_link"/>
         <axis xyz="0 0 1"/>
-        <!-- <mimic joint="base_wheel_front_right_joint" multiplier="1.0"/> -->
+        <!-- <mimic joint="${agent_namespace}_base_wheel_front_right_joint" multiplier="1.0"/> -->
     </joint>
 
-    <joint name="base_wheel_back_left_joint" type="continuous">
-        <origin xyz="${-((base_w)/2 - wheel_r)} ${(base_l/2) + (wheel_l/2)} ${-base_h/2}" rpy="${-pi/2} 0 0"/>
+    <joint name="${agent_namespace}_base_wheel_back_left_joint" type="continuous">
+        <origin xyz="${-((base_w)/2 - wheel_x_offset_back)} ${(base_l/2) + wheel_y_offset} ${-base_h/2}" rpy="${-pi/2} 0 0"/>
         <parent link="${agent_namespace}_base_link"/>
         <child link="${agent_namespace}_wheel_back_left_link"/>
         <axis xyz="0 0 1"/>
-        <!-- <mimic joint="base_wheel_front_left_joint" multiplier="1.0"/> -->
+        <!-- <mimic joint="${agent_namespace}_base_wheel_front_left_joint" multiplier="1.0"/> -->
     </joint>
-
-    <!-- GAZEBO -->
-    <gazebo>
-        <plugin name="${agent_namespace}_diff_drive" filename="libgazebo_ros_diff_drive.so">
-            <ros>
-                <namespace>${agent_namespace}</namespace>
-            </ros>
-            <update_rate>50</update_rate> 
-             
-            <right_joint>base_wheel_back_right_joint</right_joint>
-            <left_joint>base_wheel_back_left_joint</left_joint>
-
-            <wheel_separation>${base_l + wheel_l}</wheel_separation>
-            <wheel_diameter>${wheel_r*2}</wheel_diameter>
-
-            <max_wheel_torque>20</max_wheel_torque>
-            <max_wheel_acceleration>1</max_wheel_acceleration>
-
-            <command_topic>cmd_vel</command_topic>
-
-            <odometry_frame>odom</odometry_frame>
-            <robot_base_frame>${agent_namespace}_footprint_link</robot_base_frame>
-            
-            <odometry_topic>odom</odometry_topic>
-            <publish_odom>true</publish_odom>
-            <publish_odom_tf>true</publish_odom_tf>
-            <publish_wheel_tf>true</publish_wheel_tf>
-        </plugin>
-    </gazebo>    
-    <gazebo>
-        <plugin name="${agent_namespace}_diff_drive_2" filename="libgazebo_ros_diff_drive.so">
-            <ros>
-                <namespace>${agent_namespace}</namespace>
-            </ros>
-            <update_rate>50</update_rate> 
-             
-            <right_joint>base_wheel_front_right_joint</right_joint>
-            <left_joint>base_wheel_front_left_joint</left_joint>
-
-            <wheel_separation>${base_l + wheel_l}</wheel_separation>
-            <wheel_diameter>${wheel_r*2}</wheel_diameter>
-
-            <max_wheel_torque>20</max_wheel_torque>
-            <max_wheel_acceleration>1</max_wheel_acceleration>
-
-            <command_topic>cmd_vel</command_topic>
-
-            <odometry_frame>odom</odometry_frame>
-            <robot_base_frame>${agent_namespace}_footprint_link</robot_base_frame>
-            
-            <odometry_topic>odom</odometry_topic>
-            <publish_odom>true</publish_odom>
-            <publish_odom_tf>true</publish_odom_tf>
-            <publish_wheel_tf>true</publish_wheel_tf>
-        </plugin>
-    </gazebo>    
-
-    <!-- <gazebo>
-        <plugin name="${agent_namespace}_control" filename="libgazebo_ros2_control.so">
-            <robot_param_node>/${agent_namespace}/robot_state_publisher</robot_param_node> 
-            <parameters>$(find pipe_swarm)/config/robot_controllers_sim.yaml</parameters>
-            <ros>
-                <namespace>${agent_namespace}</namespace>
-            </ros>
-        </plugin>
-    </gazebo>
-
-    <ros2_control name="GazeboSystem" type="system">
-        <hardware>
-            <plugin>gazebo_ros2_control/GazeboSystem</plugin>
-        </hardware>
-        <joint name="base_wheel_front_right_joint">
-            <command_interface name="velocity">
-                <param name="min">-2</param>
-                <param name="max">2</param>
-            </command_interface>
-            <state_interface name="position"/>
-            <state_interface name="velocity"/>
-        </joint>
-        <joint name="base_wheel_front_left_joint">
-            <command_interface name="velocity">
-                <param name="min">-2</param>
-                <param name="max">2</param>
-            </command_interface>
-            <state_interface name="position"/>
-            <state_interface name="velocity"/>
-        </joint>
-        <joint name="base_wheel_back_right_joint">
-            <command_interface name="velocity">
-                <param name="min">-2</param>
-                <param name="max">2</param>
-            </command_interface>
-            <state_interface name="position"/>
-            <state_interface name="velocity"/>
-        </joint>
-        <joint name="base_wheel_back_left_joint">
-            <command_interface name="velocity">
-                <param name="min">-2</param>
-                <param name="max">2</param>
-            </command_interface>
-            <state_interface name="position"/>
-            <state_interface name="velocity"/>
-        </joint>
-    </ros2_control> -->
-
-    <gazebo reference="${agent_namespace}_wheel_front_right_link">
-        <material>Gazebo/Black</material>
-        <mu1 value="1.0"/>
-        <mu2 value="1.0"/>
-    </gazebo>
-    <gazebo reference="${agent_namespace}_wheel_front_left_link">
-        <material>Gazebo/Black</material>
-        <mu1 value="1.0"/>
-        <mu2 value="1.0"/>
-    </gazebo>
-    <gazebo reference="${agent_namespace}_wheel_back_right_link">
-        <material>Gazebo/Black</material>
-        <mu1 value="1.0"/>
-        <mu2 value="1.0"/>
-    </gazebo>
-    <gazebo reference="${agent_namespace}_wheel_back_left_link">
-        <material>Gazebo/Black</material>
-        <mu1 value="1.0"/>
-        <mu2 value="1.0"/>
-    </gazebo>
 
 </robot>

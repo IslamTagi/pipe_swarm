@@ -14,6 +14,9 @@ find_package(std_msgs REQUIRED)
 find_package(gazebo_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(pipe_swarm_interfaces REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(cv_bridge REQUIRED)
+find_package(image_transport REQUIRED)
 
   # if(BUILD_TESTING)
   #   find_package(ament_lint_auto REQUIRED)
@@ -50,6 +53,9 @@ install(
     py_src/move_robot.py
     py_src/move_using_lidar.py
     py_src/move_robot_with_imu.py
+    py_src/joint_control.py
+    py_src/alignment_topic.py
+    py_src/connect_robots.py
     py_src/obstacle_detection.py
   DESTINATION lib/${PROJECT_NAME}/  
 )
