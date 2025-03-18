@@ -15,6 +15,7 @@ class MyNode(Node):
         self.initialized = False
         self.obstacle_detected = False
         self.initial_scan = None
+        self.robot_distance = None
         self.difference_threshold = 0.1  # 10% difference threshold
 
         self.cmd_vel_publisher_ = self.create_publisher(Twist, "/agent_0/cmd_vel", 10)
@@ -23,14 +24,17 @@ class MyNode(Node):
         
         self.get_logger().info("Robot controller with LiDAR obstacle detection started")
 
+        # Timer to print distance every 0.1 seconds
+        self.distance_timer = self.create_timer(0.1, self.print_distance)
+
     def send_velocity_command(self, linear_x, angular_z):
         cmd = Twist()
-        if self.obstacle_detected:
-            cmd.linear.x = 0.01  # Stop when obstacle is detected
-            self.get_logger().info("Obstacle detected! Stopping robot.")
-        else:
-            cmd.linear.x = linear_x
-            cmd.angular.z = angular_z
+        # if self.obstacle_detected:
+        #     # cmd.linear.x = 0.00  # Stop when obstacle is detected
+        #     # self.get_logger().info("Obstacle detected! Stopping robot.")
+        # else:
+        cmd.linear.x = linear_x
+        cmd.angular.z = angular_z
 
         if self.last_cmd != cmd.linear.x:
             self.cmd_vel_publisher_.publish(cmd)
@@ -40,7 +44,7 @@ class MyNode(Node):
     def odometry_callback(self, msg: Odometry):
         position = msg.pose.pose.position
         x = position.x
-        self.get_logger().info(f'Position -> x: {x:.2f}')
+        # self.get_logger().info(f'Position -> x: {x:.2f}')
 
         if not self.initialized:
             self.initialized = True
@@ -63,14 +67,20 @@ class MyNode(Node):
                     robot_ranges.append(msg.ranges[i])
         
         if robot_ranges:
-            robot_distance = np.mean(robot_ranges)
+            self.robot_distance = np.mean(robot_ranges)
             self.obstacle_detected = True
-            self.get_logger().info(f'Robot detected at {robot_distance:.2f}m, stopping.')
+            # self.get_logger().info(f'Robot detected at {self.robot_distance:.2f}m, stopping.')
         else:
             self.obstacle_detected = False
 
         self.send_velocity_command(self.last_cmd, 0.0)
         
+    def print_distance(self):
+        """ Print the distance every 0.1 seconds """
+        if self.robot_distance is not None:
+            self.get_logger().info(f'Current Distance: {self.robot_distance:.2f}')
+        else:
+            self.get_logger().info("No obstacle detected.")
 
 def main(args=None):
     rclpy.init(args=args)
