@@ -62,15 +62,14 @@ class Connect_Robots(Node):
                     # ADD LOCIG SO THAT IF THEY ARE NOT ALIGNED, TRIES AGAIN
 
     def centre_robot(self):
-        k_p = 0.1 # Proportional gain
+        k_p = -0.1 # Proportional gain
 
         if self.roll > 5 or self.roll < -5:
             angular_z = k_p * self.roll
-            print(f'Angular velocity: {angular_z}')
         else:
             angular_z = 0.0
-            self.get_logger().info("Robot centring not needed")
         
+        print(f'roll: {self.roll} x: {self.x} y: {self.y} Angular velocity: {angular_z}')
         self.send_velocity_command(self.last_cmd, angular_z)
 
     def send_velocity_command(self, linear_x, angular_z):
@@ -89,8 +88,8 @@ class Connect_Robots(Node):
         ay = msg.linear_acceleration.y
         az = msg.linear_acceleration.z
 
-        self.roll = math.atan2(ay, az)  # Roll calculation
-        self.pitch = math.atan2(-ax, math.sqrt(ay**2 + az**2))  # Pitch calculation
+        self.pitch = math.degrees(math.atan2(ay, math.sqrt(ax**2 + az**2)))  # Roll calculation
+        self.roll = math.degrees(math.atan2(-ax, math.sqrt(ay**2 + az**2)))  # Pitch calculation
 
     def lidar_callback(self, msg: LaserScan):
         if not self.initial_scan:
