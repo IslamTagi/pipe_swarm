@@ -56,6 +56,7 @@ install(
     py_src/joint_control.py
     py_src/alignment_topic.py
     py_src/connect_robots.py
+    py_src/obstacle_detection.py
   DESTINATION lib/${PROJECT_NAME}/  
 )
 
