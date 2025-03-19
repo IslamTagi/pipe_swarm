@@ -28,6 +28,8 @@
                 <box size="${base_w_offset} ${base_l_offset} ${base_h}"/>
             </geometry>
             <material name="grey">
+                <color rgba="0.86 0.86 0.86 1"/>
+            </material>
         </visual>
         <visual>
             <origin xyz="${(base_w/2)-(base_w_offset/2)} ${-((base_l/2) - (base_l_offset/2))} 0" rpy="0 0 0"/>
@@ -35,6 +37,8 @@
                 <box size="${base_w_offset} ${base_l_offset} ${base_h}"/>
             </geometry>
             <material name="grey">
+                    <color rgba="0.86 0.86 0.86 1"/>
+            </material>
         </visual>
         <visual>
             <origin xyz="${(base_w/2)-(base_w_offset/2)} 0 ${(base_l/2) - (base_l_offset/2)}" rpy="0 0 0"/>
@@ -42,6 +46,8 @@
                 <box size="${base_w_offset} ${base_l} ${base_l_offset}"/>
             </geometry>
             <material name="grey">
+                    <color rgba="0.86 0.86 0.86 1"/>
+            </material>
         </visual>
         <visual>
             <origin xyz="${(base_w/2)-(base_w_offset/2)} 0 ${-((base_l/2) - (base_l_offset/2))}" rpy="0 0 0"/>
@@ -49,6 +55,8 @@
                 <box size="${base_w_offset} ${base_l} ${base_l_offset}"/>
             </geometry>
             <material name="grey">
+                    <color rgba="0.86 0.86 0.86 1"/>
+            </material>
         </visual>
         
         <collision>
