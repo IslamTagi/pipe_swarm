@@ -19,33 +19,12 @@
     <xacro:property name="female_h" value="${female_diameter}" />  <!-- height /m -->
     <xacro:property name="female_l" value="0.028" />  <!-- length /m -->
     
+    <xacro:property name="pivot_w" value="0.027" />  <!-- length /m -->
     <xacro:property name="pivot_l" value="0.055" />  <!-- length /m -->
     <xacro:property name="pivot_o" value="0.01" />  <!-- offset from centre of robot /m -->
-    <xacro:property name="lock_w" value="0.0665" />  <!-- width /m -->
+    <xacro:property name="lock_w" value="0.02" />  <!-- width /m -->
+    <xacro:property name="cover_o" value="0.003" />  <!-- offset /m -->
 
-    <xacro:macro name="female_rotation_shape">
-            <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
-            <geometry>
-                <cylinder radius="${female_diameter/2}" length="${female_l}"/>
-            </geometry>
-    </xacro:macro>
-    <xacro:macro name="female_stopper_shape">
-            <origin xyz="${-female_stopper_width/2} 0 0" rpy="0 0 0"/>
-            <geometry>
-                <box size="${female_stopper_width} ${female_l} ${female_diameter}"/>
-            </geometry>
-    </xacro:macro>
-    <xacro:macro name="female_wall_shape" params="y_offset z_offset">
-            <origin xyz="${-(female_stopper_width + female_hole_depth/2)} 
-                        ${y_offset * (female_wall_thickness/2 + female_hole_thickness/2)} 
-                        ${z_offset * (female_wall_thickness/2 + female_hole_thickness/2)}" 
-                        rpy="0 0 0"/>
-            <geometry>
-                <box size="${female_hole_depth} ${female_wall_thickness} ${female_wall_thickness}"/>
-            </geometry>
-    </xacro:macro>
-
-    
     <!-- LINKS -->
     <link name="${agent_namespace}_male_link">
         <visual>
@@ -72,7 +51,7 @@
         <visual>
             <origin xyz="0.0 0.0 0.0" rpy="${pi/2} 0.0 ${pi/2}"/>
             <geometry>
-                <mesh filename="package://modular_robot/meshes/cover.stl" scale="0.001 0.001 0.001"/>
+                <mesh filename="package://modular_robot/meshes/cover_v2.stl" scale="0.001 0.001 0.001"/>
             </geometry>
             <material name="base">
                 <color rgba="1.0 1.0 1.0 1.0"/>
@@ -82,7 +61,7 @@
         <collision>
             <origin xyz="0.0 0.0 0.0" rpy="${pi/2} 0.0 ${pi/2}"/>
             <geometry>
-                <mesh filename="package://modular_robot/meshes/cover.stl" scale="0.001 0.001 0.001"/>
+                <mesh filename="package://modular_robot/meshes/cover_v2.stl" scale="0.001 0.001 0.001"/>
             </geometry>
         </collision>
 
@@ -93,7 +72,7 @@
        <visual>
             <origin xyz="${-lock_w/2} 0 0" rpy="0.0 ${pi/2} ${pi/2}"/>
             <geometry>
-                <mesh filename="package://modular_robot/meshes/lock.stl" scale="0.001 0.001 0.001"/>
+                <mesh filename="package://modular_robot/meshes/lock_v2.stl" scale="0.001 0.001 0.001"/>
             </geometry>
             <material name="base">
                 <color rgba="1.0 1.0 1.0 1.0"/>
@@ -103,7 +82,7 @@
         <collision>
             <origin xyz="${-lock_w/2} 0 0" rpy="0.0 ${pi/2} ${pi/2}"/>
             <geometry>
-                <mesh filename="package://modular_robot/meshes/lock.stl" scale="0.001 0.001 0.001"/>
+                <mesh filename="package://modular_robot/meshes/lock_v2.stl" scale="0.001 0.001 0.001"/>
             </geometry>
         </collision>
     </link>
@@ -137,30 +116,24 @@
     </joint>
 
     <joint name="${agent_namespace}_base_cover_joint" type="fixed">
-        <origin xyz="${base_w - 0.02 + male_o } 0 ${pivot_o}" rpy="0 0 0"/>
+        <origin xyz="${base_w - 0.02 + cover_o } 0 ${pivot_o}" rpy="0 0 0"/>
         <parent link="${agent_namespace}_base_link"/>
         <child link="${agent_namespace}_cover_link"/>
     </joint>
 
     <joint name="${agent_namespace}_female_pivot_joint" type="fixed">
-        <origin xyz="${lock_w/2} 0 0" rpy="0 0 0"/>
+        <origin xyz="${(pivot_w) + (lock_w/2)} 0 0" rpy="0 0 0"/>
         <parent link="${agent_namespace}_female_link"/>
         <child link="${agent_namespace}_pivot_link"/>
     </joint>
 
     <joint name="${agent_namespace}_pivot_base_joint" type="revolute">
-        <origin xyz="${0.02-0.014} 0 ${-pivot_o}" rpy="0 0 0"/>
+        <origin xyz="${0.02-pivot_o} 0 ${-pivot_o}" rpy="0 0 0"/>
         <parent link="${agent_namespace}_pivot_link"/>
         <child link="${agent_namespace}_base_link"/>
         <axis xyz="0 1 0"/>
         <limit lower="${-pi/4}" upper="${pi/4}" effort="1.0" velocity="1.0"/>
         <dynamics damping="0.3" friction="0.5"/>
     </joint>
-    
-    <!-- <joint name="${agent_namespace}_footprint_base_joint" type="fixed">
-        <origin xyz="${(base_w*0.5) - female_diameter/2} 0 0" rpy="0 0 0"/>
-        <parent link="${agent_namespace}_footprint_link"/>
-        <child link="${agent_namespace}_base_link"/>
-    </joint> -->
 
 </robot>
