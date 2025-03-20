@@ -74,7 +74,7 @@
         <visual>
             <origin xyz="0.0 0.0 0.0" rpy="${pi/2} 0.0 ${pi/2}"/>
             <geometry>
-                <mesh filename="package://pipe_swarm/models/hollow_pipe/meshes/cover_v2.stl" scale="0.001 0.001 0.001"/>
+                <mesh filename="package://pipe_swarm/models/hollow_pipe/meshes/cover.stl" scale="0.001 0.001 0.001"/>
             </geometry>
             <material name="base">
                 <color rgba="1.0 1.0 1.0 1.0"/>
@@ -84,7 +84,7 @@
         <collision>
             <origin xyz="0.0 0.0 0.0" rpy="${pi/2} 0.0 ${pi/2}"/>
             <geometry>
-                <mesh filename="package://pipe_swarm/models/hollow_pipe/meshes/cover_v2.stl" scale="0.001 0.001 0.001"/>
+                <mesh filename="package://pipe_swarm/models/hollow_pipe/meshes/cover.stl" scale="0.001 0.001 0.001"/>
             </geometry>
         </collision>
 
@@ -96,7 +96,7 @@
        <visual>
             <origin xyz="${-lock_w/2} 0 0" rpy="0.0 ${pi/2} ${pi/2}"/>
             <geometry>
-                <mesh filename="package://pipe_swarm/models/hollow_pipe/meshes/lock_v2.stl" scale="0.001 0.001 0.001"/>
+                <mesh filename="package://pipe_swarm/models/hollow_pipe/meshes/lock.stl" scale="0.001 0.001 0.001"/>
             </geometry>
             <material name="base">
                 <color rgba="1.0 1.0 1.0 1.0"/>
@@ -106,7 +106,7 @@
         <collision>
             <origin xyz="${-lock_w/2} 0 0" rpy="0.0 ${pi/2} ${pi/2}"/>
             <geometry>
-                <mesh filename="package://pipe_swarm/models/hollow_pipe/meshes/lock_v2.stl" scale="0.001 0.001 0.001"/>
+                <mesh filename="package://pipe_swarm/models/hollow_pipe/meshes/lock.stl" scale="0.001 0.001 0.001"/>
             </geometry>
         </collision>
     </link>
