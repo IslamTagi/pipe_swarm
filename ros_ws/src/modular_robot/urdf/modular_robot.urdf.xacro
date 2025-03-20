@@ -18,13 +18,13 @@
     </joint>
 
     <joint name="agent_n_agent_n2_joint" type="fixed">
-        <origin xyz="0.01 0 0" rpy="0 0 0"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
         <parent link="agent_n_male_link"/>
         <child link="agent_n2_female_link"/>
     </joint>
 
     <joint name="agent_n2_agent_n3_joint" type="fixed">
-        <origin xyz="0.01 0 0" rpy="0 0 0"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
         <parent link="agent_n2_male_link"/>
         <child link="agent_n3_female_link"/>
     </joint>

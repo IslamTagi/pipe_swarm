@@ -116,7 +116,7 @@
     </joint>
 
     <joint name="${agent_namespace}_base_cover_joint" type="fixed">
-        <origin xyz="${base_w - 0.02 + cover_o } 0 ${pivot_o}" rpy="0 0 0"/>
+        <origin xyz="${base_w - 0.02 - cover_o } 0 ${pivot_o}" rpy="0 0 0"/>
         <parent link="${agent_namespace}_base_link"/>
         <child link="${agent_namespace}_cover_link"/>
     </joint>
