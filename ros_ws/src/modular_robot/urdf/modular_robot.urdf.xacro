@@ -7,9 +7,9 @@
     <link name="footprint_link" />
 
     <!-- Call pipe_robot with agent_namespace -->
-    <xacro:pipe_robot agent_namespace="agent_n" include_gazebo="${include_gazebo}"/>
-    <xacro:pipe_robot agent_namespace="agent_n2" include_gazebo="${include_gazebo}"/>
-    <xacro:pipe_robot agent_namespace="agent_n3" include_gazebo="${include_gazebo}"/>
+    <xacro:pipe_robot agent_namespace="agent_n" include_gazebo="true"/>
+    <xacro:pipe_robot agent_namespace="agent_n2" include_gazebo="true"/>
+    <xacro:pipe_robot agent_namespace="agent_n3" include_gazebo="true"/>
 
     <joint name="footprint_agent_n_joint" type="fixed">
         <origin xyz="0 0 0" rpy="0 0 0"/>

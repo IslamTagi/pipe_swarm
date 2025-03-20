@@ -17,7 +17,7 @@ def generate_launch_description():
     xacro_path = os.path.join(modular_robot_share, 'urdf', 'modular_robot.urdf.xacro')
     world_path = os.path.join(modular_robot_share, 'worlds', 'bookshelf.sdf')
 
-    agents = []
+    launch_description = []
 
     # Gazebo Launch
     gazebo_launch = IncludeLaunchDescription(
@@ -25,9 +25,6 @@ def generate_launch_description():
             os.path.join(gazebo_ros_share, 'launch', 'gazebo.launch.py')
         )
     )
-
-    # Pre-Agent Setup
-    agents.append(gazebo_launch)
 
     # Load and publish the robot state
     modular_robot_state_publisher = Node(
@@ -75,13 +72,6 @@ def generate_launch_description():
         package='joint_state_publisher_gui',
         executable='joint_state_publisher_gui'
     )
-
-    agents.extend([
-        ros_controllers_event,
-        modular_robot_state_publisher,
-        # joint_state_publisher,
-        spawn_entity,
-    ])
     
     # Launch RViz2 for visualization
     rviz_display = Node(
@@ -90,5 +80,13 @@ def generate_launch_description():
         output='screen'
     )
 
-    agents.append(rviz_display)
-    return LaunchDescription(agents)
+    launch_description.extend([
+        gazebo_launch,
+        ros_controllers_event,
+        modular_robot_state_publisher,
+        # joint_state_publisher,
+        spawn_entity,
+        rviz_display
+    ])
+
+    return LaunchDescription(launch_description)
