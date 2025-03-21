@@ -1,0 +1,5 @@
+# Default initial positions for modular_robot's ros2_control fake system
+
+initial_positions:
+  agent_n2_pivot_base_joint: 0
+  agent_n3_pivot_base_joint: 0
