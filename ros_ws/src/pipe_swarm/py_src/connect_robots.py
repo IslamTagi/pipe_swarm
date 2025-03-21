@@ -20,7 +20,7 @@ class Connect_Robots(Node):
         # Inital pitch and roll
         self.pitch = 0.0 # Store pitch
         self.roll = 0.0 # Store roll
-        self.count = 0.0 # Wait before engaging lock
+        self.count = 0.0 # Count to wait before engaging lock
 
         # Initilise values
         self.last_cmd_agent_0 = None
@@ -41,7 +41,7 @@ class Connect_Robots(Node):
         self.locked = False
         self.connected = False
 
-        # 10% difference threshold for Lidar
+        # 10% difference threshold for Lidar and IMU
         self.difference_threshold = 0.1  
 
         # Publishers
@@ -64,7 +64,7 @@ class Connect_Robots(Node):
             self.initial_delay_timer = self.create_timer(2.0, self.initial_delay)
 
         # Main Script
-        self.timer = self.create_timer(0.2, self.connect_robots)
+        self.timer = self.create_timer(0.1, self.connect_robots)
 
     def initial_delay(self):
         if not self.delay_occured:
@@ -76,7 +76,7 @@ class Connect_Robots(Node):
         if not self.delay_occured:
             return
 
-        # If not moving forward, move forward
+        # If not moving forward, move forward and initilise IMU, male and female angles
         if not self.initialized:
             self.initialized = True
             linear_x = 0.1
@@ -90,6 +90,11 @@ class Connect_Robots(Node):
 
             # Take an initial reading of the IMU
             self.initial_imu = [self.ax, self.ay, self.az]
+
+            # Reset female linkage
+            self.female_angle = 0.0
+            self.lift_female()
+
         else:
             # if robots are connected
             if self.connected is True:
@@ -99,7 +104,7 @@ class Connect_Robots(Node):
                 self.lift_female()
                 return
 
-            # if already moving forward, centre robot
+            # centre robot
             self.centre_robot()
             
             # robot detection
@@ -142,8 +147,8 @@ class Connect_Robots(Node):
                                 # Compare whether IMU values change
                                 self.current_imu = [self.ax, self.ay, self.az]
                                 for initial, current in zip(self.initial_imu, self.current_imu):
-                                    percentage_diff = abs(current - initial)/initial * 100
-                                    if percentage_diff > 50:
+                                    imu_difference = abs(current - initial)/initial
+                                    if imu_difference > 5 * self.difference_threshold:
                                         self.connected = True
                                         print('Connected')
                                         linear_x = 0.0
