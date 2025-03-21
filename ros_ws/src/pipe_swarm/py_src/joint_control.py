@@ -13,24 +13,25 @@ class JointControlNode(Node):
         super().__init__('joint_control_node')
 
         # Initilise joint position dictionary
-        self.angle = -3.14159/2
+        self.angle = 3.14159/2
         self.current_position = {}
 
-        self.male_joint_subscriber = self.create_subscription(JointTrajectoryControllerState, '/agent_0/male_joint_trajectory_controller/state', self.joint_state_callback, 10)
+        self.male_joint_subscriber = self.create_subscription(JointTrajectoryControllerState, '/agent_0/male_joint_trajectory_controller/controller_state', self.joint_state_callback, 10)
         self.male_joint_publisher = self.create_publisher(JointTrajectory, '/agent_0/male_joint_trajectory_controller/joint_trajectory', 10)
         
         self.timer = self.create_timer(3.0, self.publish_male_joint)  # Publish every second
 
     def joint_state_callback(self, msg):
-        # Extract actual and desired positions
-        for i, name in enumerate(msg.joint_names):
-            if len(msg.actual.positions) > i:
-                self.current_position[name] = msg.actual.positions[i]
+        print('joint_state running')
+        # Input position
+        self.reference_position = list(msg.reference.positions)
+        
+        # Actual position
+        self.reference_feedback = list(msg.feedback.positions)
+        print(self.reference_feedback)
 
-        # Print the joint positions
-        if 'base_male_joint' in self.current_position:
-            actual_pos = self.current_position['base_male_joint']
-            self.get_logger().info(f'Actual position: {actual_pos:.4f} rad')
+        # Output position
+        self.output_postion = list(msg.output.positions)
 
     def publish_male_joint(self):
         msg = JointTrajectory()
