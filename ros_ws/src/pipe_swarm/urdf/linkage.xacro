@@ -8,9 +8,9 @@
     <xacro:property name="cover_out" value="0.0015" />  <!-- length /m -->
     
     <xacro:property name="male_m" value="0.1" />  <!-- mass /kg -->
-    <xacro:property name="male_w" value="0.04" />  <!-- width /m -->
-    <xacro:property name="male_h" value="0.005" />  <!-- height /m -->
-    <xacro:property name="male_l" value="0.0575" />  <!-- length /m -->
+    <xacro:property name="male_w" value="0.014" />  <!-- width /m -->
+    <xacro:property name="male_l" value="0.0054" />  <!-- height /m -->
+    <xacro:property name="male_h" value="0.0128" />  <!-- length /m -->
     <xacro:property name="male_o" value="0.007" />  <!-- offset /m -->
 
     
@@ -49,7 +49,7 @@
             </geometry>
         </collision>
 
-        <xacro:box_inertial m="${male_m}" w="${male_w}" l="${male_l}" h="${male_h}" xyz="0 0 0 " rpy="0 0 0"/>
+        <xacro:box_inertial m="${male_m}" w="${male_w}" l="${male_l}" h="${male_h}" xyz="${-male_w/2} 0 0 " rpy="0 0 0"/>
     </link>
 
     <link name="${agent_namespace}_cover_link">
