@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<robot name="front_tof" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    
+    <xacro:property name="tof_m" value="0.1" />  <!-- mass /kg -->
+    <xacro:property name="tof_w" value="0.01" />  <!-- width /m -->
+    <xacro:property name="tof_l" value="0.01" />  <!-- length /m -->
+    <xacro:property name="tof_h" value="0.01" />  <!-- height /m -->
+    
+    <!-- LINKS -->
+    <link name="${agent_namespace}_tof_link">
+        <visual>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <geometry>
+                <box size="${tof_w} ${tof_l} ${tof_h}"/>
+            </geometry>
+            <material name="red">
+                <color rgba="1 0 0 1"/>
+            </material>
+        </visual>
+        
+        <collision>
+            <geometry>
+                <box size="${tof_w} ${tof_l} ${tof_h}"/>
+            </geometry>
+        </collision>
+
+        <xacro:box_inertial m="${tof_m}" w="${tof_w}" l="${tof_l}" h="${tof_h}" xyz="0 0 0 " rpy="0 0 0"/>
+    </link>
+
+    <!-- JOINTS -->
+    <joint name="${agent_namespace}_base_tof_joint" type="fixed">
+        <origin xyz="${(base_w*0.5)} ${-(base_l*0.5 - tof_l)} ${(base_h*0.5)}" rpy="${pi/2} 0 0"/>
+        <parent link="${agent_namespace}_base_link"/>
+        <child link="${agent_namespace}_tof_link"/>
+    </joint>
+
+</robot>

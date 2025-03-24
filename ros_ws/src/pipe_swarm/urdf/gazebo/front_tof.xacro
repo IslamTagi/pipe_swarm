@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<robot name="gazebo_front_tof" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- GAZEBO -->
+    <gazebo reference="${agent_namespace}_tof_link">
+        <material>Gazebo/Green</material>
+        <sensor name="${agent_namespace}_tof_sensor" type="ray">
+            <pose>0 0 0 0 ${pi/2} 0</pose>
+            <visualize>true</visualize>
+            <update_rate>10.0</update_rate>
+            <ray>
+                <scan>
+                    <horizontal>
+                        <samples>10</samples>
+                        <resolution>1</resolution>
+                        <min_angle>-0.10472</min_angle>
+                        <max_angle>-0.10472</max_angle>
+                    </horizontal>
+                </scan>
+                <range>
+                    <min>0.1</min>
+                    <max>10.0</max>
+                    <resolution>0.01</resolution>
+                </range>
+            </ray>
+            <plugin name="${agent_namespace}_tof_controller" filename="libgazebo_ros_ray_sensor.so">
+                <ros>
+                    <namespace>${agent_namespace}</namespace>
+                    <remapping>~/out:=infrared_range</remapping>
+                </ros>
+                <output_type>sensor_msgs/Range</output_type>
+                <frame_name>${agent_namespace}_tof_link</frame_name>
+                <radiation_type>infrared</radiation_type>
+            </plugin>
+        </sensor>
+    </gazebo>
+
+</robot>
