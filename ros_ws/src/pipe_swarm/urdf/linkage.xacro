@@ -10,8 +10,8 @@
     
     <xacro:property name="male_m" value="0.1" />  <!-- mass /kg -->
     <xacro:property name="male_w" value="0.014" />  <!-- width /m -->
-    <xacro:property name="male_l" value="0.0054" />  <!-- height /m -->
     <xacro:property name="male_h" value="0.0128" />  <!-- length /m -->
+    <xacro:property name="male_l" value="0.0054" />  <!-- height /m -->
     <xacro:property name="male_o" value="0.007" />  <!-- offset /m -->
 
     <xacro:property name="pivot_m" value="0.1" />  <!-- mass /kg -->
