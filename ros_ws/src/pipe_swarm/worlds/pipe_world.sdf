@@ -29,7 +29,7 @@
     <!-- Add the hollow pipe model -->
     <model name="hollow_pipe">
       <static>true</static>  <!-- Pipe is static, it's not going to move -->
-      <pose>-0.2 -0.075 0 1.5708 0 1.5708</pose>
+      <pose>-0.2 -0.08 0.08 1.5708 0 1.5708</pose>
       <link name="hollow_pipe_link">
         <visual name="hollow_pipe_visual">
           <geometry>
