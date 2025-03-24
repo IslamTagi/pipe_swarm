@@ -11,6 +11,7 @@
         <xacro:include filename="linkage.xacro"/>
         <xacro:include filename="wheels.xacro"/>
         <xacro:include filename="detection_object.xacro"/>
+        <xacro:include filename="front_tof.xacro"/>
     </xacro:macro>
 
     <xacro:gazebo_pipe_robot namespace="${agent_namespace}" />
