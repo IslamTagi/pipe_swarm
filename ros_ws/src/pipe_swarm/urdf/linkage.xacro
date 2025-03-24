@@ -20,7 +20,11 @@
     <xacro:property name="pivot_l" value="0.055" />   <!-- length /m -->
     <xacro:property name="pivot_o" value="0.0075" />  <!-- offset /m -->
     
-    <xacro:property name="lock_w" value="0.02" />  <!-- width /m -->
+    <xacro:property name="female_m" value="0.1" />  <!-- mass /kg -->
+    <xacro:property name="female_w" value="0.02" />  <!-- width /m -->
+    <xacro:property name="female_h" value="0.024" />  <!-- height /m -->
+    <xacro:property name="female_l" value="0.024" />   <!-- length /m -->
+    
     <xacro:property name="lock_o" value="0.01" />  <!-- offset /m -->
 
     <!-- LINKS -->
@@ -69,7 +73,7 @@
 
     <link name="${agent_namespace}_female_link">
        <visual>
-            <origin xyz="${-lock_w/2} 0 0" rpy="0.0 ${pi/2} ${pi/2}"/>
+            <origin xyz="${-female_w/2} 0 0" rpy="0.0 ${pi/2} ${pi/2}"/>
             <geometry>
                 <mesh filename="package://pipe_swarm/models/hollow_pipe/meshes/lock.stl" scale="0.001 0.001 0.001"/>
             </geometry>
@@ -79,11 +83,13 @@
         </visual>
         
         <collision>
-            <origin xyz="${-lock_w/2} 0 0" rpy="0.0 ${pi/2} ${pi/2}"/>
+            <origin xyz="${-female_w/2} 0 0" rpy="0.0 ${pi/2} ${pi/2}"/>
             <geometry>
                 <mesh filename="package://pipe_swarm/models/hollow_pipe/meshes/lock.stl" scale="0.001 0.001 0.001"/>
             </geometry>
         </collision>
+
+        <xacro:box_inertial m="${female_m}" w="${female_w}" l="${female_l}" h="${female_h}" xyz="0 0 0" rpy="0 0 0"/>
     </link>
 
     <link name="${agent_namespace}_pivot_link">
