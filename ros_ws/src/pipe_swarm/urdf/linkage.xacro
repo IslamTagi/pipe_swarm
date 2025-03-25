@@ -96,7 +96,7 @@
        <visual>
             <origin xyz="${-lock_w/2} 0 0" rpy="0.0 ${pi/2} ${pi/2}"/>
             <geometry>
-                <mesh filename="package://pipe_swarm/models/hollow_pipe/meshes/lock_v2_for_sim.stl" scale="0.001 0.001 0.001"/>
+                <mesh filename="package://pipe_swarm/models/hollow_pipe/meshes/lock_sim.stl" scale="0.001 0.001 0.001"/> <!-- no chamfer-->
             </geometry>
             <material name="base">
                 <color rgba="1.0 1.0 1.0 1.0"/>
@@ -106,7 +106,7 @@
         <collision>
             <origin xyz="${-lock_w/2} 0 0" rpy="0.0 ${pi/2} ${pi/2}"/>
             <geometry>
-                <mesh filename="package://pipe_swarm/models/hollow_pipe/meshes/lock_v2_for_sim.stl" scale="0.001 0.001 0.001"/>
+                <mesh filename="package://pipe_swarm/models/hollow_pipe/meshes/lock_sim.stl" scale="0.001 0.001 0.001"/> <!-- no chamfer-->
             </geometry>
         </collision>
     </link>
