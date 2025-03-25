@@ -66,7 +66,7 @@
         <origin xyz="${base_w - wheel_x_offset_front - 0.02} ${-((base_l/2) + (wheel_l/2) + wheel_y_offset)} ${-base_h/2}" rpy="${-pi/2} 0 0"/>
         <parent link="${agent_namespace}_base_link"/>
         <child link="${agent_namespace}_wheel_front_right_link"/>
-        <axis xyz="0 0 1"/>
+        <!-- <axis xyz="0 0 1"/> -->
     </joint>
     
     <joint name="${agent_namespace}_base_wheel_front_left_joint" type="fixed">
