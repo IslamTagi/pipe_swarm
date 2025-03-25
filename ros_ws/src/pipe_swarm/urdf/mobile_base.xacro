@@ -46,7 +46,7 @@
                 <box size="${base_w_offset} ${base_l} ${base_l_offset}"/>
             </geometry>
             <material name="grey">
-                <color rgba="0.86 0.86 0.86 1"/>
+                    <color rgba="0.86 0.86 0.86 1"/>
             </material>
         </visual>
         <visual>
