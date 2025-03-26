@@ -47,6 +47,7 @@ class Connect_Robots(Node):
         self.locked = False
         self.connected = False
         self.close = False
+        self.alignment_failed =  False
 
         # 10% difference threshold for Lidar and IMU
         self.difference_threshold = 0.2  
@@ -85,6 +86,11 @@ class Connect_Robots(Node):
         # If not moving forward, move forward and initilise IMU, male and female angles
         if not self.initialized:
             self.initialized = True
+
+            # Take an initial reading of the IMU
+            self.initial_imu = [self.ax, self.ay, self.az]
+
+            # Send the robot forward
             linear_x = 0.1
             self.send_velocity_command_agent_0(linear_x, self.last_angular_cmd_agent_0)
             print("Robot Initialized: Moving forward")
@@ -94,20 +100,27 @@ class Connect_Robots(Node):
                 self.lock = 0.0
                 self.lock_male()
 
-            # Take an initial reading of the IMU
-            self.initial_imu = [self.ax, self.ay, self.az]
-
             # Reset female linkage
             self.female_angle = 0.0
             self.lift_female()
 
         else:
+            if self.alignment_failed is True:
+                self.robot_distance = self.range
+                self.reset()
+                return
+
             # if robots are connected
             if self.connected is True:
-                print('Lifting female joint')
+                print('Locked and Connected')
+                linear_x = 0.0
+                angular_z = 0.0
+                self.send_velocity_command_agent_1(linear_x, angular_z)
+                self.send_velocity_command_agent_0(linear_x, angular_z)
+                # print('Lifting female joint')
 
-                self.female_angle = 3.14159/4
-                self.lift_female()
+                # self.female_angle = 3.14159/4
+                # self.lift_female()
                 return
 
             # centre robot
@@ -121,10 +134,10 @@ class Connect_Robots(Node):
                 # Stop if distance is less than 2 cm
                 if self.robot_distance < 0.15:
                     self.close = True
-                    print("Within 2 cm of obstacle")
+                    print("Within 1.5 cm of obstacle")
                     # check alignment
                     if self.aligned is True:
-                        print('Robots aligned')
+                        print(f'Robots aligned, waiting {self.count}/100 before locking')
 
                         # Reverse robot 1 into robot 0
                         linear_x = -0.02
@@ -132,7 +145,7 @@ class Connect_Robots(Node):
                         self.count += 1
 
                         # Wait 8 seconds to ensure robots are connected
-                        if self.unlocked is True and self.count > 100:
+                        if self.unlocked is True and self.count > 100.0:
                             print('Lock unlocked - locking')
 
                             # Initiate lock
@@ -144,20 +157,22 @@ class Connect_Robots(Node):
                                 print('Locked')
 
                                 # Test whether robots are successfully locked together
-                                linear_x = 0.02
+                                linear_x = 0.05
                                 self.send_velocity_command_agent_1(linear_x, self.last_angular_cmd_agent_1)
 
                                 # Compare whether IMU values change
                                 self.current_imu = [self.ax, self.ay, self.az]
                                 for initial, current in zip(self.initial_imu, self.current_imu):
                                     imu_difference = abs(current - initial)/initial
+
                                     if imu_difference > 5 * self.difference_threshold:
                                         self.connected = True
-                                        print('Connected')
-                                        linear_x = 0.0
-                                        self.send_velocity_command_agent_1(linear_x, self.last_angular_cmd_agent_1)
-                                        self.send_velocity_command_agent_0(linear_x, self.last_angular_cmd_agent_0)
-                                        self.delay_occured = False
+                                        # print('Connected and locked')
+                                        # linear_x = 0.0
+                                        # self.send_velocity_command_agent_1(linear_x, self.last_angular_cmd_agent_1)
+                                        # self.send_velocity_command_agent_0(linear_x, self.last_angular_cmd_agent_0)
+                                        # self.delay_occured = False
+                                        return
                     
                     else:
                         # ROBOTS NOT ALIGNED FILL IN
@@ -172,20 +187,40 @@ class Connect_Robots(Node):
                     self.close = False
                     linear_x = 0.02
                     self.send_velocity_command_agent_0(linear_x, self.last_angular_cmd_agent_0)
+                    return
 
 
     def align_robots(self):
         print(f'Not aligned, alignment count: {self.align_count}')
         self.align_count += 1
-        if self.align_count <= 99:
+        if self.align_count <= 100:
             angular_z = 0.15
             self.send_velocity_command_agent_1(self.last_linear_cmd_agent_1, angular_z)
         elif self.align_count <= 300:
             angular_z = -0.15
             self.send_velocity_command_agent_1(self.last_linear_cmd_agent_1, angular_z)
-        elif self.align_count > 300:
+        elif self.align_count <= 400:
+            angular_z = 0.15
+            self.send_velocity_command_agent_1(self.last_linear_cmd_agent_1, angular_z)
+        elif self.align_count > 400:
             self.align_count = 0
             print('Robot alignment failed')
+            self.alignment_failed = True
+    
+    def reset(self):
+        # Seperate robots until seperation is 6 cm
+        print(self.robot_distance)
+        if self.robot_distance < 0.6:
+            linear_x = -0.02
+            self.send_velocity_command_agent_0(linear_x, 0.0)
+            linear_x = 0.02
+            self.send_velocity_command_agent_1(linear_x, 0.0)
+        elif self.robot_distance >= 0.6:
+            self.alignment_failed = False
+            linear_x = 0.02
+            self.send_velocity_command_agent_0(linear_x, self.last_angular_cmd_agent_0)
+            linear_x = 0.0
+            self.send_velocity_command_agent_1(linear_x, self.last_angular_cmd_agent_0)
 
 
     def centre_robot(self):
@@ -208,7 +243,7 @@ class Connect_Robots(Node):
             self.cmd_vel_publisher_agent_0_.publish(cmd)
             self.last_linear_cmd_agent_0 = cmd.linear.x
             self.last_angular_cmd_agent_0 = cmd.angular.z
-            print(f'Published command to agent 0: linear_x = {cmd.linear.x}, angular_z = {cmd.angular.z}')
+            print(f'Published command to agent 0: linear_x = {cmd.linear.x}, angular_z = {cmd.angular.z:4f}')
         
     def send_velocity_command_agent_1(self, linear_x, angular_z):
         cmd = Twist()
@@ -219,7 +254,7 @@ class Connect_Robots(Node):
             self.cmd_vel_publisher_agent_1_.publish(cmd)
             self.last_linear_cmd_agent_1 = cmd.linear.x
             self.last_angular_cmd_agent_1 = cmd.angular.z
-            print(f'Published command to agent 1: linear_x = {cmd.linear.x}, angular_z = {cmd.angular.z}')    
+            print(f'Published command to agent 1: linear_x = {cmd.linear.x}, angular_z = {cmd.angular.z:4f}')    
 
     
     def imu_callback(self, msg: Imu):
