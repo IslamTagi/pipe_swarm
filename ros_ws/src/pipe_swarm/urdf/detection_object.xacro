@@ -78,13 +78,13 @@
     </joint>
 
     <joint name="${agent_namespace}_base_white_box_1_joint" type="fixed">
-        <origin xyz="${(-base_w*0.5)+(obstacle_w)} ${(obstacle_l*0.54)} ${(base_h*0.5)+(obstacle_w*0.5)}" rpy="0.0 0.0 0.0"/>
+        <origin xyz="${(-base_w*0.5)+(obstacle_w)} ${(obstacle_l*0.6)} ${(base_h*0.5)+(obstacle_w*0.5)}" rpy="0.0 0.0 0.0"/>
         <parent link="${agent_namespace}_base_link"/>
         <child link="${agent_namespace}_white_box_1_link"/>
     </joint>
 
     <joint name="${agent_namespace}_base_white_box_2_joint" type="fixed">
-        <origin xyz="${(-base_w*0.5)+(obstacle_w)} ${(-obstacle_l*0.54)} ${(base_h*0.5)+(obstacle_w*0.5)}" rpy="0.0 0.0 0.0"/>
+        <origin xyz="${(-base_w*0.5)+(obstacle_w)} ${(-obstacle_l*0.6)} ${(base_h*0.5)+(obstacle_w*0.5)}" rpy="0.0 0.0 0.0"/>
         <parent link="${agent_namespace}_base_link"/>
         <child link="${agent_namespace}_white_box_2_link"/>
     </joint>
