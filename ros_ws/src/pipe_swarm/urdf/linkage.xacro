@@ -1,53 +1,32 @@
 <?xml version="1.0"?>
 <robot name="linkage" xmlns:xacro="http://www.ros.org/wiki/xacro">
     
+    <xacro:property name="cover_m" value="0.1" />  <!-- mass /kg -->
+    <xacro:property name="cover_w" value="0.029" />  <!-- width /m -->
+    <xacro:property name="cover_h" value="0.024" />  <!-- height /m -->
+    <xacro:property name="cover_l" value="0.024" />  <!-- length /m -->
+    <xacro:property name="cover_o" value="0.0045" />  <!-- offset /m -->
+    <xacro:property name="cover_out" value="0.0015" />  <!-- extruded cover /m -->
+    
     <xacro:property name="male_m" value="0.1" />  <!-- mass /kg -->
-    <xacro:property name="male_w" value="0.04" />  <!-- width /m -->
-    <xacro:property name="male_h" value="0.005" />  <!-- height /m -->
-    <xacro:property name="male_l" value="0.0575" />  <!-- length /m -->
+    <xacro:property name="male_w" value="0.014" />  <!-- width /m -->
+    <xacro:property name="male_h" value="0.0128" />  <!-- length /m -->
+    <xacro:property name="male_l" value="0.0054" />  <!-- height /m -->
     <xacro:property name="male_o" value="0.007" />  <!-- offset /m -->
 
-    
-    <xacro:property name="female_diameter" value="0.04" />  <!-- /m -->
-    <xacro:property name="female_stopper_width" value="0.05" />  <!-- /m -->
-    <xacro:property name="female_hole_depth" value="0.03" />  <!-- /m -->
-    <xacro:property name="female_wall_thickness" value="0.01" />  <!-- /m -->
-    <xacro:property name="female_hole_thickness" value="0.01" />  <!-- /m -->
+    <xacro:property name="pivot_m" value="0.1" />  <!-- mass /kg -->
+    <xacro:property name="pivot_w" value="0.035" />  <!-- width /m -->
+    <xacro:property name="pivot_h" value="0.024" />  <!-- height /m -->
+    <xacro:property name="pivot_l" value="0.055" />   <!-- length /m -->
+    <xacro:property name="pivot_o" value="0.0075" />  <!-- offset /m -->
     
     <xacro:property name="female_m" value="0.1" />  <!-- mass /kg -->
-    <xacro:property name="female_w" value="${(female_diameter/2) + female_stopper_width + female_hole_depth}" />  <!-- width /m -->
-    <xacro:property name="female_h" value="${female_diameter}" />  <!-- height /m -->
-    <xacro:property name="female_l" value="0.028" />   <!-- length /m -->
+    <xacro:property name="female_w" value="0.02" />  <!-- width /m -->
+    <xacro:property name="female_h" value="0.024" />  <!-- height /m -->
+    <xacro:property name="female_l" value="0.024" />   <!-- length /m -->
     
-    <xacro:property name="pivot_l" value="0.055" />  <!-- length /m -->
-    <xacro:property name="lock_w" value="0.02" />  <!-- width /m -->
     <xacro:property name="lock_o" value="0.01" />  <!-- offset /m -->
-    <xacro:property name="cover_o" value="0.003" />  <!-- offset /m -->
 
-
-    <xacro:macro name="female_rotation_shape">
-            <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
-            <geometry>
-                <mesh filename="model://hollow_pipe/meshes/lock.stl"/>
-            </geometry>
-    </xacro:macro>
-    <xacro:macro name="female_stopper_shape">
-            <origin xyz="${-female_stopper_width/2} 0 0" rpy="0 0 0"/>
-            <geometry>
-                <box size="${female_stopper_width} ${female_l} ${female_diameter}"/>
-            </geometry>
-    </xacro:macro>
-    <xacro:macro name="female_wall_shape" params="y_offset z_offset">
-            <origin xyz="${-(female_stopper_width + female_hole_depth/2)} 
-                        ${y_offset * (female_wall_thickness/2 + female_hole_thickness/2)} 
-                        ${z_offset * (female_wall_thickness/2 + female_hole_thickness/2)}" 
-                        rpy="0 0 0"/>
-            <geometry>
-                <box size="${female_hole_depth} ${female_wall_thickness} ${female_wall_thickness}"/>
-            </geometry>
-    </xacro:macro>
-
-    
     <!-- LINKS -->
     <link name="${agent_namespace}_male_link">
         <visual>
@@ -67,7 +46,7 @@
             </geometry>
         </collision>
 
-        <xacro:box_inertial m="${male_m}" w="${male_w}" l="${male_l}" h="${male_h}" xyz="0 0 0 " rpy="0 0 0"/>
+        <xacro:box_inertial m="${male_m}" w="${male_w}" l="${male_l}" h="${male_h}" xyz="${-male_w/2} 0 0 " rpy="0 0 0"/>
     </link>
 
     <link name="${agent_namespace}_cover_link">
@@ -88,13 +67,13 @@
             </geometry>
         </collision>
 
-        <xacro:box_inertial m="${male_m}" w="${male_w}" l="${male_l}" h="${male_h}" xyz="0 0 0 " rpy="0 0 0"/>
+        <xacro:box_inertial m="${cover_m}" w="${cover_w}" l="${cover_l}" h="${cover_h}" xyz="${-cover_o} 0 0 " rpy="0 0 0"/>
     </link>
 
 
     <link name="${agent_namespace}_female_link">
        <visual>
-            <origin xyz="${-lock_w/2} 0 0" rpy="0.0 ${pi/2} ${pi/2}"/>
+            <origin xyz="${-female_w/2} 0 0" rpy="0.0 ${pi/2} ${pi/2}"/>
             <geometry>
                 <mesh filename="package://pipe_swarm/models/hollow_pipe/meshes/lock_sim.stl" scale="0.001 0.001 0.001"/> <!-- no chamfer-->
             </geometry>
@@ -104,11 +83,13 @@
         </visual>
         
         <collision>
-            <origin xyz="${-lock_w/2} 0 0" rpy="0.0 ${pi/2} ${pi/2}"/>
+            <origin xyz="${-female_w/2} 0 0" rpy="0.0 ${pi/2} ${pi/2}"/>
             <geometry>
                 <mesh filename="package://pipe_swarm/models/hollow_pipe/meshes/lock_sim.stl" scale="0.001 0.001 0.001"/> <!-- no chamfer-->
             </geometry>
         </collision>
+
+        <xacro:box_inertial m="${female_m}" w="${female_w}" l="${female_l}" h="${female_h}" xyz="0 0 0" rpy="0 0 0"/>
     </link>
 
     <link name="${agent_namespace}_pivot_link">
@@ -129,12 +110,12 @@
             </geometry>
         </collision>
 
-        <xacro:box_inertial m="${female_m}" w="0.05" l="0.05" h="0.05" xyz="0 0 0" rpy="0 0 0"/>
+        <xacro:box_inertial m="${pivot_m}" w="${pivot_w}" l="${pivot_l}" h="${pivot_h}" xyz="${-pivot_w/2 + pivot_o} 0 0" rpy="0 0 0"/>
     </link>
     
     <!-- JOINTS -->
     <joint name="${agent_namespace}_base_cover_joint" type="fixed">
-        <origin xyz="${(base_w*0.5)-cover_o} 0.0 0.0" rpy="0 0 0"/>
+        <origin xyz="${(base_w*0.5) - cover_o + cover_out} 0.0 0.0" rpy="0 0 0"/>
         <parent link="${agent_namespace}_base_link"/>
         <child link="${agent_namespace}_cover_link"/>
     </joint>
@@ -155,12 +136,6 @@
         <limit lower="${-pi/4}" upper="${pi/4}" effort="0.5" velocity="0.5"/>
     </joint>
     
-    <!-- <joint name="${agent_namespace}_footprint_base_joint" type="fixed">
-        <origin xyz="${(base_w*0.5) - female_diameter/2} 0 0" rpy="0 0 0"/>
-        <parent link="${agent_namespace}_footprint_link"/>
-        <child link="${agent_namespace}_base_link"/>
-    </joint> -->
-
     <joint name="${agent_namespace}_base_neutral_joint" type="fixed">
         <origin xyz="${-lock_o-pivot_l/2} 0 0.0" rpy="0 0 0"/>
         <parent link="${agent_namespace}_pivot_link"/>

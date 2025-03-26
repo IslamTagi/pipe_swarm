@@ -2,9 +2,9 @@
 <robot name="gazebo_tof_lidar" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
     <!-- GAZEBO -->
-    <gazebo reference="${agent_namespace}_lidar_link">
+    <gazebo reference="${agent_namespace}_tof_lidar_link">
         <material>Gazebo/Green</material>
-        <sensor name="${agent_namespace}_lidar_sensor" type="lidar">
+        <sensor name="${agent_namespace}_tof_lidar_sensor" type="lidar">
             <pose>0 0 0 0 0 0</pose>
             <visualize>true</visualize>
             <update_rate>10.0</update_rate>
@@ -21,14 +21,14 @@
                     <max>1</max>
                 </range>
             </ray>
-            <plugin name="${agent_namespace}_lidar_controller" filename="libgazebo_ros_ray_sensor.so">
+            <plugin name="${agent_namespace}_tof_lidar_controller" filename="libgazebo_ros_ray_sensor.so">
                 <ros>
                     <namespace>${agent_namespace}</namespace>
                     <remapping>~/out:=laserscan</remapping>
                 </ros>
                 <output_type>sensor_msgs/LaserScan</output_type>
                 <min_intensity>100.0</min_intensity>
-                <frame_name>${agent_namespace}_lidar_link</frame_name>
+                <frame_name>${agent_namespace}_tof_lidar_link</frame_name>
             </plugin>
         </sensor>
     </gazebo>
