@@ -29,7 +29,7 @@
 
     <!-- JOINTS -->
     <joint name="${agent_namespace}_base_front_tof_joint" type="fixed">
-        <origin xyz="${(base_w/2)} ${-(base_l/2 - front_tof_l)} ${(base_h/2)}" rpy="${pi/2} 0 0"/>
+        <origin xyz="${(base_w/2)} ${-(base_l/2 - front_tof_l*2)} ${(base_h/2)}" rpy="${pi/2} 0 0"/>
         <parent link="${agent_namespace}_base_link"/>
         <child link="${agent_namespace}_front_tof_link"/>
     </joint>
