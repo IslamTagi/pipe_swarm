@@ -26,7 +26,7 @@
             </geometry>
         </collision>
         
-        <xacro:box_inertial m="${base_m}" w="${base_w}" l="${base_l}" h="${base_h}" xyz="0 0 0 " rpy="0 0 0"/>
+        <xacro:box_inertial m="${base_m}" w="${base_w}" l="${base_l}" h="${base_h}" xyz="${base_w/2 - 0.02} 0 0 " rpy="0 0 0"/>
     </link>
     
 </robot>
