@@ -29,14 +29,14 @@
     <!-- Add the hollow pipe model -->
     <model name="half_hollow_pipe">
       <static>true</static>  <!-- Pipe is static, it's not going to move -->
-      <pose>-0.2 -0.32 0.08 1.5708 0 1.5708</pose>
+      <pose>-0.2 -0.1084 0.08 1.5708 0 1.5708</pose>
       <link name="hollow_pipe_link">
         <visual name="hollow_pipe_visual">
           <geometry>
             <mesh>
               <!-- Path to the hollow pipe mesh -->
               <uri>model://pipe_swarm/models/hollow_pipe/meshes/half_hollow_pipe.stl</uri>
-              <scale>0.004 0.004 0.004</scale>  <!-- Scale if needed -->
+              <scale>0.001354667 0.001354667 0.001354667</scale>  <!-- Scale if needed -->
             </mesh>
           </geometry>
         </visual>
@@ -46,7 +46,7 @@
             <mesh>
               <!-- Path to the hollow pipe mesh for collision -->
               <uri>model://pipe_swarm/models/hollow_pipe/meshes/half_hollow_pipe.stl</uri>
-              <scale>0.004 0.004 0.004</scale>  <!-- Scale for collision geometry -->
+              <scale>0.001354667 0.001354667 0.001354667</scale>  <!-- Scale for collision geometry -->
             </mesh>
           </geometry>
         </collision>
