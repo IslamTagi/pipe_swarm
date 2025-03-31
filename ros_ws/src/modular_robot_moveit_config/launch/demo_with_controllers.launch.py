@@ -78,11 +78,27 @@ def generate_launch_description():
         output="screen"
     )
 
+    mobile_base_controller_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["mobile_base_controller", "--controller-manager", "/controller_manager"],
+        output="screen"
+    )
+
+    mobile_chain_controller_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["mobile_chain_controller", "--controller-manager", "/controller_manager"],
+        output="screen"
+    )
+
     return LaunchDescription(
         [
             ros2_control_node,
             joint_state_broadcaster_spawner,
-            chain_joint_trajectory_controller_spawner,
+            # chain_joint_trajectory_controller_spawner,
+            # mobile_base_controller_spawner,
+            mobile_chain_controller_spawner,
             robot_state_publisher_node,
             move_group_node,
             rviz_node

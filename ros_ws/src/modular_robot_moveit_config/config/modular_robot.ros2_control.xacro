@@ -6,8 +6,8 @@
         <ros2_control name="${name}" type="system">
             <hardware>
                 <!-- By default, set up controllers for simulation. This won't work on real hardware -->
-                <!-- <plugin>mock_components/GenericSystem</plugin> -->
-                <plugin>gazebo_ros2_control/GazeboSystem</plugin>
+                <plugin>mock_components/GenericSystem</plugin>
+                <!-- <plugin>gazebo_ros2_control/GazeboSystem</plugin> -->
             </hardware>
             <joint name="agent_n_pivot_base_joint">
                 <command_interface name="position"/>
@@ -27,6 +27,13 @@
                 <command_interface name="position"/>
                 <state_interface name="position">
                   <param name="initial_value">${initial_positions['agent_n3_pivot_base_joint']}</param>
+                </state_interface>
+                <state_interface name="velocity"/>
+            </joint>
+            <joint name="mobile_joint">
+                <command_interface name="position"/>
+                <state_interface name="position">
+                  <param name="initial_value">${initial_positions['mobile_joint']}</param>
                 </state_interface>
                 <state_interface name="velocity"/>
             </joint>
