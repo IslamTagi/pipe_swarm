@@ -15,12 +15,12 @@
         <link name="world" />
 
         <joint name="mobile_joint" type="prismatic">
-        <origin xyz="0 0 0" rpy="0 0 0"/>
-        <parent link="world"/>
-        <child link="footprint_link"/>
-        <axis xyz="1 0 0"/>
-        <limit lower="-1.0" upper="1.0" effort="100" velocity="1.0"/>
-    </joint>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <parent link="world"/>
+            <child link="footprint_link"/>
+            <axis xyz="1 0 0"/>
+            <limit lower="-1.0" upper="1.0" effort="100" velocity="1.0"/>
+        </joint>
     </xacro:unless>
 
     <joint name="footprint_agent_n_joint" type="fixed">
