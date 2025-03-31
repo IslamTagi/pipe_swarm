@@ -127,19 +127,38 @@
         <child link="${agent_namespace}_cover_link"/>
     </joint>
 
-    <joint name="${agent_namespace}_female_pivot_joint" type="fixed">
-        <origin xyz="${(pivot_l/2) + lock_o} 0 0" rpy="0 0 0"/>
-        <parent link="${agent_namespace}_female_link"/>
-        <child link="${agent_namespace}_pivot_link"/>
-    </joint>
+    <xacro:if value="${first_link}">
+        <joint name="${agent_namespace}_female_pivot_joint" type="fixed">
+            <origin xyz="${-(pivot_l/2) - lock_o} 0 0" rpy="0 0 0"/>
+            <parent link="${agent_namespace}_pivot_link"/>
+            <child link="${agent_namespace}_female_link"/>
+        </joint>
 
-    <joint name="${agent_namespace}_pivot_base_joint" type="revolute">
-        <origin xyz="${0.02-lock_o} 0 ${-pivot_zo}" rpy="0 0 0"/>
-        <parent link="${agent_namespace}_pivot_link"/>
-        <child link="${agent_namespace}_base_link"/>
-        <axis xyz="0 1 0"/>
-        <limit lower="${-pi/4}" upper="${pi/4}" effort="1.0" velocity="1.0"/>
-        <dynamics damping="0.3" friction="0.5"/>
-    </joint>
+        <joint name="${agent_namespace}_pivot_base_joint" type="revolute">
+            <origin xyz="${-(0.02-lock_o)} 0 ${pivot_zo}" rpy="0 0 0"/>
+            <parent link="${agent_namespace}_base_link"/>
+            <child link="${agent_namespace}_pivot_link"/>
+            <axis xyz="0 1 0"/>
+            <limit lower="${-pi/4}" upper="${pi/4}" effort="1.0" velocity="1.0"/>
+            <dynamics damping="0.3" friction="0.5"/>
+        </joint>
+    </xacro:if>
+    <xacro:unless value="${first_link}">
+        <joint name="${agent_namespace}_female_pivot_joint" type="fixed">
+            <origin xyz="${(pivot_l/2) + lock_o} 0 0" rpy="0 0 0"/>
+            <parent link="${agent_namespace}_female_link"/>
+            <child link="${agent_namespace}_pivot_link"/>
+        </joint>
+
+        <joint name="${agent_namespace}_pivot_base_joint" type="revolute">
+            <origin xyz="${0.02-lock_o} 0 ${-pivot_zo}" rpy="0 0 0"/>
+            <parent link="${agent_namespace}_pivot_link"/>
+            <child link="${agent_namespace}_base_link"/>
+            <axis xyz="0 1 0"/>
+            <limit lower="${-pi/4}" upper="${pi/4}" effort="1.0" velocity="1.0"/>
+            <dynamics damping="0.3" friction="0.5"/>
+        </joint>
+    </xacro:unless>
+
 
 </robot>

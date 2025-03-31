@@ -7,14 +7,26 @@
     <link name="footprint_link" />
 
     <!-- Call pipe_robot with agent_namespace -->
-    <xacro:pipe_robot agent_namespace="agent_n" include_gazebo="true"/>
-    <xacro:pipe_robot agent_namespace="agent_n2" include_gazebo="true"/>
-    <xacro:pipe_robot agent_namespace="agent_n3" include_gazebo="true"/>
+    <xacro:pipe_robot agent_namespace="agent_n" include_gazebo="true" first_link="true"/>
+    <xacro:pipe_robot agent_namespace="agent_n2" include_gazebo="true" first_link="false"/>
+    <xacro:pipe_robot agent_namespace="agent_n3" include_gazebo="true" first_link="false"/>
+
+    <xacro:unless value="${include_gazebo}">
+        <link name="world" />
+
+        <joint name="mobile_joint" type="prismatic">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <parent link="world"/>
+        <child link="footprint_link"/>
+        <axis xyz="1 0 0"/>
+        <limit lower="-1.0" upper="1.0" effort="100" velocity="1.0"/>
+    </joint>
+    </xacro:unless>
 
     <joint name="footprint_agent_n_joint" type="fixed">
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <parent link="footprint_link"/>
-        <child link="agent_n_female_link"/>
+        <child link="agent_n_base_link"/>
     </joint>
 
     <joint name="agent_n_agent_n2_joint" type="fixed">

@@ -134,6 +134,7 @@
         <child link="${agent_namespace}_pivot_link"/>
         <axis xyz="0 1 0"/>
         <limit lower="${-pi/4}" upper="${pi/4}" effort="0.5" velocity="0.5"/>
+        <dynamics damping="0.3" friction="0.5"/>
     </joint>
     
     <joint name="${agent_namespace}_base_neutral_joint" type="fixed">
