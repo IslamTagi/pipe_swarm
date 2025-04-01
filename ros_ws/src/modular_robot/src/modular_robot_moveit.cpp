@@ -15,10 +15,10 @@ int main(int argc, char * argv[])
     "modular_robot_moveit",
     rclcpp::NodeOptions()
       .automatically_declare_parameters_from_overrides(true)
-      .parameter_overrides({{"use_sim_time", rclcpp::ParameterValue(true)}})
+      // .parameter_overrides({{"use_sim_time", rclcpp::ParameterValue(true)}})
   );
 
-  static const std::string PLANNING_GROUP = "chain";
+  static const std::string PLANNING_GROUP = "mobile_chain";
   // Create a ROS logger
   auto const logger = rclcpp::get_logger("modular_robot_moveit");
 
@@ -36,8 +36,9 @@ int main(int argc, char * argv[])
       move_group_interface.getCurrentState()->getJointModelGroup(PLANNING_GROUP);
   std::vector<double> target_joint_group_positions;
   current_state->copyJointGroupPositions(joint_model_group, target_joint_group_positions);
-  target_joint_group_positions[0] = -0.785;  // radians
-  target_joint_group_positions[1] = -0.785;  // radians
+  target_joint_group_positions[0] = 0.45;  // m
+  target_joint_group_positions[1] = 0;  // radians
+  target_joint_group_positions[2] = -0.785;  // radians
   move_group_interface.setJointValueTarget(target_joint_group_positions);
 
   // We lower the allowed maximum velocity and acceleration to 5% of their maximum.

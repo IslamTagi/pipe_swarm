@@ -10,7 +10,10 @@ def generate_launch_description():
         .robot_description(file_path="config/modular_robot.urdf.xacro")
         .robot_description_semantic(file_path="config/modular_robot.srdf")
         .trajectory_execution(file_path="config/moveit_controllers.yaml")
-        .planning_pipelines(
+        .robot_description_kinematics(file_path="config/kinematics.yaml")
+        .planning_scene_monitor(
+            publish_robot_description= True, publish_robot_description_semantic= True
+        ).planning_pipelines(
             pipelines=["ompl", "chomp", "pilz_industrial_motion_planner"]
         )
         .to_moveit_configs()
@@ -96,9 +99,9 @@ def generate_launch_description():
         [
             ros2_control_node,
             joint_state_broadcaster_spawner,
-            # chain_joint_trajectory_controller_spawner,
+            chain_joint_trajectory_controller_spawner,
             # mobile_base_controller_spawner,
-            mobile_chain_controller_spawner,
+            # mobile_chain_controller_spawner,
             robot_state_publisher_node,
             move_group_node,
             rviz_node
