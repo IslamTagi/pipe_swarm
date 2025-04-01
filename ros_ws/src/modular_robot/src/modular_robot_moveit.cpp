@@ -36,8 +36,8 @@ int main(int argc, char * argv[])
       move_group_interface.getCurrentState()->getJointModelGroup(PLANNING_GROUP);
   std::vector<double> target_joint_group_positions;
   current_state->copyJointGroupPositions(joint_model_group, target_joint_group_positions);
-  target_joint_group_positions[0] = -1.0;  // radians
-  target_joint_group_positions[1] = -1.0;  // radians
+  target_joint_group_positions[0] = -0.785;  // radians
+  target_joint_group_positions[1] = -0.785;  // radians
   move_group_interface.setJointValueTarget(target_joint_group_positions);
 
   // We lower the allowed maximum velocity and acceleration to 5% of their maximum.
@@ -73,11 +73,21 @@ int main(int argc, char * argv[])
   // Apply the collision object
   planning_scene_interface.applyCollisionObjects({collision_object});
 
-
   // start path planning
   moveit::planning_interface::MoveGroupInterface::Plan my_plan;
-  bool success = (move_group_interface.plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS);
-  RCLCPP_INFO(logger, "Visualizing plan 2 (joint space goal) %s", success ? "" : "FAILED");
+  move_group_interface.setPlanningTime(10.0);  // Set 10-second timeout
+  moveit::core::MoveItErrorCode plan_state = move_group_interface.plan(my_plan);
+  bool success = (plan_state == moveit::core::MoveItErrorCode::SUCCESS);
+  RCLCPP_INFO(logger, "Motion Planning Request: %s", moveit::core::error_code_to_string(plan_state).c_str());
+  // if (true == success)
+  // {
+
+  // }
+  // else
+  // {
+
+  // }
+  // RCLCPP_INFO(logger, "Visualizing plan 2 (joint space goal)");
   
   // visualize the plan in RViz:
   namespace rvt = rviz_visual_tools;
