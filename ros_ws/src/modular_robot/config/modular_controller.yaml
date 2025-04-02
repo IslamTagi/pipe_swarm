@@ -8,6 +8,12 @@
 
     chain_joint_trajectory_controller:
       type: joint_trajectory_controller/JointTrajectoryController
+
+    mobile_base_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+    mobile_chain_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
  
 /chain_joint_trajectory_controller:
   ros__parameters:
@@ -29,9 +35,43 @@
     constraints:
       stopped_velocity_tolerance: 0.01
       goal_time: 0.0
-      agent_n2_female_base_joint:
+      agent_n2_pivot_base_joint:
         trajectory: 0.05
         goal: 0.0
-      agent_n3_female_base_joint:
+      agent_n3_pivot_base_joint:
         trajectory: 0.05
         goal: 0.0
+
+/mobile_base_controller:
+  ros__parameters:
+    joints:
+      - prismatic_agent_n_joint
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+    action_monitor_rate: 20.0
+
+    allow_partial_joints_goal: true
+    open_loop_control: true
+    constraints:
+      velocity: 0.2
+      goal: 0.01
+      stopped_velocity_tolerance: 0.05
+      goal_time: 2.0
+      prismatic_agent_n_joint:
+        trajectory: 0.1
+        goal: 0.01
+
+/mobile_chain_controller:
+  ros__parameters:
+    joints:
+      - prismatic_agent_n_joint
+      - agent_n2_pivot_base_joint
+      - agent_n3_pivot_base_joint
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
