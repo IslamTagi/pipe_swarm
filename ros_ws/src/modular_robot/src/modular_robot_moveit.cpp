@@ -80,14 +80,12 @@ int main(int argc, char * argv[])
   moveit::core::MoveItErrorCode plan_state = move_group_interface.plan(my_plan);
   bool success = (plan_state == moveit::core::MoveItErrorCode::SUCCESS);
   RCLCPP_INFO(logger, "Motion Planning Request: %s", moveit::core::error_code_to_string(plan_state).c_str());
-  // if (true == success)
-  // {
-
-  // }
-  // else
-  // {
-
-  // }
+  if (true == success)
+  {
+    moveit::core::MoveItErrorCode exec_status = move_group_interface.execute(my_plan);
+    RCLCPP_INFO(logger, "Execution Request: %s", moveit::core::error_code_to_string(exec_status).c_str());
+  }
+  
   // RCLCPP_INFO(logger, "Visualizing plan 2 (joint space goal)");
   
   // visualize the plan in RViz:
