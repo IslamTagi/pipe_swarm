@@ -31,7 +31,7 @@ chain_joint_trajectory_controller:
 mobile_base_controller:
   ros__parameters:
     joints:
-      - mobile_joint
+      - prismatic_agent_n_joint
     command_interfaces:
       - position
     state_interfaces:
@@ -40,7 +40,7 @@ mobile_base_controller:
 mobile_chain_controller:
   ros__parameters:
     joints:
-      - mobile_joint
+      - prismatic_agent_n_joint
       - agent_n2_pivot_base_joint
       - agent_n3_pivot_base_joint
     command_interfaces:
