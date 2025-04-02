@@ -15,7 +15,7 @@ int main(int argc, char * argv[])
     "modular_robot_moveit",
     rclcpp::NodeOptions()
       .automatically_declare_parameters_from_overrides(true)
-      // .parameter_overrides({{"use_sim_time", rclcpp::ParameterValue(true)}})
+      .parameter_overrides({{"use_sim_time", rclcpp::ParameterValue(true)}})
   );
 
   static const std::string PLANNING_GROUP = "mobile_chain";
@@ -36,8 +36,8 @@ int main(int argc, char * argv[])
       move_group_interface.getCurrentState()->getJointModelGroup(PLANNING_GROUP);
   std::vector<double> target_joint_group_positions;
   current_state->copyJointGroupPositions(joint_model_group, target_joint_group_positions);
-  target_joint_group_positions[0] = 0.45;  // m
-  target_joint_group_positions[1] = 0;  // radians
+  target_joint_group_positions[0] = 0.1;  // m
+  target_joint_group_positions[1] = -0.785;  // radians
   target_joint_group_positions[2] = -0.785;  // radians
   move_group_interface.setJointValueTarget(target_joint_group_positions);
 
@@ -57,12 +57,12 @@ int main(int argc, char * argv[])
   // Define the box shape
   shape_msgs::msg::SolidPrimitive box;
   box.type = box.BOX;
-  box.dimensions = {0.3, 0.3, 0.3};  // size in meters (x, y, z)
+  box.dimensions = {0.1, 0.2, 0.2};  // size in meters (x, y, z)
 
   // Define the box pose
   geometry_msgs::msg::Pose box_pose;
   box_pose.orientation.w = 1.0;
-  box_pose.position.x = 0.51;
+  box_pose.position.x = 0.17;
   box_pose.position.y = 0.0;
   box_pose.position.z = 0.2;
 
