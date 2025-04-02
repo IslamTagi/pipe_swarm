@@ -105,6 +105,20 @@ def generate_launch_description():
         arguments=['chain_joint_trajectory_controller'],
         output='screen',
     )
+    
+    spawn_mobile_base_controller = Node(
+        package='controller_manager',
+        executable='spawner',
+        arguments=['mobile_base_controller'],
+        output='screen',
+    )
+    
+    spawn_mobile_chain_controller = Node(
+        package='controller_manager',
+        executable='spawner',
+        arguments=['mobile_chain_controller'],
+        output='screen',
+    )
 
     use_sim_time = {"use_sim_time": True}
     moveit_config_dict = moveit_config.to_dict()
@@ -123,6 +137,8 @@ def generate_launch_description():
             target_action=controller_manager_node,
             on_start=[spawn_joint_state_broadcaster,
                         spawn_joint_trajectory_controller,
+                        spawn_mobile_base_controller,
+                        # spawn_mobile_chain_controller,
                     ]
         )
     )

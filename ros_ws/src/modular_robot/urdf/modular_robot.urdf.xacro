@@ -3,7 +3,7 @@
 
     <xacro:include filename="pipe_robot.xacro"/>
     <xacro:include filename="common.xacro"/>
-    <xacro:property name="include_gazebo" value="true" />
+    <xacro:property name="include_gazebo" value="false" />
     
     <link name="footprint_link" />
 
@@ -27,18 +27,6 @@
     <xacro:pipe_robot agent_namespace="agent_n2" include_gazebo="true" first_link="false"/>
     <xacro:pipe_robot agent_namespace="agent_n3" include_gazebo="true" first_link="false"/>
 
-    <!-- <xacro:unless value="${include_gazebo}">
-        <link name="world_link" />
-
-        <joint name="mobile_joint" type="prismatic">
-            <origin xyz="0 0 0" rpy="0 0 0"/>
-            <parent link="world_link"/>
-            <child link="footprint_link"/>
-            <axis xyz="1 0 0"/>
-            <limit lower="-1.0" upper="1.0" effort="100" velocity="1.0"/>
-        </joint>
-    </xacro:unless> -->
-
     <joint name="footprint_prismatic_joint" type="fixed">
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <parent link="footprint_link"/>
@@ -54,15 +42,6 @@
         <dynamics damping="5.0" friction="2.0"/>
 
     </joint>
-    <!-- <transmission name="prismatic_agent_n_trans">
-        <type>transmission_interface/SimpleTransmission</type>
-        <joint name="prismatic_agent_n_joint">
-            <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
-        </joint>
-        <actuator name="prismatic_agent_n_actuator">
-            <mechanicalReduction>1</mechanicalReduction>
-        </actuator>
-    </transmission> -->
 
     <joint name="agent_n_agent_n2_joint" type="fixed">
         <origin xyz="0 0 0" rpy="0 0 0"/>
