@@ -12,7 +12,6 @@
 /chain_joint_trajectory_controller:
   ros__parameters:
     joints:
-      - agent_n_pivot_base_joint
       - agent_n2_pivot_base_joint
       - agent_n3_pivot_base_joint
 
@@ -30,15 +29,9 @@
     constraints:
       stopped_velocity_tolerance: 0.01
       goal_time: 0.0
-      agent_n_female_base_joint:
-        trajectory: 0.05
-        goal: 0.0
       agent_n2_female_base_joint:
         trajectory: 0.05
         goal: 0.0
       agent_n3_female_base_joint:
-        trajectory: 0.05
-        goal: 0.0
-      agent_n4_female_base_joint:
         trajectory: 0.05
         goal: 0.0

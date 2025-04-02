@@ -134,13 +134,13 @@
             <child link="${agent_namespace}_female_link"/>
         </joint>
 
-        <joint name="${agent_namespace}_pivot_base_joint" type="revolute">
+        <joint name="${agent_namespace}_pivot_base_joint" type="fixed">
             <origin xyz="${-(0.02-lock_o)} 0 ${pivot_zo}" rpy="0 0 0"/>
             <parent link="${agent_namespace}_base_link"/>
             <child link="${agent_namespace}_pivot_link"/>
-            <axis xyz="0 1 0"/>
+            <!-- <axis xyz="0 1 0"/>
             <limit lower="${-pi/4}" upper="${pi/4}" effort="1.0" velocity="1.0"/>
-            <dynamics damping="0.3" friction="0.5"/>
+            <dynamics damping="0.3" friction="0.5"/> -->
         </joint>
     </xacro:if>
     <xacro:unless value="${first_link}">
