@@ -100,7 +100,7 @@ def generate_launch_description():
             ros2_control_node,
             joint_state_broadcaster_spawner,
             chain_joint_trajectory_controller_spawner,
-            # mobile_base_controller_spawner,
+            mobile_base_controller_spawner,
             # mobile_chain_controller_spawner,
             robot_state_publisher_node,
             move_group_node,
