@@ -11,7 +11,7 @@ from control_msgs.msg import JointTrajectoryControllerState
 from builtin_interfaces.msg import Duration
 from sensor_msgs.msg import Range
 from enum import Enum, auto
-import time # Using time for delays/timeouts is often clearer
+import time # Using time for delays/timeouts
 
 # Define the states using Enum for clarity
 class RobotState(Enum):
@@ -44,7 +44,7 @@ class Connect_Robots(Node):
 
         # --- Constants and Configuration (Consider making these ROS Parameters later) ---
         self.initial_delay_sec = 2.0
-        self.robot_detection_threshold = 0.1  # 10% difference threshold
+        self.robot_detection_threshold = 0.2  # 10% difference threshold
         self.connection_verification_threshold = 0.2 # 20% difference threshold for connection test
         self.close_distance_m = 0.15 # Threshold to start alignment/docking
         self.reset_distance_m = 0.3  # Target separation distance during reset
@@ -94,7 +94,7 @@ class Connect_Robots(Node):
         # --- Main Loop Timer ---
         self.timer = self.create_timer(0.1, self.state_machine_tick) # 10 Hz loop
 
-        self.get_logger().info("Connect_Robots FSM node initialized.")
+        self.get_logger().info("Connect_Robots Finite State Machine Node initialized.")
 
     # ==========================================================================
     # State Machine Core Logic
@@ -209,7 +209,7 @@ class Connect_Robots(Node):
             self.get_logger().info(f"Stored obstacle scan range: {self.robot_confirm_scan_range:.3f} m. Attempting confirmation.")
             self.change_state(RobotState.CONFIRMING_ROBOT)
         else:
-            # If range became invalid just as we detected, maybe retry detection?
+            # If range became invalid just as we detected,  retry detection
             self.get_logger().warn("Range invalid while trying to store obstacle scan. Reverting to MOVING_FORWARD.")
             self.initial_scan_range = None # Reset initial scan too
             self.change_state(RobotState.MOVING_FORWARD)
@@ -229,7 +229,6 @@ class Connect_Robots(Node):
         # Ensure current range is valid for comparison
         current_range = self.range
         if current_range is None or current_range < 0.05:
-            # If range is lost during confirmation, treat as failure? Or wait?
             # For now, let timeout handle it if range doesn't recover.
             self.get_logger().warn("Range reading lost during robot confirmation.", throttle_duration_sec=5.0)
             pass # Continue letting agent 1 move for the timeout duration
@@ -237,8 +236,7 @@ class Connect_Robots(Node):
             # Check if range changes significantly, indicating the obstacle (agent_1) moved
             if self.robot_confirm_scan_range > 0.05: # Avoid division by zero/small numbers
                 difference = abs(current_range - self.robot_confirm_scan_range) / self.robot_confirm_scan_range
-                # Use a slightly larger threshold maybe, as agent 1 moving *towards* agent 0 changes range
-                if difference > (1.5 * self.robot_detection_threshold):
+                if difference > self.robot_detection_threshold:
                     self.get_logger().info(f"Range changed significantly (difference: {difference:.2f}). Robot confirmed.")
                     self._send_velocity_command_agent_1(0.0, 0.0) # Stop agent 1
                     self.change_state(RobotState.APPROACHING_TARGET)
@@ -258,7 +256,7 @@ class Connect_Robots(Node):
         # Ensure robots are stopped
         self._send_velocity_command_agent_0(0.0, 0.0)
         self._send_velocity_command_agent_1(0.0, 0.0)
-        # Print message only once
+        # Print message
         self.get_logger().info("Obstacle detected (not the target robot). Halting connection process.", once=True)
         # Stay in this state, no further actions related to connection
 
@@ -292,7 +290,6 @@ class Connect_Robots(Node):
     def _handle_aligning_state(self, time_in_state):
         """Perform the alignment maneuver by rotating agent_1."""
         self._send_velocity_command_agent_0(0.0, 0.0) # Agent 0 waits
-        self._centre_robot_1() # Center agent 1 while aligning
 
         # Check if alignment succeeded (via callback)
         if self.aligned:
@@ -310,10 +307,10 @@ class Connect_Robots(Node):
 
         # Alignment turning logic (based on original counts translated to time)
         # Cycle: 1s left, 2s right, 1s left (total 4s per cycle)
-        time_in_cycle = time_in_state % 4.0
+        time_in_cycle = time_in_state % 8.0
         angular_z = 0.0
-        if time_in_cycle <= 1.0: angular_z = 0.15
-        elif time_in_cycle <= 3.0: angular_z = -0.15
+        if time_in_cycle <= 2.0: angular_z = 0.15
+        elif time_in_cycle <= 6.0: angular_z = -0.15
         else: angular_z = 0.15
         self._send_velocity_command_agent_1(0.0, angular_z)
 
@@ -323,13 +320,9 @@ class Connect_Robots(Node):
         self.get_logger().info(f"Docking maneuver... (time: {time_in_state:.1f}/{self.docking_duration_sec:.1f})", throttle_duration_sec=1.0)
         self._send_velocity_command_agent_0(0.01, 0.0)
         self._send_velocity_command_agent_1(-0.015, 0.0)
-        self._centre_robot_0()
-        self._centre_robot_1()
 
         if time_in_state >= self.docking_duration_sec:
             self.get_logger().info("Docking duration complete. Attempting lock.")
-            self._send_velocity_command_agent_0(0.0, 0.0)
-            self._send_velocity_command_agent_1(0.0, 0.0)
             self.change_state(RobotState.LOCKING)
 
 
@@ -358,11 +351,10 @@ class Connect_Robots(Node):
                 self.get_logger().info(f"Verifying connection. Stored locked range: {self.locked_connection_range:.3f} m.")
             else:
                 self.get_logger().warn("Cannot start verification, range invalid.", throttle_duration_sec=5.0)
-                # Option: Fail immediately? Or wait briefly for range to recover?
                 if time_in_state > 1.0: # Wait 1s for range recovery
                     self.get_logger().error("Verification failed: Invalid range at start.")
                     self.change_state(RobotState.FAILED)
-                return # Wait a bit longer
+                return 
 
         self._send_velocity_command_agent_0(-0.05, 0.0)
         self._centre_robot_0()
@@ -409,8 +401,8 @@ class Connect_Robots(Node):
         self.get_logger().info(f"Resetting: Moving robots apart. Current range: {current_range:.3f} m / Target: {self.reset_distance_m:.3f} m", throttle_duration_sec=1.0)
 
         if current_range < self.reset_distance_m:
-            self._send_velocity_command_agent_0(-0.01, 0.0)
-            self._send_velocity_command_agent_1(0.02, 0.0)
+            self._send_velocity_command_agent_0(-0.02, 0.0)
+            self._send_velocity_command_agent_1(0.01, 0.0)
             self._centre_robot_0()
             self._centre_robot_1()
         else:
@@ -458,45 +450,31 @@ class Connect_Robots(Node):
     def _centre_robot_0(self):
             """Calculates and sends centering command based on agent_0's roll, adjusting for direction."""
             # --- Gain Configuration ---
-            # NOTE: Assumes k_p=-0.05 produced the correct turn direction for FORWARD motion in the previous version.
-            # This implies that a positive physical roll (e.g., right side down) resulted in a NEGATIVE self.roll_agent_0 value.
-            k_p_forward = -0.05 # Original gain assumed correct for forward
+            k_p_forward = -0.05 # Original forward gain 
 
             angular_z_cmd = 0.0
             roll_threshold_rad = math.radians(0.5) # ~0.5 degrees threshold
 
             # --- Determine current linear direction ---
-            # Use the *intended* command, not just the last published one, if available,
-            # but last published is usually sufficient here.
             current_linear = self.last_linear_cmd_agent_0 if self.last_linear_cmd_agent_0 is not None else 0.0
             is_reversing = current_linear < -0.001 # Use a small tolerance to avoid issues near zero
 
             # --- Calculate Correction ---
             if abs(self.roll_agent_0) > roll_threshold_rad:
-                # If moving forward (or stationary), use the forward gain.
-                # If moving backward, the required angular velocity sign to correct the roll is flipped.
                 effective_k_p = -k_p_forward if is_reversing else k_p_forward # Flip gain sign if reversing
 
                 # Calculate the desired angular velocity
                 angular_z_cmd = effective_k_p * self.roll_agent_0
 
-                # Clamp maximum angular velocity correction (optional but recommended)
+                # Clamp maximum angular velocity correction 
                 max_correction_vel = 0.2 # rad/s
                 angular_z_cmd = max(-max_correction_vel, min(max_correction_vel, angular_z_cmd))
 
             # --- Publish Command ---
             # Only publish if the angular command *needs* changing significantly.
-            # The linear part is set by the state machine logic calling this helper.
-            # Check against the *last commanded* angular Z for this agent.
             last_angular = self.last_angular_cmd_agent_0 if self.last_angular_cmd_agent_0 is not None else 0.0
             if abs(angular_z_cmd - last_angular) > 0.005: # Publish if changed significantly
-                # Note: We send the 'current_linear' which was the *last commanded* linear.
-                # This assumes the state machine sets the desired linear speed, and centering
-                # only adjusts the angular speed.
                 self._send_velocity_command_agent_0(current_linear, angular_z_cmd)
-            # If angular_z_cmd is close to the last command, do nothing to avoid jitter,
-            # unless linear command is also changing (handled by _send_velocity_command check).
-
 
     def _centre_robot_1(self):
         """Calculates and sends centering command based on agent_1's roll, adjusting for direction."""
@@ -512,17 +490,17 @@ class Connect_Robots(Node):
 
         # --- Calculate Correction ---
         if abs(self.roll_agent_1) > roll_threshold_rad:
-            # Flip gain sign if reversing
-            effective_k_p = -k_p_forward if is_reversing else k_p_forward
+            effective_k_p = -k_p_forward if is_reversing else k_p_forward # Flip gain sign if reversing
 
             # Calculate the desired angular velocity
             angular_z_cmd = effective_k_p * self.roll_agent_1
 
-            # Clamp maximum angular velocity correction (optional but recommended)
+            # Clamp maximum angular velocity correction
             max_correction_vel = 0.2 # rad/s
             angular_z_cmd = max(-max_correction_vel, min(max_correction_vel, angular_z_cmd))
 
         # --- Publish Command ---
+        # Only publish if the angular command *needs* changing significantly.
         last_angular = self.last_angular_cmd_agent_1 if self.last_angular_cmd_agent_1 is not None else 0.0
         if abs(angular_z_cmd - last_angular) > 0.005: # Publish if changed significantly
             self._send_velocity_command_agent_1(current_linear, angular_z_cmd)
@@ -566,17 +544,7 @@ class Connect_Robots(Node):
         if accel_mag_sq < 0.01:
              # self.get_logger().warn("IMU acceleration near zero, cannot calculate roll/pitch.", throttle_duration_sec=10.0)
              return None, None
-
-        # Calculate roll and pitch in radians using atan2 for robustness
-        # Ensure axis definitions match your hardware setup!
-        # Common convention: Roll is rotation around X (forward), Pitch around Y (left)
         try:
-            # Roll (rad): Rotation around X. Using atan2(ay, az) is common but sensitive if az is near 0.
-            # Pitch (rad): Rotation around Y. Using atan2(-ax, sqrt(ay^2 + az^2))
-            # Using the definition from your original code more directly:
-            # roll = math.atan2(-ax, math.sqrt(ay**2 + az**2)) # Your original 'roll' definition
-            # pitch = math.atan2(ay, math.sqrt(ax**2 + az**2)) # Your original 'pitch' definition
-
             # Let's stick to your 'roll' calculation (atan2(-ax, sqrt(ay^2 + az^2))) for consistency
             roll_rad = math.atan2(-ax, math.sqrt(ay**2 + az**2))
             pitch_rad = math.atan2(ay, math.sqrt(ax**2 + az**2)) # Keep pitch calc too
