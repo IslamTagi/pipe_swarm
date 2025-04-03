@@ -113,16 +113,16 @@ class Connect_Robots(Node):
         # Timing
         self.initial_delay_sec = 2.0
         self.alignment_timeout_sec = 40.0
-        self.docking_duration_sec = 10.0
+        self.docking_duration_sec = 15.0
         self.locking_timeout_sec = 10.0 # Increased slightly as pushing might take longer
         self.verification_duration_sec = 5.0
-        self.confirmation_timeout_per_robot_sec = 3.0 # Time to wait for range change per robot check
+        self.confirmation_timeout_per_robot_sec = 2.0 # Time to wait for range change per robot check
         # Speeds
         self.forward_speed = 0.1
         self.approach_speed_gain = 0.1
         self.approach_min_speed = 0.02
-        self.docking_speed_male = 0.0075      # Speed for male pushing during DOCKING/LOCKING
-        self.docking_speed_female = -0.01  # Speed for female pushing during DOCKING/LOCKING
+        self.docking_speed_male = 0.005      # Speed for male pushing during DOCKING/LOCKING
+        self.docking_speed_female = -0.0075  # Speed for female pushing during DOCKING/LOCKING
         self.verification_pull_speed = -0.05 # Speed for male pulling during VERIFYING
         self.reset_speed_seeker = -0.02     # Adjusted for potentially better separation
         self.reset_speed_target = 0.01      # Adjusted for potentially better separation
@@ -134,7 +134,7 @@ class Connect_Robots(Node):
         self.confirmation_detection_threshold = 0.2 # % change during confirmation
         self.connection_verification_threshold = 0.2 # % change allowed during verify pull
         self.close_distance_m = 0.15
-        self.reset_distance_m = 0.3
+        self.reset_distance_m = 0.2
         self.range_valid_min_m = 0.05 # Ignore range readings below this
         self.roll_threshold_deg = 1.5
         # Joints
@@ -960,7 +960,9 @@ class Connect_Robots(Node):
         # --- Ensure Partner (if exists) stays stopped ---
         if partner_id is not None:
             self.get_logger().debug(f"Docking CMD (Partner Present): Male={male_id} V={self.docking_speed_male:.3f}, Female={female_id} V={self.docking_speed_female:.3f}, Partner={partner_id} V=0.0", throttle_duration_sec=1.0)
-            self._send_velocity(partner_id, self.docking_speed_female, 0.0)
+            self._send_velocity(partner_id, 2*self.docking_speed_female, 0.0)
+            self._send_velocity(female_id, 2*self.docking_speed_female, 0.0)
+            self._send_velocity(male_id, 3*self.docking_speed_male, 0.0)
 
             # self._centre_robot(partner_id)
         # ---
@@ -1044,7 +1046,7 @@ class Connect_Robots(Node):
                 self.locked_connection_range = current_range_male
                 self.get_logger().info(f"Verifying connection (Pair: {male_id},{female_id}). Locked range: {self.locked_connection_range:.3f}m.")
             else:
-                if time_in_state > 1.0: # Wait 1s for valid range
+                if time_in_state > 3.0: # Wait 1s for valid range
                     self.get_logger().error(f"Verification failed - No valid range from male {male_id} at start.")
                     self.change_state(RobotState.HANDLING_FAILURE)
                 return # Wait for valid range
