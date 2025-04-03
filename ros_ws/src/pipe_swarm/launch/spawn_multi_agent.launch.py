@@ -51,7 +51,7 @@ def generate_launch_description():
     pipe_swarm_share = get_package_share_directory('pipe_swarm')
     gazebo_ros_share = get_package_share_directory('gazebo_ros')
     xacro_path = os.path.join(pipe_swarm_share, 'urdf', 'pipe_agent.urdf.xacro')
-    world_path = os.path.join(pipe_swarm_share, 'worlds', 'bookshelf.sdf')
+    world_path = os.path.join(pipe_swarm_share, 'worlds', 'step.sdf')
 
     agents = []
 
@@ -66,7 +66,7 @@ def generate_launch_description():
     # Pre-Agent Setup
     agents.append(gazebo_launch)
 
-    for i in range(3):  # Launch 3 robots
+    for i in range(4):  # Launch 3 robots
         namespace = f'agent_{i}'
 
         # update_controllers_namespace(namespace)
@@ -87,9 +87,9 @@ def generate_launch_description():
             name=f'spawn_agent_{i}',
             output='screen',
             arguments=[ '-entity', namespace,
-                        '-x', f'{i*2}',
+                        '-x', f'{i}',
                         '-y', '0',
-                        '-z', '0.1',
+                        '-z', '0.15',
                         '-R', '0',  # Roll
                         '-P', '0',  # Pitch 
                         '-Y', f'{math.radians(0)}',  # Yaw
@@ -164,5 +164,5 @@ def generate_launch_description():
         output='screen'
     )
 
-    agents.append(rviz_display)
+    # agents.append(rviz_display)
     return LaunchDescription(agents)
