@@ -52,10 +52,24 @@ def generate_launch_description():
         output='screen',
     )
     
-    spawn_joint_trajectory_controller = Node(
+    spawn_chain_joint_trajectory_controller = Node(
         package='controller_manager',
         executable='spawner',
         arguments=['chain_joint_trajectory_controller'],
+        output='screen',
+    )
+    
+    spawn_mobile_base_controller = Node(
+        package='controller_manager',
+        executable='spawner',
+        arguments=['mobile_base_controller'],
+        output='screen',
+    )
+    
+    spawn_mobile_chain_controller = Node(
+        package='controller_manager',
+        executable='spawner',
+        arguments=['mobile_chain_controller'],
         output='screen',
     )
     
@@ -63,7 +77,9 @@ def generate_launch_description():
         event_handler=OnProcessExit(
             target_action=spawn_entity,
             on_exit=[spawn_joint_state_broadcaster,
-                        spawn_joint_trajectory_controller,
+                        spawn_chain_joint_trajectory_controller,
+                        spawn_mobile_base_controller,
+                        # spawn_mobile_chain_controller,
                     ],
         )
     )

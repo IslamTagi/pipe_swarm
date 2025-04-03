@@ -7,12 +7,40 @@ controller_manager:
       type: joint_trajectory_controller/JointTrajectoryController
 
 
+    mobile_base_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+
+    mobile_chain_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
 
 chain_joint_trajectory_controller:
   ros__parameters:
     joints:
+      - agent_n2_pivot_base_joint
+      - agent_n3_pivot_base_joint
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+mobile_base_controller:
+  ros__parameters:
+    joints:
+      - prismatic_agent_n_joint
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+mobile_chain_controller:
+  ros__parameters:
+    joints:
+      - prismatic_agent_n_joint
       - agent_n2_pivot_base_joint
       - agent_n3_pivot_base_joint
     command_interfaces:
