@@ -61,6 +61,8 @@ install(
     py_src/connect_multiple_robots.py
     py_src/connect_robots_state_management.py
     py_src/connect_multiple_robots_fsm.py
+    py_src/FSM.py
+
   DESTINATION lib/${PROJECT_NAME}/  
 )
 
