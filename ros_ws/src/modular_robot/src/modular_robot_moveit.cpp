@@ -8,7 +8,7 @@
 #include <moveit_visual_tools/moveit_visual_tools.h>
 
 void splitExecuteTrajectory(std::shared_ptr<rclcpp::Node> move_group_node,
-                  rclcpp::Logger logger,
+                  // rclcpp::Logger logger,
                   moveit::planning_interface::MoveGroupInterface::Plan plan)
 {
   auto trajectory_points = plan.trajectory_.joint_trajectory.points;
@@ -17,23 +17,32 @@ void splitExecuteTrajectory(std::shared_ptr<rclcpp::Node> move_group_node,
   auto agent_1_pub = move_group_node->create_publisher<trajectory_msgs::msg::JointTrajectory>(
     "/agent_1/female_joint_trajectory_controller/joint_trajectory", 10);
   
+    auto agent_2_pub = move_group_node->create_publisher<trajectory_msgs::msg::JointTrajectory>(
+    "/agent_2/female_joint_trajectory_controller/joint_trajectory", 10);
+  
   // set joint names
   trajectory_msgs::msg::JointTrajectory traj_agent_1;
   traj_agent_1.joint_names.push_back("base_female_joint");
+  trajectory_msgs::msg::JointTrajectory traj_agent_2;
+  traj_agent_2.joint_names.push_back("base_female_joint");
 
   const auto& points = plan.trajectory_.joint_trajectory.points;
 
   for (const auto& point : points)
   {
     trajectory_msgs::msg::JointTrajectoryPoint point_agent_1;
-    point_agent_1.positions.push_back(point.positions[1]); // index 1: agent_n2_pivot_base_joint
+    point_agent_1.positions.push_back(-point.positions[1]); // invert position
     point_agent_1.time_from_start = point.time_from_start;
     traj_agent_1.points.push_back(point_agent_1);
+    
+    trajectory_msgs::msg::JointTrajectoryPoint point_agent_2;
+    point_agent_2.positions.push_back(-point.positions[2]); // invert position
+    point_agent_2.time_from_start = point.time_from_start;
+    traj_agent_2.points.push_back(point_agent_2);
   }
 
-  RCLCPP_INFO(logger, "Sending Traj 1");
   agent_1_pub->publish(traj_agent_1);
-  RCLCPP_INFO(logger, "Sent Traj 1");
+  agent_2_pub->publish(traj_agent_2);
   
 }
 
@@ -111,7 +120,7 @@ int main(int argc, char * argv[])
   RCLCPP_INFO(logger, "Motion Planning Request: %s", moveit::core::error_code_to_string(plan_state).c_str());
   if (true == success)
   {
-    splitExecuteTrajectory(move_group_node, logger, my_plan);
+    splitExecuteTrajectory(move_group_node, /*logger,*/ my_plan);
     moveit::core::MoveItErrorCode exec_status = move_group_interface.execute(my_plan);
     RCLCPP_INFO(logger, "Execution Request: %s", moveit::core::error_code_to_string(exec_status).c_str());
   }
