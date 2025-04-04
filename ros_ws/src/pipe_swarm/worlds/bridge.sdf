@@ -76,6 +76,24 @@
               <scale>0.001 0.001 0.001</scale>  <!-- Scale for collision geometry -->
             </mesh>
           </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1.5</mu>   <!-- Increased friction -->
+                <mu2>1.5</mu2>  <!-- Increased friction -->
+                <slip1>0.0</slip1>
+                <slip2>0.0</slip2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <kp>1000000.0</kp> <!-- Standard contact stiffness -->
+                <kd>100.0</kd>     <!-- Standard contact damping -->
+                <max_vel>1.0</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
         </collision>
       </link>
     </model>
@@ -103,6 +121,24 @@
               <scale>0.001 0.001 0.001</scale>  <!-- Scale for collision geometry -->
             </mesh>
           </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1.5</mu>   <!-- Increased friction -->
+                <mu2>1.5</mu2>  <!-- Increased friction -->
+                <slip1>0.0</slip1>
+                <slip2>0.0</slip2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <kp>1000000.0</kp> <!-- Standard contact stiffness -->
+                <kd>100.0</kd>     <!-- Standard contact damping -->
+                <max_vel>1.0</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
         </collision>
       </link>
     </model>
@@ -130,6 +166,24 @@
               <scale>0.001 0.001 0.001</scale>  <!-- Scale for collision geometry -->
             </mesh>
           </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1.5</mu>   <!-- Increased friction -->
+                <mu2>1.5</mu2>  <!-- Increased friction -->
+                <slip1>0.0</slip1>
+                <slip2>0.0</slip2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <kp>1000000.0</kp> <!-- Standard contact stiffness -->
+                <kd>100.0</kd>     <!-- Standard contact damping -->
+                <max_vel>1.0</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
         </collision>
       </link>
     </model>

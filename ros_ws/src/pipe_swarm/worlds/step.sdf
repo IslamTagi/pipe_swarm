@@ -51,7 +51,6 @@
               <scale>0.001 0.001 0.001</scale>  <!-- Scale for collision geometry -->
             </mesh>
           </geometry>
-          <!-- === ADDED SURFACE PROPERTIES for hollow_pipe === -->
           <surface>
             <friction>
               <ode>
@@ -70,7 +69,6 @@
               </ode>
             </contact>
           </surface>
-          <!-- === END SURFACE PROPERTIES === -->
         </collision>
       </link>
     </model>
@@ -98,12 +96,11 @@
               <scale>0.001 0.001 0.001</scale>  <!-- Scale for collision geometry -->
             </mesh>
           </geometry>
-           <!-- === ADDED SURFACE PROPERTIES for half_hollow_pipe === -->
           <surface>
             <friction>
               <ode>
-                <mu>2.0</mu>   <!-- Increased friction -->
-                <mu2>2.0</mu2>  <!-- Increased friction -->
+                <mu>1.5</mu>   <!-- Increased friction -->
+                <mu2>1.5</mu2>  <!-- Increased friction -->
                 <slip1>0.0</slip1>
                 <slip2>0.0</slip2>
               </ode>
@@ -117,7 +114,6 @@
               </ode>
             </contact>
           </surface>
-          <!-- === END SURFACE PROPERTIES === -->
         </collision>
       </link>
     </model>
@@ -145,26 +141,24 @@
               <scale>0.001 0.001 0.001</scale>  <!-- Scale for collision geometry -->
             </mesh>
           </geometry>
-          <!-- === ADDED SURFACE PROPERTIES for pipe_end === -->
           <surface>
             <friction>
               <ode>
-                <mu>2.0</mu>   <!-- Increased friction -->
-                <mu2>2.0</mu2>  <!-- Increased friction -->
+                <mu>1.5</mu>   
+                <mu2>1.5</mu2>  
                 <slip1>0.0</slip1>
                 <slip2>0.0</slip2>
               </ode>
             </friction>
             <contact>
               <ode>
-                <kp>1000000.0</kp> <!-- Standard contact stiffness -->
-                <kd>100.0</kd>     <!-- Standard contact damping -->
+                <kp>1000000.0</kp>
+                <kd>100.0</kd>   
                 <max_vel>1.0</max_vel>
                 <min_depth>0.001</min_depth>
               </ode>
             </contact>
           </surface>
-          <!-- === END SURFACE PROPERTIES === -->
         </collision>
       </link>
     </model>
