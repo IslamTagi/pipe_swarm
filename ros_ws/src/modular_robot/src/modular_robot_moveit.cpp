@@ -36,9 +36,9 @@ int main(int argc, char * argv[])
       move_group_interface.getCurrentState()->getJointModelGroup(PLANNING_GROUP);
   std::vector<double> target_joint_group_positions;
   current_state->copyJointGroupPositions(joint_model_group, target_joint_group_positions);
-  target_joint_group_positions[0] = 0.1;  // m
-  target_joint_group_positions[1] = -0.785;  // radians
-  target_joint_group_positions[2] = -0.785;  // radians
+  target_joint_group_positions[0] = 0.09;  // m
+  target_joint_group_positions[1] = -0.78;  // radians
+  target_joint_group_positions[2] = -0.78;  // radians
   move_group_interface.setJointValueTarget(target_joint_group_positions);
 
   // We lower the allowed maximum velocity and acceleration to 5% of their maximum.

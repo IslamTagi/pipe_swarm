@@ -58,11 +58,11 @@
     constraints:
       velocity: 0.2
       goal: 0.01
-      stopped_velocity_tolerance: 0.05
-      goal_time: 2.0
+      stopped_velocity_tolerance: 3.0
+      goal_time: 3.0
       prismatic_agent_n_joint:
         trajectory: 0.1
-        goal: 0.01
+        goal: 0.05
 
 /mobile_chain_controller:
   ros__parameters:
