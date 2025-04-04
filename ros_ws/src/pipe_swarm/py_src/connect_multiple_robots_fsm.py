@@ -13,7 +13,7 @@ from builtin_interfaces.msg import Duration
 from enum import Enum, auto
 import time
 from functools import partial
-from collections import defaultdict # Useful for initializing dicts
+from collections import defaultdict 
 import traceback
 
 # ==========================================================================
@@ -33,10 +33,10 @@ class RobotState(Enum):
     CHECKING_ALIGNMENT = auto()
     ALIGNING = auto()
     DOCKING = auto()
-    LOCKING = auto()                    # <<< Robots will push/pull during this state
-    VERIFYING_CONNECTION = auto()       # <<< Robots will pull back during this state
-    CONNECTED = auto()                  # Transient state after verification success
-    HANDLING_FAILURE = auto()           # Unified failure handling before reset
+    LOCKING = auto()                    
+    VERIFYING_CONNECTION = auto()      
+    CONNECTED = auto()                  
+    HANDLING_FAILURE = auto()           
     RESETTING = auto()
     ALL_CONNECTED_OR_HALTED = auto()
     FAILED = auto()
@@ -69,20 +69,19 @@ class Connect_Robots(Node):
         super().__init__("connect_robots_fsm_node")
 
         # --- Discovery ---
-        self.robots = {}                    # Basic info {agent_id: {'ns': ns}}
+        self.robots = {}                  
         self.discovered_agent_ids = set()
         self.num_discovered_robots = 0
         self.discovery_complete = False
         self.discovery_timer_period = 2.0
         self.discovery_attempts = 0
-        self.max_discovery_attempts = 5
+        self.max_discovery_attempts = 2
 
         # --- Dynamic Pub/Sub/Data Storage ---
         self.agent_pubs = {'cmd_vel': {}, 'male_joint': {}, 'female_joint': {}}
         self.agent_subs = {'imu': {}, 'range': {}, 'alignment': {}, 'male_joint_state': {}}
         # Store latest sensor data keyed by agent_id, defaulting nested keys
         self.agent_sensor_data = defaultdict(lambda: defaultdict(lambda: None))
-        self._initialize_sensor_data_keys() # Ensure top-level keys exist
         self.agent_last_cmd_vel = {} # {agent_id: (linear, angular)}
 
         # --- Multi-Robot State Tracking ---
@@ -103,7 +102,6 @@ class Connect_Robots(Node):
         self.current_male_id = None         # Cache male role for current pair (seeker)
         self.current_female_id = None       # Cache female role for current pair (target)
         self.locked_connection_range = None # Range stored just before verification pull
-        self.current_target_partner_id = None # Immediate partner of current_target_id (if any)
         self.current_target_group = set()     # <<< Stores IDs in the target's connected group
 
         # --- State Machine ---
@@ -115,25 +113,23 @@ class Connect_Robots(Node):
         # Timing
         self.initial_delay_sec = 2.0
         self.alignment_timeout_sec = 40.0
-        self.docking_duration_sec = 20.0
+        self.docking_duration_sec = 16.0
         self.locking_timeout_sec = 10.0
         self.verification_duration_sec = 5.0
         self.confirmation_timeout_per_robot_sec = 2.0
         # Speeds
         self.forward_speed = 0.1
-        self.approach_speed_gain = 0.1
-        self.approach_min_speed = 0.05
-        self.docking_speed_male = 0.0075
+        self.approach_speed = 0.05
+        self.docking_speed_male = 0.005
         self.docking_speed_female = -0.0075
-        self.docking_speed_group = -0.015
+        self.docking_speed_group = -0.02
         self.verification_pull_speed = -0.05
         self.reset_speed_seeker = -0.02
         self.reset_speed_target = 0.01
         self.confirmation_move_speed = 0.05
         self.aligning_turn_speed = 0.15
-        # self.partner_hold_speed = 0.0 # No longer used directly for movement
         # Thresholds & Distances
-        self.robot_detection_threshold = 0.2
+        self.robot_detection_threshold = 0.15
         self.confirmation_detection_threshold = 0.2
         self.connection_verification_threshold = 0.1
         self.close_distance_m = 0.15
@@ -159,13 +155,6 @@ class Connect_Robots(Node):
         self.fsm_loop_timer = self.create_timer(0.1, self.state_machine_tick) # 10 Hz
 
         self.get_logger().info("Connect_Robots FSM node initialized, starting discovery.")
-
-    def _initialize_sensor_data_keys(self):
-        """Ensure top-level keys for sensor data dictionary exist."""
-        keys = ['roll', 'pitch', 'range', 'aligned', 'male_locked', 'male_unlocked']
-        for key in keys:
-            if key not in self.agent_sensor_data:
-                self.agent_sensor_data[key] = {}
 
     # ==========================================================================
     # Robot Discovery
@@ -226,8 +215,6 @@ class Connect_Robots(Node):
                  if self.discovery_timer:
                      self.discovery_timer.cancel()
 
-        # Final transition logic moved to state_machine_tick check after discovery_complete flag is set
-
 
     def _register_robot(self, agent_id):
         """Creates publishers, subscribers, and initializes data for a newly discovered robot."""
@@ -256,14 +243,10 @@ class Connect_Robots(Node):
             self.agent_pubs['male_joint'][agent_id] = self.create_publisher(JointTrajectory, f"/{ns}/male_joint_trajectory_controller/joint_trajectory", 10)
             self.agent_pubs['female_joint'][agent_id] = self.create_publisher(JointTrajectory, f"/{ns}/female_joint_trajectory_controller/joint_trajectory", 10)
             # Create Subscribers - Use partial to pass agent_id to the callback
-            self.agent_subs['imu'][agent_id] = self.create_subscription(
-                Imu, f"/{ns}/imu/out", partial(self.imu_callback, agent_id=agent_id), 10)
-            self.agent_subs['range'][agent_id] = self.create_subscription(
-                Range, f"/{ns}/infrared_range", partial(self.range_callback, agent_id=agent_id), 10)
-            self.agent_subs['alignment'][agent_id] = self.create_subscription(
-                Bool, f"/{ns}/alignment", partial(self.alignment_callback, agent_id=agent_id), 10)
-            self.agent_subs['male_joint_state'][agent_id] = self.create_subscription(
-                JointTrajectoryControllerState, f"/{ns}/male_joint_trajectory_controller/controller_state", partial(self.male_joint_state_callback, agent_id=agent_id), 10)
+            self.agent_subs['imu'][agent_id] = self.create_subscription(Imu, f"/{ns}/imu/out", partial(self.imu_callback, agent_id=agent_id), 10)
+            self.agent_subs['range'][agent_id] = self.create_subscription(Range, f"/{ns}/infrared_range", partial(self.range_callback, agent_id=agent_id), 10)
+            self.agent_subs['alignment'][agent_id] = self.create_subscription(Bool, f"/{ns}/alignment", partial(self.alignment_callback, agent_id=agent_id), 10)
+            self.agent_subs['male_joint_state'][agent_id] = self.create_subscription(JointTrajectoryControllerState, f"/{ns}/male_joint_trajectory_controller/controller_state", partial(self.male_joint_state_callback, agent_id=agent_id), 10)
             self.get_logger().info(f"Successfully registered resources for agent {agent_id}")
         except Exception as e:
             self.get_logger().error(f"Failed to create resources for agent {agent_id}: {e}", exc_info=True)
@@ -362,11 +345,7 @@ class Connect_Robots(Node):
 
         if handler:
             try:
-                takes_time_arg = self.current_state in [
-                    RobotState.IDLE, RobotState.SEQUENTIAL_CONFIRMATION,
-                    RobotState.ALIGNING, RobotState.DOCKING, RobotState.LOCKING,
-                    RobotState.VERIFYING_CONNECTION, RobotState.RESETTING
-                ]
+                takes_time_arg = self.current_state in [RobotState.IDLE, RobotState.ALIGNING, RobotState.DOCKING, RobotState.LOCKING, RobotState.VERIFYING_CONNECTION]
                 if takes_time_arg:
                      handler(time_in_state)
                 else:
@@ -392,7 +371,7 @@ class Connect_Robots(Node):
         self.get_logger().debug(f"--- change_state START ---")
         self.get_logger().info(f"Changing state from {previous_state.name} to {new_state.name}")
         # Log vars before potential reset
-        self.get_logger().debug(f"Vars BEFORE Reset Check: seeker={self.current_seeker_id}, target={self.current_target_id}, partner={self.current_target_partner_id}, group={self.current_target_group}")
+        self.get_logger().debug(f"Vars BEFORE Reset Check: seeker={self.current_seeker_id}, target={self.current_target_id}, group={self.current_target_group}")
 
         self.current_state = new_state
         self.state_enter_time = self.get_clock().now()
@@ -427,17 +406,15 @@ class Connect_Robots(Node):
              self.current_male_id = None
              self.current_female_id = None
              self.locked_connection_range = None
-             self.current_target_partner_id = None
              self.current_target_group = set() # <<< RESET GROUP
         # ---
 
-        self.get_logger().debug(f"Vars AFTER change_state: seeker={self.current_seeker_id}, target={self.current_target_id}, partner={self.current_target_partner_id}, group={self.current_target_group}")
+        self.get_logger().debug(f"Vars AFTER change_state: seeker={self.current_seeker_id}, target={self.current_target_id}, group={self.current_target_group}")
         self.get_logger().debug(f"--- change_state END ---")
 
     # ==========================================================================
     # State Handling Functions
     # ==========================================================================
-
     def _handle_idle_state(self, time_in_state):
         """Waits for initial delay and ensures resources are ready."""
         # Ensure all robots discovered have publishers ready
@@ -468,7 +445,6 @@ class Connect_Robots(Node):
             elif current_status != AgentStatus.ACTIVE:
                  self.get_logger().warn(f"  Agent {agent_id} has unexpected status {current_status.name} during init, leaving as is.")
 
-
             # Attempt to get initial scan if not already obtained
             if self.initial_scan_ranges.get(agent_id) is None and self.robot_status.get(agent_id) == AgentStatus.ACTIVE:
                 current_range = self.agent_sensor_data['range'].get(agent_id, None)
@@ -497,12 +473,10 @@ class Connect_Robots(Node):
         active_agent_found = False
         for agent_id in self.discovered_agent_ids:
             agent_status = self.robot_status.get(agent_id)
-            # Log status for debugging which robots are moving
-            # self.get_logger().debug(f"MOVING_FWD Check: Agent {agent_id} Status: {agent_status.name if agent_status else 'None'}", throttle_duration_sec=5.0)
 
             if agent_status == AgentStatus.ACTIVE:
                 active_agent_found = True
-                # self.get_logger().debug(f"MOVING_FWD: Commanding Agent {agent_id} forward.", throttle_duration_sec=5.0)
+                self.get_logger().debug(f"MOVING_FWD: Commanding Agent {agent_id} forward.", throttle_duration_sec=5.0)
                 self._send_velocity(agent_id, self.forward_speed, 0.0)
                 self._centre_robot(agent_id)
 
@@ -517,7 +491,7 @@ class Connect_Robots(Node):
                     continue # Skip detection check this tick
 
                 # Check for significant range change
-                if current_range is not None and current_range >= self.range_valid_min_m and initial_range >= self.range_valid_min_m:
+                if current_range is not None:
                     if initial_range > 0.01: # Avoid division by zero
                         difference = abs(current_range - initial_range) / initial_range
                         if difference > self.robot_detection_threshold:
@@ -538,13 +512,8 @@ class Connect_Robots(Node):
 
     def _handle_global_detection_halt_state(self):
         """Stops all robots and prepares list for sequential confirmation, including connected robots."""
-        if self.detecting_agent_id is None:
-            self.get_logger().error("Entered GLOBAL_DETECTION_HALT without detecting_agent_id!")
-            self.change_state(RobotState.FAILED)
-            return
 
         self.get_logger().info(f"Global halt triggered by Agent {self.detecting_agent_id}. Preparing confirmation checks.")
-        self.stop_all_robots() # Ensure everyone is stopped
 
         # Build list of potential targets: Include ACTIVE, OBSTACLE_NEAR, and CONNECTED robots
         valid_target_statuses = {AgentStatus.ACTIVE, AgentStatus.OBSTACLE_NEAR, AgentStatus.CONNECTED}
@@ -575,53 +544,88 @@ class Connect_Robots(Node):
         self.change_state(RobotState.SEQUENTIAL_CONFIRMATION)
 
 
-    def _handle_sequential_confirmation_state(self, time_in_state):
-        """Sequentially moves potential targets and checks detector's range. Handles confirmation of single robots and connected chains."""
+    def _handle_sequential_confirmation_state(self):
+        """
+        Sequentially moves potential targets and checks detector's range.
+        On success, identifies target group and proceeds to connection.
+        On failure (invalid range, timeout, etc.), transitions directly to FAILED state.
+        """
+        # --- Initial Check for Valid State Variables ---
         if self.detecting_agent_id is None or not self.confirmation_target_ids or self.confirmation_start_time is None:
-            self.get_logger().error("Entered SEQUENTIAL_CONFIRMATION with invalid state variables!")
+            log_msg = "SEQ_CONFIRM Error: Invalid state variables on entry! "
+            log_msg += f"Detector={self.detecting_agent_id}, Targets={self.confirmation_target_ids}, StartTime={self.confirmation_start_time}"
+            self.get_logger().error(log_msg)
             self.change_state(RobotState.FAILED)
             return
 
-        # Get the agent currently being checked
+        # --- Check Index Validity ---
+        if self.confirmation_check_index >= len(self.confirmation_target_ids):
+             self.get_logger().error(f"SEQ_CONFIRM Error: Check index {self.confirmation_check_index} out of bounds for targets {self.confirmation_target_ids}.")
+             self.change_state(RobotState.FAILED)
+             return
+
+        # --- Get Current Target ---
         target_check_id = self.confirmation_target_ids[self.confirmation_check_index]
-        self.get_logger().debug(f"Checking target Agent {target_check_id} (Index {self.confirmation_check_index}). Moving it.", throttle_duration_sec=1.0)
+        self.get_logger().debug(f"Checking target Agent {target_check_id} (Index {self.confirmation_check_index}).", throttle_duration_sec=1.0)
 
-        # Store original status BEFORE setting to CONFIRMATION_TARGET
-        original_status_before_check = self.robot_status.get(target_check_id, AgentStatus.UNKNOWN)
-        if original_status_before_check == AgentStatus.UNKNOWN:
-            self.get_logger().warn(f"Agent {target_check_id} had UNKNOWN status before confirmation check.")
+        # --- Check for Timeout FIRST ---
+        time_since_check_started = (self.get_clock().now() - self.confirmation_start_time).nanoseconds / 1e9
+        if time_since_check_started > self.confirmation_timeout_per_robot_sec:
+             # Get current detector range *at the time of timeout* for logging
+             detector_range_at_timeout = self.agent_sensor_data['range'].get(self.detecting_agent_id, "N/A")
+             range_str = f"{detector_range_at_timeout:.3f}" if isinstance(detector_range_at_timeout, float) else detector_range_at_timeout
+             detection_range_str = f"{self.detection_range:.3f}" if self.detection_range is not None else "None"
 
-        # Temporarily mark target being checked
+             self.get_logger().warn(f"SEQ_CONFIRM Timeout: Check for Agent {target_check_id} timed out. Detector range {range_str} (initial {detection_range_str}).")
+             self._send_velocity(target_check_id, 0.0, 0.0) # Stop the timed-out target
+
+             # --- Handle Timeout: Move to Next or Fail ---
+             self.robot_status[target_check_id] = AgentStatus.ACTIVE # Revert status simply
+             self.confirmation_check_index += 1 # Move to next index
+
+             if self.confirmation_check_index >= len(self.confirmation_target_ids):
+                 # All targets checked, none confirmed
+                 self.get_logger().warn(f"All potential targets {self.confirmation_target_ids} checked for detector {self.detecting_agent_id}. Assuming obstacle.")
+                 self._handle_obstacle_outcome()
+             else:
+                 # Prepare for the next check
+                 next_target_id = self.confirmation_target_ids[self.confirmation_check_index]
+                 self.confirmation_start_time = self.get_clock().now() # Reset timer for next target
+                 self.current_target_group = set() # Ensure group is clear for next check
+                 self.get_logger().info(f"Moving to check next target: {next_target_id} (Index {self.confirmation_check_index}).")
+                 # Stay in SEQUENTIAL_CONFIRMATION, let next tick handle next target
+             return # <<< Important: Exit function after handling timeout this tick
+
+        # --- If no timeout, proceed with checks and movement ---
+
+        # --- Mark Target (Only if not timed out this tick) ---
         self.robot_status[target_check_id] = AgentStatus.CONFIRMATION_TARGET
 
-        # Ensure detector's range is valid before starting check
-        if self.detection_range is None or self.detection_range < self.range_valid_min_m:
-             self.get_logger().warn(f"Initial detection range for detector {self.detecting_agent_id} was invalid ({self.detection_range}). Cannot confirm. Assuming obstacle.")
-             self._send_velocity(target_check_id, 0.0, 0.0) # Stop target
-             # Revert status before handling obstacle
-             if original_status_before_check in {AgentStatus.ACTIVE, AgentStatus.UNKNOWN}: self.robot_status[target_check_id] = AgentStatus.ACTIVE
-             elif original_status_before_check != AgentStatus.CONFIRMATION_TARGET: self.robot_status[target_check_id] = original_status_before_check
-             self._handle_obstacle_outcome()
+        # --- Validate Initial Detector Range ---
+        if self.detection_range is None:
+             self.get_logger().error(f"SEQ_CONFIRM Error: Initial detection range is None. Cannot proceed.")
+             self._send_velocity(target_check_id, 0.0, 0.0)
+             self.robot_status[target_check_id] = AgentStatus.ACTIVE # Revert status
+             self.change_state(RobotState.FAILED)
              return
-        detector_current_range = self.agent_sensor_data['range'].get(self.detecting_agent_id)
-        if detector_current_range is None or detector_current_range < self.range_valid_min_m:
-            self.get_logger().warn(f"Detector Agent {self.detecting_agent_id}'s range ({detector_current_range}) invalid during confirmation check. Assuming obstacle.")
-            self._send_velocity(target_check_id, 0.0, 0.0) # Stop target
-            # Revert status before handling obstacle
-            if original_status_before_check in {AgentStatus.ACTIVE, AgentStatus.UNKNOWN}: self.robot_status[target_check_id] = AgentStatus.ACTIVE
-            elif original_status_before_check != AgentStatus.CONFIRMATION_TARGET: self.robot_status[target_check_id] = original_status_before_check
-            self._handle_obstacle_outcome()
-            return
 
-        # Move the current target robot slightly forward
+        # --- Move Target ---
         self._send_velocity(target_check_id, self.confirmation_move_speed, 0.0)
         self._centre_robot(target_check_id)
 
-        # Check if detector's range changes significantly (re-get range after move)
+        # --- Check for Range Change (Confirmation) ---
+        # Re-get detector range *after* moving the target
         detector_current_range_after_move = self.agent_sensor_data['range'].get(self.detecting_agent_id)
+
+        # Validate the range reading after move
+        if detector_current_range_after_move is None:
+            self.get_logger().warn(f"SEQ_CONFIRM Warning: Detector range became None after moving target {target_check_id}. Assuming no confirmation this tick.")
+            # Stay in this state and try again next tick, maybe range will recover
+            return
+
+        # Calculate difference only if ranges are valid
         difference = 0.0
-        # Safely calculate difference
-        if self.detection_range > 0.01 and detector_current_range_after_move is not None:
+        if self.detection_range > 0.01: # Avoid division by zero
              difference = abs(detector_current_range_after_move - self.detection_range) / self.detection_range
 
         if difference > self.confirmation_detection_threshold:
@@ -630,76 +634,37 @@ class Connect_Robots(Node):
             self._send_velocity(target_check_id, 0.0, 0.0) # Stop the confirmed target
 
             confirmed_seeker_id = self.detecting_agent_id
-            confirmed_target_id = target_check_id # <<< Keep the confirmed ID as the target
+            confirmed_target_id = target_check_id
 
-            # Find the group this confirmed target belongs to
-            target_group = self._find_connected_group(confirmed_target_id) # <<< FIND GROUP
-
-            if not target_group: # Error case from helper
-                 self.get_logger().error(f"Could not determine group for confirmed target {confirmed_target_id}. Assuming obstacle.")
-                 if original_status_before_check in {AgentStatus.ACTIVE, AgentStatus.UNKNOWN}: self.robot_status[target_check_id] = AgentStatus.ACTIVE
-                 elif original_status_before_check != AgentStatus.CONFIRMATION_TARGET: self.robot_status[target_check_id] = original_status_before_check
-                 self._handle_obstacle_outcome()
+            target_group = self._find_connected_group(confirmed_target_id)
+            if not target_group:
+                 self.get_logger().error(f"SEQ_CONFIRM Error: Could not determine group for confirmed target {confirmed_target_id}.")
+                 self.robot_status[target_check_id] = AgentStatus.ACTIVE # Revert status
+                 self.change_state(RobotState.FAILED)
                  return
 
             self.get_logger().info(f"Confirmed Agent {confirmed_target_id} belongs to group: {target_group}")
 
-            # Find immediate partner (optional, for context)
-            confirmed_partner_id = None
-            if len(target_group) > 1:
-                for id1, id2 in self.connected_pairs:
-                     partner = None
-                     if id1 == confirmed_target_id and id2 in target_group: partner = id2
-                     elif id2 == confirmed_target_id and id1 in target_group: partner = id1
-                     if partner is not None:
-                         confirmed_partner_id = partner
-                         break
-                self.get_logger().info(f"Target {confirmed_target_id} is part of a group. Immediate partner: {confirmed_partner_id}.")
-            else:
-                 self.get_logger().info(f"Target {confirmed_target_id} is single.")
-
-
-            # Final Check and Assignment
+            # Final Check (should always pass here)
             if confirmed_seeker_id is None or confirmed_target_id is None:
-                self.get_logger().error(f"CRITICAL: Cannot initiate connection. Seeker ({confirmed_seeker_id}) or Target ({confirmed_target_id}) is None AFTER confirmation logic.")
-                if original_status_before_check in {AgentStatus.ACTIVE, AgentStatus.UNKNOWN}: self.robot_status[target_check_id] = AgentStatus.ACTIVE
-                elif original_status_before_check != AgentStatus.CONFIRMATION_TARGET: self.robot_status[target_check_id] = original_status_before_check
-                self._handle_obstacle_outcome()
-                return
+                 self.get_logger().error("CRITICAL: Seeker/Target ID None after confirmation success!")
+                 self.robot_status[target_check_id] = AgentStatus.ACTIVE # Revert status
+                 self.change_state(RobotState.FAILED)
+                 return
 
             self.get_logger().debug(f"SEQ_CONFIRM: Prep Seeker={confirmed_seeker_id}, Target={confirmed_target_id}, Group={target_group}")
             self.current_seeker_id = confirmed_seeker_id
-            self.current_target_id = confirmed_target_id      # Store correct target ID
-            self.current_target_partner_id = confirmed_partner_id # Store immediate partner (optional)
-            self.current_target_group = target_group          # Store group
+            self.current_target_id = confirmed_target_id
+            self.current_target_group = target_group
+            self.current_target_partner_id = None # Ensure cleared if removing partner logic
 
+            # Revert status of confirmed robot before initiating connection
+            self.robot_status[target_check_id] = AgentStatus.ACTIVE # Set simply to Active
             self.change_state(RobotState.INITIATE_CONNECTION)
-            return # Exit state handler after handling confirmation
+            return # Success - Exit
 
-        # --- Timeout check for *this specific target* ---
-        time_since_check_started = (self.get_clock().now() - self.confirmation_start_time).nanoseconds / 1e9
-        if time_since_check_started > self.confirmation_timeout_per_robot_sec:
-             self.get_logger().warn(f"Confirmation check for Agent {target_check_id} timed out. Detector range {detector_current_range_after_move:.3f} (initial {self.detection_range:.3f}). Assuming not the target.")
-             self._send_velocity(target_check_id, 0.0, 0.0) # Stop the target being checked
-
-             # Reset status based on original status
-             if original_status_before_check in {AgentStatus.ACTIVE, AgentStatus.UNKNOWN}: self.robot_status[target_check_id] = AgentStatus.ACTIVE
-             elif original_status_before_check != AgentStatus.CONFIRMATION_TARGET: self.robot_status[target_check_id] = original_status_before_check
-             else: self.robot_status[target_check_id] = AgentStatus.ACTIVE # Fallback
-
-             # Reset group if timeout occurs for this target
-             self.current_target_group = set() # <<< RESET GROUP ON TIMEOUT
-
-             # Move to the next target or handle obstacle
-             self.confirmation_check_index += 1
-             if self.confirmation_check_index >= len(self.confirmation_target_ids):
-                 self.get_logger().warn(f"All potential targets checked for detector {self.detecting_agent_id}. Assuming obstacle.")
-                 self._handle_obstacle_outcome()
-             else:
-                 next_target_id = self.confirmation_target_ids[self.confirmation_check_index]
-                 self.confirmation_start_time = self.get_clock().now()
-                 self.get_logger().info(f"Moving to check next target: {next_target_id} (Index {self.confirmation_check_index}).")
-                 # Stay in SEQUENTIAL_CONFIRMATION
+        # If no confirmation and no timeout yet, stay in this state for next tick
+        self.get_logger().debug(f"SeqConfirm: No confirmation yet for {target_check_id}. Waiting.", throttle_duration_sec=1.0)
 
 
     def _handle_obstacle_outcome(self):
@@ -746,7 +711,7 @@ class Connect_Robots(Node):
 
         # --- Assign roles for the NEW connection ---
         self.current_male_id = seeker_id
-        self.current_female_id = target_id # <<< CORRECT: female is the target being docked to
+        self.current_female_id = target_id
 
         # --- Log based on group size and stop group members ---
         if len(target_group) > 1:
@@ -765,11 +730,10 @@ class Connect_Robots(Node):
 
         # Stop the specific target robot too
         self._send_velocity(target_id, 0.0, 0.0)
-        # ---
 
         # Command joints for the connecting pair (Male=Seeker, Female=Target)
         self._set_joint(self.current_male_id, 'male', self.male_unlock_angle)
-        self._set_joint(self.current_female_id, 'female', self.female_lift_angle) # <<< CORRECT FEMALE
+        self._set_joint(self.current_female_id, 'female', self.female_lift_angle)
 
         # Update status for the active participants
         self.robot_status[seeker_id] = AgentStatus.CONNECTION_SEEKER
@@ -784,7 +748,7 @@ class Connect_Robots(Node):
         if self.current_seeker_id is None or self.current_target_id is None: return self._fail_state_missing_ids("APPROACHING_TARGET")
 
         seeker_id = self.current_seeker_id
-        target_group = self.current_target_group # <<< USE GROUP
+        target_group = self.current_target_group 
 
         # --- Ensure Target Group is stopped ---
         if not target_group:
@@ -794,9 +758,8 @@ class Connect_Robots(Node):
              return
 
         self.get_logger().debug(f"Approach: Stopping target group {target_group}", throttle_duration_sec=5.0)
-        for member_id in target_group: # <<< USE GROUP
+        for member_id in target_group:
             self._send_velocity(member_id, 0.0, 0.0)
-        # ---
 
         # Move seeker
         self._centre_robot(seeker_id) # Apply centering to seeker
@@ -805,7 +768,6 @@ class Connect_Robots(Node):
         if current_range_seeker is None or current_range_seeker < self.range_valid_min_m:
              self.get_logger().warn(f"Seeker {seeker_id}'s range lost/invalid ({current_range_seeker}) during approach.", throttle_duration_sec=5.0)
              self._send_velocity(seeker_id, 0.0, 0.0) # Stop seeker
-             # Consider if we should fail here or just wait
              return
 
         if current_range_seeker < self.close_distance_m:
@@ -813,11 +775,8 @@ class Connect_Robots(Node):
             self._send_velocity(seeker_id, 0.0, 0.0)
             self.change_state(RobotState.CHECKING_ALIGNMENT)
         else:
-            # speed = max(self.approach_min_speed, self.approach_speed_gain * (current_range_seeker - self.close_distance_m))
-            # Send velocity only to seeker (angular handled by _centre_robot)
-            # Get last angular from cache for _centre_robot to work correctly
             _, last_angular = self.agent_last_cmd_vel.get(seeker_id, (0.0, 0.0))
-            self._send_velocity(seeker_id, self.approach_min_speed, last_angular)
+            self._send_velocity(seeker_id, self.approach_speed, last_angular)
 
 
     def _handle_checking_alignment_state(self):
@@ -825,7 +784,7 @@ class Connect_Robots(Node):
         if self.current_seeker_id is None or self.current_target_id is None: return self._fail_state_missing_ids("CHECKING_ALIGNMENT")
 
         seeker_id = self.current_seeker_id
-        target_group = self.current_target_group # <<< USE GROUP
+        target_group = self.current_target_group
 
         # --- Ensure Seeker and Target Group are stopped ---
         self._send_velocity(seeker_id, 0.0, 0.0)
@@ -834,7 +793,7 @@ class Connect_Robots(Node):
             self.change_state(RobotState.HANDLING_FAILURE)
             return
         self.get_logger().debug(f"Check Align: Stopping target group {target_group}", throttle_duration_sec=5.0)
-        for member_id in target_group: # <<< USE GROUP
+        for member_id in target_group:
             self._send_velocity(member_id, 0.0, 0.0)
         # ---
 
@@ -857,18 +816,10 @@ class Connect_Robots(Node):
         seeker_id = self.current_seeker_id
         target_id = self.current_target_id # Only this robot rotates
         target_group = self.current_target_group
-        other_group_members = target_group - {target_id} if target_group else set() # <<< Find others
+        other_group_members = target_group - {target_id} if target_group else set()
 
         # --- Ensure Seeker and Other Group Members stay stopped ---
         self._send_velocity(seeker_id, 0.0, 0.0)
-        if other_group_members: # <<< Check if there are others
-             self.get_logger().debug(f"Align: Stopping other group members {other_group_members}", throttle_duration_sec=2.0)
-             for member_id in other_group_members: # <<< Stop others
-                  self._send_velocity(member_id, 0.0, 0.0)
-        # ---
-
-        # Only centre the target being rotated
-        self._centre_robot(target_id)
 
         seeker_aligned = self.agent_sensor_data['aligned'].get(seeker_id, False)
         self.get_logger().debug(f"ALIGNING: Seeker {seeker_id} alignment sensor value = {seeker_aligned} (Time in state: {time_in_state:.2f}s)", throttle_duration_sec=0.5)
@@ -896,7 +847,8 @@ class Connect_Robots(Node):
         if time_in_cycle <= 1.0: angular_z = self.aligning_turn_speed
         elif time_in_cycle <= 3.0: angular_z = -self.aligning_turn_speed
         else: angular_z = self.aligning_turn_speed
-        self._send_velocity(target_id, 0.0, angular_z) # Command rotation only to target_id
+        for member_id in target_group:
+            self._send_velocity(member_id, 0.0, angular_z) # Command rotation to all targets
 
 
     def _handle_docking_state(self, time_in_state):
@@ -905,17 +857,13 @@ class Connect_Robots(Node):
         if self.current_male_id is None or self.current_female_id is None: return self._fail_state_missing_ids("DOCKING")
 
         male_id = self.current_male_id     # This is the seeker
-        target_group = self.current_target_group # <<< USE STORED GROUP
-
-        # --- Optional: Roll Logging ---
-        # ...
+        target_group = self.current_target_group
 
         # --- Command Velocities ---
         self.get_logger().info(f"Docking Male={male_id}, TargetGroup={target_group}... ({time_in_state:.1f}/{self.docking_duration_sec:.1f})", throttle_duration_sec=1.0)
 
         # Command Male Forward
         self._send_velocity(male_id, self.docking_speed_male, 0.0)
-        # self._centre_robot(male_id) # Apply centering to male
 
         # Command Entire Target Group Backward
         if not target_group:
@@ -923,11 +871,14 @@ class Connect_Robots(Node):
              self.change_state(RobotState.HANDLING_FAILURE)
              return
 
-        self.get_logger().info(f"Docking: Moving target group {target_group} backward at {self.docking_speed_group:.4f}", throttle_duration_sec=5.0)
-        for member_id in target_group: # <<< ITERATE THROUGH GROUP
-            self._send_velocity(member_id, self.docking_speed_group, 0.0) # Command backward
-            # self._centre_robot(member_id) # Apply centering to group members
-        # ---
+        # self.get_logger().info(f"Docking: Moving target group {target_group} backward at {self.docking_speed_group:.4f}", throttle_duration_sec=5.0)
+        
+        if len(target_group) > 1:
+            for member_id in target_group:
+                self._send_velocity(member_id, self.docking_speed_group, 0.0)
+        else:
+            for member_id in target_group:
+                self._send_velocity(member_id, self.docking_speed_female, 0.0) 
 
         if time_in_state >= self.docking_duration_sec:
             self.get_logger().info("Docking duration complete. Attempting lock.")
@@ -939,27 +890,25 @@ class Connect_Robots(Node):
 
     def _handle_locking_state(self, time_in_state):
         """Commands lock while pushing male forward and target group backward."""
-         # female_id is the target_id being docked TO
+         # female_id is the target_id being docked to
         if self.current_male_id is None or self.current_female_id is None: return self._fail_state_missing_ids("LOCKING")
 
         male_id = self.current_male_id
-        target_group = self.current_target_group # <<< USE STORED GROUP
+        target_group = self.current_target_group 
 
         # --- Apply Gentle Push/Pull ---
+
         self.get_logger().debug(f"Pushing during LOCKING: Male={male_id}, TargetGroup={target_group}", throttle_duration_sec=1.0)
         # Push Male
         self._send_velocity(male_id, self.docking_speed_male, 0.0)
-        self._centre_robot(male_id)
 
         # Pull Target Group
         if not target_group:
              self.get_logger().error("Locking state reached with empty target group!")
              self.change_state(RobotState.HANDLING_FAILURE)
              return
-        for member_id in target_group: # <<< ITERATE THROUGH GROUP
-             self._send_velocity(member_id, self.docking_speed_female, 0.0) # Command backward
-             self._centre_robot(member_id) # Apply centering to group members
-        # ---
+        for member_id in target_group:
+             self._send_velocity(member_id, self.docking_speed_female, 0.0)
 
         # Command lock once near the beginning of the state
         if time_in_state < 0.2: # Only command once
@@ -973,7 +922,7 @@ class Connect_Robots(Node):
             self.get_logger().info(f"Male ({male_id}) lock confirmed by feedback.")
             # Stop pushing before verifying
             self._send_velocity(male_id, 0.0, 0.0)
-            for member_id in target_group: # <<< Stop whole group
+            for member_id in target_group:
                 self._send_velocity(member_id, 0.0, 0.0)
             self.change_state(RobotState.VERIFYING_CONNECTION)
             return
@@ -983,7 +932,7 @@ class Connect_Robots(Node):
             self.get_logger().error(f"Locking timed out for male agent {male_id}!")
             # Stop pushing on failure
             self._send_velocity(male_id, 0.0, 0.0)
-            for member_id in target_group: # <<< Stop whole group
+            for member_id in target_group:
                 self._send_velocity(member_id, 0.0, 0.0)
             self.change_state(RobotState.HANDLING_FAILURE)
 
@@ -994,7 +943,7 @@ class Connect_Robots(Node):
         if self.current_male_id is None or self.current_female_id is None: return self._fail_state_missing_ids("VERIFYING_CONNECTION")
 
         male_id = self.current_male_id     # Seeker
-        target_group = self.current_target_group # <<< USE STORED GROUP
+        target_group = self.current_target_group 
 
         # --- Ensure Target Group stays stopped ---
         if not target_group:
@@ -1002,7 +951,7 @@ class Connect_Robots(Node):
             self.change_state(RobotState.HANDLING_FAILURE)
             return
         self.get_logger().debug(f"Verify: Stopping target group {target_group}", throttle_duration_sec=2.0)
-        for member_id in target_group: # <<< ITERATE THROUGH GROUP
+        for member_id in target_group:
             self._send_velocity(member_id, 0.0, 0.0)
         # ---
 
@@ -1032,7 +981,7 @@ class Connect_Robots(Node):
             current_range_male_after_pull = self.agent_sensor_data['range'].get(male_id)
 
             # Check verification threshold
-            if self.locked_connection_range is None or current_range_male_after_pull is None or current_range_male_after_pull < self.range_valid_min_m:
+            if self.locked_connection_range is None or current_range_male_after_pull is None:
                 self.get_logger().error(f"Verify check fail - Invalid range male={current_range_male_after_pull}, stored={self.locked_connection_range}.")
                 self.change_state(RobotState.HANDLING_FAILURE)
                 return
@@ -1060,8 +1009,8 @@ class Connect_Robots(Node):
              return
 
         seeker_id = self.current_seeker_id
-        target_id = self.current_target_id # The direct target
-        target_group = self.current_target_group # The group the target belonged to
+        target_id = self.current_target_id
+        target_group = self.current_target_group 
 
         self.get_logger().info(f"Pair ({seeker_id}, {target_id}) successfully connected.")
         if len(target_group) > 1:
@@ -1070,16 +1019,15 @@ class Connect_Robots(Node):
         # Ensure all involved robots are stopped
         self.get_logger().debug(f"Connected: Stopping Seeker={seeker_id}, TargetGroup={target_group}")
         self._send_velocity(seeker_id, 0.0, 0.0)
-        for member_id in target_group: # <<< ITERATE THROUGH GROUP
+        for member_id in target_group: 
              self._send_velocity(member_id, 0.0, 0.0)
-        # ---
 
         # --- Update status and store pair ---
         self.get_logger().info(f"Updating status for {seeker_id} and {target_id} to CONNECTED.")
         self.robot_status[seeker_id] = AgentStatus.CONNECTED
         self.robot_status[target_id] = AgentStatus.CONNECTED
         # Update status for other group members (should already be CONNECTED, but ensure)
-        for member_id in target_group: # <<< ITERATE THROUGH GROUP
+        for member_id in target_group: 
              if member_id != target_id and self.robot_status.get(member_id) != AgentStatus.CONNECTED:
                  self.get_logger().warn(f"Connected State: Group member {member_id} status was not CONNECTED. Setting.")
                  self.robot_status[member_id] = AgentStatus.CONNECTED
@@ -1088,7 +1036,6 @@ class Connect_Robots(Node):
         self.connected_pairs.add(tuple(sorted((seeker_id, target_id))))
         self.get_logger().info(f"Updated Robot Status: {self.robot_status}")
         self.get_logger().info(f"Updated Connected Pairs: {self.connected_pairs}")
-        # ---
 
         # Transition back to MOVING (group will be cleared by change_state)
         self.change_state(RobotState.MOVING_ALL_FORWARD)
@@ -1099,15 +1046,14 @@ class Connect_Robots(Node):
         self.get_logger().error("Handling connection sequence failure.")
         seeker_id = self.current_seeker_id
         target_id = self.current_target_id # Store direct target ID before group potentially clears
-        target_group = self.current_target_group # <<< USE GROUP
+        target_group = self.current_target_group 
         male_id = self.current_male_id # Seeker is assumed male
 
         # Stop involved robots
         self.get_logger().debug(f"Failure: Stopping Seeker={seeker_id}, TargetGroup={target_group}")
         if seeker_id is not None: self._send_velocity(seeker_id, 0.0, 0.0)
-        for member_id in target_group: # <<< ITERATE THROUGH GROUP
+        for member_id in target_group:
             self._send_velocity(member_id, 0.0, 0.0)
-        # ---
 
         # Attempt to unlock male (seeker's) joint
         if male_id is not None:
@@ -1116,60 +1062,35 @@ class Connect_Robots(Node):
              time.sleep(0.5) # Give command time to send
 
         # Set status for involved robots for reset
-        # Only mark seeker and direct target as RESETTING
-        # Other group members remain CONNECTED (unless connection broke during failure?)
         if seeker_id is not None: self.robot_status[seeker_id] = AgentStatus.RESETTING
-        if target_id is not None:
-            self.robot_status[target_id] = AgentStatus.RESETTING
-        # ---
+        if target_id is not None: self.robot_status[target_id] = AgentStatus.RESETTING
 
-        self.change_state(RobotState.RESETTING) # Temp vars (including group) cleared by change_state
+        self.change_state(RobotState.RESETTING)
 
 
-    def _handle_resetting_state(self, time_in_state):
+    def _handle_resetting_state(self):
             """Moves seeker and direct target apart. Keeps rest of prior target group stopped. Retries connection."""
             local_seeker_id = self.current_seeker_id
             local_target_id = self.current_target_id
-            # Partner ID was stored before entering failure/resetting
-            local_partner_id = self.current_target_partner_id
 
             if local_seeker_id is None or local_target_id is None:
                 # Recovery logic might need adjustment as group info is lost
-                self.get_logger().warn("Entered RESETTING without seeker/target IDs! Attempting recovery.")
-                resetting_agents = [aid for aid, status in self.robot_status.items() if status == AgentStatus.RESETTING]
-                if len(resetting_agents) >= 2: # Find at least two resetting
-                     # Heuristic: assume they were the seeker/target pair. Cannot reliably recover partner/group.
-                     local_seeker_id = resetting_agents[0]
-                     local_target_id = resetting_agents[1]
-                     self.get_logger().info(f"Recovered resetting pair (arbitrary roles): {local_seeker_id}, {local_target_id}")
-                     self.current_seeker_id = local_seeker_id
-                     self.current_target_id = local_target_id
-                     self.current_target_partner_id = None # Cannot recover partner
-                     local_partner_id = None
-                else:
-                     self.get_logger().error("Could not recover resetting pair. Returning to MOVING.")
-                     for aid in self.discovered_agent_ids: # Reset all potentially stuck agents
-                         if self.robot_status.get(aid) == AgentStatus.RESETTING:
-                             self.robot_status[aid] = AgentStatus.ACTIVE
-                     # Clear all connection sequence vars
-                     self.current_seeker_id = None; self.current_target_id = None; self.current_male_id = None; self.current_female_id = None; self.locked_connection_range = None; self.current_target_partner_id = None; self.current_target_group = set()
-                     self.change_state(RobotState.MOVING_ALL_FORWARD)
-                     return
+                self.get_logger().warn("Entered RESETTING without seeker/target IDs. FAILURE")
+                self.change_state(RobotState.FAILED)
 
-            # --- Ensure Partner (and its chain, if exists) stays stopped ---
-            partner_chain_stopped = set() # Keep track of who we stopped
-            if local_partner_id is not None:
-                partner_chain = self._find_connected_group(local_partner_id)
-                # Make sure we don't stop the target if it happens to be in the partner's chain
-                # (shouldn't happen with current logic, but safety check)
-                partner_chain_to_stop = partner_chain - {local_target_id}
-                if partner_chain_to_stop:
-                    self.get_logger().debug(f"Reset: Stopping partner chain {partner_chain_to_stop}", throttle_duration_sec=2.0)
-                    for member_id in partner_chain_to_stop:
-                        self._send_velocity(member_id, 0.0, 0.0)
-                        partner_chain_stopped.add(member_id)
+
+            # --- Find group connected to target *now* and stop others ---
+            target_group_at_reset = self._find_connected_group(local_target_id)
+            other_group_members = target_group_at_reset - {local_target_id}
+            partner_chain_stopped = set() # Keep track for final stop
+
+            if other_group_members:
+                self.get_logger().debug(f"Reset: Stopping other connected members {other_group_members}", throttle_duration_sec=2.0)
+                for member_id in other_group_members:
+                    self._send_velocity(member_id, 0.0, 0.0)
+                    partner_chain_stopped.add(member_id) # Add to set to stop again later
             # ---
-
+            
             # Use seeker's range to gauge distance between seeker and target
             current_range_seeker = self.agent_sensor_data['range'].get(local_seeker_id)
             valid_range = current_range_seeker if (current_range_seeker is not None and current_range_seeker >= self.range_valid_min_m) else self.reset_distance_m
@@ -1211,16 +1132,16 @@ class Connect_Robots(Node):
         self.get_logger().info(f"Final Robot Status: {self.robot_status}", once=True)
         self.get_logger().info(f"Connected Pairs: {self.connected_pairs}", once=True)
 
-        # Log Last Commanded Velocities (from previous answer)
-        vel_log_msgs = []
-        for agent_id in sorted(list(self.discovered_agent_ids)):
-            last_lin, last_ang = self.agent_last_cmd_vel.get(agent_id, (None, None))
-            lin_str = f"{last_lin:.3f}" if last_lin is not None else "N/A"
-            ang_str = f"{last_ang:.3f}" if last_ang is not None else "N/A"
-            vel_log_msgs.append(f"  Agent {agent_id}: Last CmdVel (L={lin_str}, A={ang_str})")
-        if vel_log_msgs:
-            log_string = "Last commanded velocities before final halt:\n" + "\n".join(vel_log_msgs)
-            self.get_logger().info(log_string, once=True)
+        # # Log Last Commanded Velocities (from previous answer)
+        # vel_log_msgs = []
+        # for agent_id in sorted(list(self.discovered_agent_ids)):
+        #     last_lin, last_ang = self.agent_last_cmd_vel.get(agent_id, (None, None))
+        #     lin_str = f"{last_lin:.3f}" if last_lin is not None else "N/A"
+        #     ang_str = f"{last_ang:.3f}" if last_ang is not None else "N/A"
+        #     vel_log_msgs.append(f"  Agent {agent_id}: Last CmdVel (L={lin_str}, A={ang_str})")
+        # if vel_log_msgs:
+        #     log_string = "Last commanded velocities before final halt:\n" + "\n".join(vel_log_msgs)
+        #     self.get_logger().info(log_string, once=True)
 
         self.stop_all_robots()
         self.get_logger().debug("Staying in ALL_CONNECTED_OR_HALTED state.", throttle_duration_sec=10.0)
@@ -1396,18 +1317,8 @@ class Connect_Robots(Node):
         accel_mag_sq = ax**2 + ay**2 + az**2
         if accel_mag_sq < 0.01: return None, None # Avoid division by zero if overall accel is tiny
         try:
-            # Use atan2(y, x) for better quadrant handling
-            # Roll: rotation around X-axis. Use ay and az. atan2(ay, az) might be more conventional? Let's test original.
-            # Pitch: rotation around Y-axis. Use ax and az.
-            # Roll based on X-accel (gravity component when rolled) vs YZ plane
             roll = math.atan2(-ax, math.sqrt(ay**2 + az**2))
-             # Pitch based on Y-accel (gravity component when pitched) vs XZ plane
-            pitch = math.atan2(ay, math.sqrt(ax**2 + az**2)) # This seems like pitch relative to XZ plane
-
-            # Alternative calculation (more common definition?)
-            # roll = math.atan2(ay, az)
-            # pitch = math.atan2(-ax, math.sqrt(ay**2 + az**2))
-
+            pitch = math.atan2(ay, math.sqrt(ax**2 + az**2))
             return roll, pitch
         except ValueError as e: # Catch potential math domain errors
             self.get_logger().warn(f"Math error in IMU calculation: {e}. Accel=[{ax:.2f},{ay:.2f},{az:.2f}]", once=True)
