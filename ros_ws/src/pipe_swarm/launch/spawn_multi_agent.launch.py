@@ -60,7 +60,10 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             os.path.join(gazebo_ros_share, 'launch', 'gazebo.launch.py')
         ),
-        launch_arguments={'world': world_path}.items()
+        launch_arguments={
+            'world': world_path,
+            "use_sim_time": "true",
+        }.items()
     )
 
     # Pre-Agent Setup

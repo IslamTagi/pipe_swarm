@@ -1,6 +1,6 @@
 /**/controller_manager:
   ros__parameters:
-    update_rate: 50
+    update_rate: 100
     use_sim_time: true
 
     joint_state_broadcaster:
@@ -29,14 +29,14 @@
 
     action_monitor_rate: 20.0
 
-    allow_partial_joints_goal: false
+    allow_partial_joints_goal: true
     open_loop_control: true
     constraints:
       stopped_velocity_tolerance: 0.01
-      goal_time: 0.0
+      goal_time: 0.05
       base_female_joint:
-        trajectory: 0.05
-        goal: 0.0
+        trajectory: 0.1
+        goal: 0.1
 
 /**/male_joint_trajectory_controller:
   ros__parameters:
