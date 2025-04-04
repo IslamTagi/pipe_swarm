@@ -6,10 +6,12 @@
 #include <shape_msgs/msg/solid_primitive.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <moveit_visual_tools/moveit_visual_tools.h>
+#include <geometry_msgs/msg/twist.hpp>
+
 
 void splitExecuteTrajectory(std::shared_ptr<rclcpp::Node> move_group_node,
-                  // rclcpp::Logger logger,
-                  moveit::planning_interface::MoveGroupInterface::Plan plan)
+                            // rclcpp::Logger logger,
+                            moveit::planning_interface::MoveGroupInterface::Plan plan)
 {
   auto trajectory_points = plan.trajectory_.joint_trajectory.points;
 
@@ -44,6 +46,71 @@ void splitExecuteTrajectory(std::shared_ptr<rclcpp::Node> move_group_node,
   agent_1_pub->publish(traj_agent_1);
   agent_2_pub->publish(traj_agent_2);
   
+}
+
+void transformPrismaticCmd(std::shared_ptr<rclcpp::Node> move_group_node,
+                          rclcpp::Logger logger,
+                          moveit::planning_interface::MoveGroupInterface::Plan plan)
+{
+  // Create a publisher for cmd_vel
+  auto cmd_vel_pub = move_group_node->create_publisher<geometry_msgs::msg::Twist>("/agent_0/cmd_vel", 10);
+
+  // Previous values for calculation
+  double prev_position = plan.trajectory_.joint_trajectory.points.front().positions[0];
+  // Convert time_from_start (builtin_interfaces::msg::Duration) to rclcpp::Duration
+  rclcpp::Duration prev_time(
+    plan.trajectory_.joint_trajectory.points.front().time_from_start.sec,
+    plan.trajectory_.joint_trajectory.points.front().time_from_start.nanosec
+  );
+
+
+  for (size_t i = 0; i <= plan.trajectory_.joint_trajectory.points.size(); i=i+10)
+  {
+    const auto& point = plan.trajectory_.joint_trajectory.points[i];
+    RCLCPP_INFO(logger, "Point %zu: time_from_start.sec = %d, nanosec = %u", 
+      i, point.time_from_start.sec, point.time_from_start.nanosec);
+
+
+    double current_position = point.positions[0]; // assuming index 0 is the prismatic joint
+
+    // Convert time_from_start to rclcpp::Duration
+    rclcpp::Duration current_time(
+      point.time_from_start.sec,
+      point.time_from_start.nanosec
+    );
+
+    // Calculate time delta
+    double dt = (current_time - prev_time).seconds();
+    if (dt <= 0)
+    {
+      RCLCPP_WARN(logger, "Delta time is non-positive at point %zu, skipping", i);
+      continue;
+    }
+
+    // Calculate velocity
+    double velocity = (current_position - prev_position) / dt;
+
+    // Prepare Twist message
+    geometry_msgs::msg::Twist cmd_vel_msg;
+    cmd_vel_msg.linear.x = velocity;
+    cmd_vel_msg.angular.z = 0.0;
+
+    // Publish
+    cmd_vel_pub->publish(cmd_vel_msg);
+
+    // Wait for dt duration to mimic trajectory timing
+    rclcpp::Rate rate(1.0 / dt);
+    rate.sleep();
+
+    // Update previous values
+    prev_position = current_position;
+    prev_time = current_time;
+  }
+
+
+  // Optionally, send zero velocity at end
+  geometry_msgs::msg::Twist stop_msg;
+  cmd_vel_pub->publish(stop_msg);
 }
 
 int main(int argc, char * argv[])
@@ -121,6 +188,7 @@ int main(int argc, char * argv[])
   if (true == success)
   {
     splitExecuteTrajectory(move_group_node, /*logger,*/ my_plan);
+    transformPrismaticCmd(move_group_node, logger, my_plan);
     moveit::core::MoveItErrorCode exec_status = move_group_interface.execute(my_plan);
     RCLCPP_INFO(logger, "Execution Request: %s", moveit::core::error_code_to_string(exec_status).c_str());
   }
