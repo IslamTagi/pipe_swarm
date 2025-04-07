@@ -3,13 +3,15 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Polygon
 from shapely.geometry import LineString, Polygon as ShapelyPolygon
 from scipy.optimize import minimize
+from shapely.ops import unary_union
 
 def get_combined_coordinates(x_coordinates, y_coordinates):
     if len(x_coordinates) != len(y_coordinates):
         return None
     coordinates = []
-    for i in range(len(x_coordinates)):
-        coordinates.append((float(x_coordinates[i]), float(y_coordinates[i])))
+    for x, y in zip(x_coordinates, y_coordinates):
+        if x is not None and y is not None:
+            coordinates.append((float(x), float(y)))
     return coordinates
 
 def get_intersection_points(robot_links:LineString, obstacle_polygon:ShapelyPolygon,
@@ -121,7 +123,7 @@ class ModularConfiguration():
     def __init__(self, sigma_np, x_pos, l_agent):
 
         # global reference frame
-        self.global_coordinates = (0, 0)
+        self.global_coordinates = (0, 1e-6)
         self.theta_global = 0
 
         # modular robot parameters
@@ -296,24 +298,82 @@ l_agent = 2
 n_agents = 3    # number of agents
 
 # define obstacle
-step_endpoints = ((4, 3, 3), (0, 2, 0))
-step = Obstacle(step_endpoints[0], step_endpoints[1])
 
-gap_endpoints = ((0, 0, 2, 2), (0, -1, -1, 0))
-gap = Obstacle(gap_endpoints[0], gap_endpoints[1], 'gap')
+class Pipe():
+    def __init__(self, pipe_length, pipe_radius, pipe_thickness, coordinates):
 
-ground_endpoints = ((-2, -2, 5, 5), (0, -2, -2, 0))
-ground = Obstacle(ground_endpoints[0], ground_endpoints[1])
+        # defining model
+        self.length = pipe_length
+        self.radius = pipe_radius
+        self.thickness = pipe_thickness
+        self.coordinates = coordinates
 
-obstacle_x, obstacle_y = ground.get_overall_obstacle(step)
-obstacle = Obstacle(obstacle_x, obstacle_y)
+        self.obstacle = self.initialize_obstacle()
 
-obstacle_x, obstacle_y = obstacle.get_overall_obstacle(gap, 'gap')
-obstacle = Obstacle(obstacle_x, obstacle_y)
+    def initialize_obstacle(self):
+        x = self.coordinates[0]
+        y = self.coordinates[1]
+        l = self.length
+        thickness = self.thickness
+
+        bottom_half_endpoints = ((x+l, x+l, x, x), (y, y-thickness, y-thickness, y))
+        bottom_half = Obstacle(bottom_half_endpoints[0], bottom_half_endpoints[1])
+        
+        y += (2*self.radius)
+
+        top_half_endpoints = ((x, x, x+l, x+l), (y+thickness, y, y, y+thickness))
+        top_half = Obstacle(top_half_endpoints[0], top_half_endpoints[1])
+
+        combined_shape = unary_union([top_half.get_shapley_polygon(), bottom_half.get_shapley_polygon()])
+
+        if combined_shape.geom_type == 'Polygon':
+            x_coords, y_coords = zip(*combined_shape.exterior.coords)
+        elif combined_shape.geom_type == 'MultiPolygon':
+            # Flatten all polygons
+            x_coords, y_coords = [], []
+            for geom in combined_shape.geoms:
+                x, y = zip(*geom.exterior.coords)
+                x_coords.extend(x + (None,))  # Add None for separator in plotting
+                y_coords.extend(y + (None,))
+        else:
+            raise ValueError(f"Unexpected geometry type: {combined_shape.geom_type}")
+
+        self.obstacle = Obstacle(x_coords, y_coords)
+
+        return self.obstacle
+    
+    def get_obstacle(self):
+        return self.obstacle
+
+pipe_radius = 0.5
+pipe_length = 2
+pipe_thickness = 1
+pipe = Pipe(pipe_length, pipe_radius, pipe_thickness, [0,0])
+obstacle = pipe.get_obstacle()
+
+# pipe2 = Pipe(pipe_length, pipe_radius, pipe_thickness, [2,0.5])
+# pipe2_obstacle = pipe2.get_obstacle()
+
+# obstacle_x, obstacle_y = pipe_obstacle.get_overall_obstacle(pipe2_obstacle)
+# obstacle = Obstacle(obstacle_x, obstacle_y)
+
+# step_endpoints = ((4, 3, 3), (0, 2, 0))
+# step = Obstacle(step_endpoints[0], step_endpoints[1])
+
+# gap_endpoints = ((0, 0, 2, 2), (0, -1, -1, 0))
+# gap = Obstacle(gap_endpoints[0], gap_endpoints[1], 'gap')
+
+# ground_endpoints = ((-2, -2, 5, 5), (0, -2, -2, 0))
+# ground = Obstacle(ground_endpoints[0], ground_endpoints[1])
+
+# obstacle_x, obstacle_y = ground.get_overall_obstacle(step)
+
+# obstacle_x, obstacle_y = obstacle.get_overall_obstacle(gap, 'gap')
+# obstacle = Obstacle(obstacle_x, obstacle_y)
 
 mpc = ModelPredictiveControl(n_agents, l_agent, obstacle)
-theta_solution = mpc.inverse_kinematics_with_constraints((3,21))
-# theta_solution = mpc.inverse_kinematics_with_constraints((2,-1))
-print(theta_solution)
-print(mpc.model_config.theta)
+theta_solution = mpc.inverse_kinematics_with_constraints((5,0.5))
+# print(theta_solution)
+# print(mpc.model_config.theta)
 mpc.model_config.visualize_agent_configuration(obstacle)
+
