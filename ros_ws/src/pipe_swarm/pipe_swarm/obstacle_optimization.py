@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import Polygon
 from shapely.geometry import LineString, Polygon as ShapelyPolygon
+from shapely.geometry import Polygon as ShapelyPolygon, MultiPolygon
 from scipy.optimize import minimize
 from shapely.ops import unary_union
 
@@ -89,18 +90,81 @@ class Obstacle():
         self.coordinates = [x_coordinates, y_coordinates]
         self.type = obstacle_type
 
+    # def get_polygon(self, border_colour='pink', fill_colour='orange'):
+    #     return Polygon(
+    #         get_combined_coordinates(self.coordinates[0], self.coordinates[1]),
+    #         closed=True,
+    #         edgecolor=border_colour,
+    #         facecolor=fill_colour,
+    #         linewidth=2,
+    #         alpha=0.8
+    #     )
+    
     def get_polygon(self, border_colour='pink', fill_colour='orange'):
-        return Polygon(
-            get_combined_coordinates(self.coordinates[0], self.coordinates[1]),
-            closed=True,
-            edgecolor=border_colour,
-            facecolor=fill_colour,
-            linewidth=2,
-            alpha=0.8
-        )
+        patches = []
+        x_coords, y_coords = self.coordinates
+        current_polygon = []
+
+        for x, y in zip(x_coords, y_coords):
+            if x is None or y is None:
+                if current_polygon:
+                    polygon = Polygon(
+                        current_polygon,
+                        closed=True,
+                        edgecolor=border_colour,
+                        facecolor=fill_colour,
+                        linewidth=2,
+                        alpha=0.8
+                    )
+                    patches.append(polygon)
+                    current_polygon = []
+            else:
+                current_polygon.append((x, y))
+
+        # Add last polygon
+        if current_polygon:
+            polygon = Polygon(
+                current_polygon,
+                closed=True,
+                edgecolor=border_colour,
+                facecolor=fill_colour,
+                linewidth=2,
+                alpha=0.8
+            )
+            patches.append(polygon)
+
+        return patches
+
+    
+    # def get_shapley_polygon(self):
+    #     return ShapelyPolygon(get_combined_coordinates(self.coordinates[0], self.coordinates[1]))
     
     def get_shapley_polygon(self):
-        return ShapelyPolygon(get_combined_coordinates(self.coordinates[0], self.coordinates[1]))
+        # Interpret self.coordinates as potentially multiple polygons
+        x_coords, y_coords = self.coordinates
+        polygons = []
+        current_polygon = []
+
+        for x, y in zip(x_coords, y_coords):
+            if x is None or y is None:
+                if current_polygon:
+                    polygons.append(ShapelyPolygon(current_polygon))
+                    current_polygon = []
+            else:
+                current_polygon.append((x, y))
+
+        # Add the last polygon if exists
+        if current_polygon:
+            polygons.append(ShapelyPolygon(current_polygon))
+
+        # Return as MultiPolygon or Polygon
+        if len(polygons) == 1:
+            return polygons[0]
+        elif len(polygons) > 1:
+            return MultiPolygon(polygons)
+        else:
+            raise ValueError("No valid polygons found in coordinates.")
+
     
     def get_combined_obstacle(self, obstacle_polygon:ShapelyPolygon):
         combined_coordinates = list(self.get_shapley_polygon().union(obstacle_polygon).exterior.coords)
@@ -202,7 +266,10 @@ class ModularConfiguration():
         
         # Obstacle
         plt.plot(obstacle.coordinates[0], obstacle.coordinates[1], '-s', color='red', markersize=8, linewidth=2, label='Obstacle')
-        plt.gca().add_patch(obstacle.get_polygon())
+        # plt.gca().add_patch(obstacle.get_polygon())
+        for patch in obstacle.get_polygon():
+            plt.gca().add_patch(patch)
+
 
         # Collision
         plt.plot(touching_points[0], touching_points[1], 'v', color='purple', markersize=10, label='Touching Point')
