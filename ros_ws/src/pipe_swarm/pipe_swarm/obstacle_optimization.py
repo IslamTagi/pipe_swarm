@@ -218,7 +218,7 @@ class ModularConfiguration():
 class ModelPredictiveControl():
 
     def __init__(self, n_agents, l_agent, obstacle:Obstacle,
-                 x_pos_min=-100, x_pos_max=100, sigma_min=-90, sigma_max=90):
+                 x_pos_min=-100, x_pos_max=100, sigma_min=-45, sigma_max=45):
 
         # defining model
         self.n_agents = n_agents
@@ -256,6 +256,9 @@ class ModelPredictiveControl():
                                                       self.obstacle.get_shapley_polygon())
         return -len(intersection_points[0]) # if any intersection points
     
+    def grounded_link_constraint(self, sigma0):
+        return sigma0[1] # first link needs to be grounded
+    
     def inverse_kinematics_with_constraints(self, pos_desired,
                                         max_iter=750, tolerance=2e-6):
         
@@ -264,6 +267,7 @@ class ModelPredictiveControl():
         
         constraints = [
             {'type': 'ineq', 'fun': self.obstalce_collision_constraint},
+            {'type': 'eq', 'fun': self.grounded_link_constraint},
             # TODO (IT): implement com constraint
             # TODO (IT): implement torque constraint
             # TODO (IT): implement x position constraint to not start past obstacle
@@ -298,7 +302,7 @@ step = Obstacle(step_endpoints[0], step_endpoints[1])
 gap_endpoints = ((0, 0, 2, 2), (0, -1, -1, 0))
 gap = Obstacle(gap_endpoints[0], gap_endpoints[1], 'gap')
 
-ground_endpoints = ((-5, -5, 5, 5), (0, -5, -5, 0))
+ground_endpoints = ((-2, -2, 5, 5), (0, -2, -2, 0))
 ground = Obstacle(ground_endpoints[0], ground_endpoints[1])
 
 obstacle_x, obstacle_y = ground.get_overall_obstacle(step)
@@ -308,6 +312,8 @@ obstacle_x, obstacle_y = obstacle.get_overall_obstacle(gap, 'gap')
 obstacle = Obstacle(obstacle_x, obstacle_y)
 
 mpc = ModelPredictiveControl(n_agents, l_agent, obstacle)
-theta_solution = mpc.inverse_kinematics_with_constraints((3,0))
-theta_solution = mpc.inverse_kinematics_with_constraints((2,-1))
+theta_solution = mpc.inverse_kinematics_with_constraints((3,21))
+# theta_solution = mpc.inverse_kinematics_with_constraints((2,-1))
+print(theta_solution)
+print(mpc.model_config.theta)
 mpc.model_config.visualize_agent_configuration(obstacle)
