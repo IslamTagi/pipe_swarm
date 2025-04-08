@@ -366,7 +366,7 @@ class ModelPredictiveControl():
                 # touching point x needs to be within x of first robot --> 
                 if(touching_point >= self.model_config.endpoints[0][0] and touching_point <= self.model_config.endpoints[0][1]):
                     grounded_touch+=1
-        return grounded_touch - 1 # first link needs to be grounded
+        return grounded_touch - 2 # first link needs to be grounded (from both ends)
     
     def inverse_kinematics_with_constraints(self, pos_desired,
                                         max_iter=750, tolerance=2e-6):
