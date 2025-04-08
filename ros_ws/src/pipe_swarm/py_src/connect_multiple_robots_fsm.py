@@ -44,6 +44,7 @@ class RobotState(Enum):
 class AgentStatus(Enum):
     """Individual status of a single robot."""
     UNKNOWN = auto()
+    INACTIVE = auto()               # Discovered but deliberately not participating
     ACTIVE = auto()                 # Moving or ready to move
     DETECTED_SOMETHING = auto()     # Triggered the halt
     CONFIRMATION_TARGET = auto()    # Being moved for confirmation check
@@ -114,9 +115,10 @@ class Connect_Robots(Node):
         self.initial_delay_sec = 2.0
         self.alignment_timeout_sec = 40.0
         self.docking_duration_sec = 16.0
-        self.locking_timeout_sec = 10.0
+        self.locking_timeout_sec = 12.0
         self.verification_duration_sec = 5.0
         self.confirmation_timeout_per_robot_sec = 2.0
+        self.num_active_robots = 4
         # Speeds
         self.forward_speed = 0.1
         self.approach_speed = 0.05
@@ -431,31 +433,66 @@ class Connect_Robots(Node):
     def _handle_initializing_robots_state(self):
         """Sets initial joint positions, status, and gets initial range scans for all robots."""
         self.get_logger().info("Initializing all robots...")
+
         all_scans_obtained = True
-        for agent_id in self.discovered_agent_ids:
-            # Initialize only if UNKNOWN or FAILED (allow retry)
+
+        # --- Determine Active/Inactive based on Target Count ---
+        discovered_ids_sorted = sorted(list(self.discovered_agent_ids))
+        num_discovered = len(discovered_ids_sorted)
+        num_to_activate = self.num_active_robots
+
+        if num_to_activate > num_discovered:
+             self.get_logger().error(f"Configuration error: num_active_robots_target ({num_to_activate}) is greater than discovered robots ({num_discovered}). Failing.")
+             self.change_state(RobotState.FAILED)
+             return
+
+        # Identify which IDs will be active (highest IDs) and inactive (lowest IDs)
+        num_to_deactivate = num_discovered - num_to_activate
+        inactive_ids = set(discovered_ids_sorted[:num_to_deactivate])
+        active_ids = set(discovered_ids_sorted[num_to_deactivate:])
+
+        self.get_logger().info(f"Target Active Robots: {num_to_activate}. Discovered: {num_discovered}.")
+        self.get_logger().info(f"Activating Agent IDs: {sorted(list(active_ids))}")
+        if inactive_ids:
+            self.get_logger().info(f"Deactivating Agent IDs: {sorted(list(inactive_ids))}")
+        # --- End Active/Inactive Determination ---
+
+        all_active_scans_obtained = True
+        initialization_complete = True
+
+        for agent_id in self.discovered_agent_ids: # Iterate through all discovered
             current_status = self.robot_status.get(agent_id, AgentStatus.UNKNOWN)
+
             if current_status in [AgentStatus.UNKNOWN, AgentStatus.FAILED]:
                 self.get_logger().info(f"  Initializing Agent {agent_id}...")
                 self._set_joint(agent_id, 'male', self.male_unlock_angle)
                 self._set_joint(agent_id, 'female', self.female_lift_angle)
-                self.robot_status[agent_id] = AgentStatus.ACTIVE
-                self.initial_scan_ranges[agent_id] = None # Clear previous scan
-                self.get_logger().info(f"    Agent {agent_id} set to ACTIVE, joints commanded.")
-            elif current_status != AgentStatus.ACTIVE:
-                 self.get_logger().warn(f"  Agent {agent_id} has unexpected status {current_status.name} during init, leaving as is.")
 
-            # Attempt to get initial scan if not already obtained
-            if self.initial_scan_ranges.get(agent_id) is None and self.robot_status.get(agent_id) == AgentStatus.ACTIVE:
-                current_range = self.agent_sensor_data['range'].get(agent_id, None)
-                if current_range is not None and current_range >= self.range_valid_min_m:
-                    self.initial_scan_ranges[agent_id] = current_range
-                    self.get_logger().info(f"    Stored initial scan range for agent {agent_id}: {current_range:.3f} m")
+                if agent_id in active_ids:
+                    self.robot_status[agent_id] = AgentStatus.ACTIVE
+                    self.initial_scan_ranges[agent_id] = None # Clear previous scan
+                    self.get_logger().info(f"    Agent {agent_id} set to ACTIVE")
                 else:
-                    self.get_logger().info(f"    Waiting for valid initial range for agent {agent_id}...")
-                    all_scans_obtained = False
+                    self.robot_status[agent_id] = AgentStatus.INACTIVE
+                    self.initial_scan_ranges[agent_id] = None # Clear previous scan
+                    self.get_logger().info(f"    Agent {agent_id} set to INACTIVE")
+            elif agent_id in inactive_ids and current_status != AgentStatus.INACTIVE:
+                 # Ensure previously active robots that are now inactive get marked correctly
+                 self.get_logger().warn(f"  Marking previously non-inactive Agent {agent_id} as INACTIVE.")
+                 self.robot_status[agent_id] = AgentStatus.INACTIVE
 
-        if all_scans_obtained:
+            # Attempt to get initial scan
+            if self.robot_status.get(agent_id) == AgentStatus.ACTIVE:
+                if self.initial_scan_ranges.get(agent_id) is None:
+                    current_range = self.agent_sensor_data['range'].get(agent_id, None)
+                    if current_range is not None and current_range >= self.range_valid_min_m:
+                        self.initial_scan_ranges[agent_id] = current_range
+                        self.get_logger().info(f"    Stored initial scan range for ACTIVE agent {agent_id}: {current_range:.3f} m")
+                    else:
+                        self.get_logger().info(f"    Waiting for valid initial range for ACTIVE agent {agent_id}...")
+                        all_active_scans_obtained = False # Wait until all ACTIVE robots have scans
+
+        if all_active_scans_obtained:
             # Check if at least one robot is ACTIVE
             if any(self.robot_status.get(aid) == AgentStatus.ACTIVE for aid in self.discovered_agent_ids):
                 self.get_logger().info("All active robots initialized and have initial range scans.")
@@ -520,7 +557,7 @@ class Connect_Robots(Node):
         excluded_statuses = {
             AgentStatus.CONNECTION_SEEKER, AgentStatus.CONNECTION_TARGET,
             AgentStatus.RESETTING, AgentStatus.CONFIRMATION_TARGET,
-            AgentStatus.FAILED
+            AgentStatus.FAILED, AgentStatus.INACTIVE
          }
 
         self.confirmation_target_ids = sorted([
