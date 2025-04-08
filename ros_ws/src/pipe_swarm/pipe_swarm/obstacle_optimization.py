@@ -319,7 +319,9 @@ class ModelPredictiveControl():
         self.n_agents = n_agents
 
             # initial sigma0 guess -- control parameters
-        self.sigma = np.zeros(n_agents) # TODO (IT): randomize based on n_agents --> self.sigma = np.random.uniform(low=sigma_min, high=sigma_max, size=n_agents)
+        # self.sigma = np.zeros(n_agents) # TODO (IT): randomize based on n_agents --> self.sigma = np.random.uniform(low=sigma_min, high=sigma_max, size=n_agents)
+        self.sigma = np.random.uniform(low=sigma_min, high=sigma_max, size=n_agents)
+        print(f'Starting Seed: {self.sigma}')
         self.x_pos = 0
         self.sigma0 = [self.x_pos]
         self.sigma0.extend(self.sigma)
@@ -351,8 +353,20 @@ class ModelPredictiveControl():
                                                       self.obstacle.get_shapley_polygon())
         return -len(intersection_points[0]) # if any intersection points
     
-    def grounded_link_constraint(self, sigma0):
+    def grounded_angle_constraint(self, sigma0):
         return sigma0[1] # first link needs to be grounded
+    
+    def grounded_contact_constraint(self, sigma0):
+        self.model_config.get_coordinate_representation(sigma0[1:], sigma0[0])
+        intersection_points_, touching_points = get_intersection_points(self.model_config.get_line_shape(), 
+                                                      self.obstacle.get_shapley_polygon())
+        grounded_touch = 0
+        if(len(touching_points[0]) > 0): 
+            for touching_point in touching_points[0]:
+                # touching point x needs to be within x of first robot --> 
+                if(touching_point >= self.model_config.endpoints[0][0] and touching_point <= self.model_config.endpoints[0][1]):
+                    grounded_touch+=1
+        return grounded_touch - 1 # first link needs to be grounded
     
     def inverse_kinematics_with_constraints(self, pos_desired,
                                         max_iter=750, tolerance=2e-6):
@@ -362,10 +376,10 @@ class ModelPredictiveControl():
         
         constraints = [
             {'type': 'ineq', 'fun': self.obstalce_collision_constraint},
-            {'type': 'eq', 'fun': self.grounded_link_constraint},
+            {'type': 'ineq', 'fun': self.grounded_contact_constraint},
+            {'type': 'eq', 'fun': self.grounded_angle_constraint},
             # TODO (IT): implement com constraint
             # TODO (IT): implement torque constraint
-            # TODO (IT): implement x position constraint to not start past obstacle
         ]
 
         # Solve the optimization problem
@@ -439,16 +453,16 @@ class Pipe():
         return self.obstacle
 
 pipe_radius = 0.5
-pipe_length = 2
+pipe_length = 6
 pipe_thickness = 0.5
 
-pipe = Pipe(pipe_length, pipe_radius, pipe_thickness, [0,0])
+pipe = Pipe(pipe_length, pipe_radius, pipe_thickness, [-4,0])
 obstacle = pipe.get_obstacle()
 
-pipe2 = Pipe(pipe_length, pipe_radius, pipe_thickness, [2,0.5])
-pipe2_obstacle = pipe2.get_obstacle()
+step_pipe = Pipe(pipe_length, pipe_radius, pipe_thickness, [2,0.25])
+step_pipe_obstacle = step_pipe.get_obstacle()
 
-obstacle_x, obstacle_y = obstacle.get_overall_obstacle(pipe2_obstacle)
+obstacle_x, obstacle_y = obstacle.get_overall_obstacle(step_pipe_obstacle)
 obstacle = Obstacle(obstacle_x, obstacle_y)
 
 # step_endpoints = ((4, 3, 3), (0, 2, 0))
@@ -467,8 +481,8 @@ obstacle = Obstacle(obstacle_x, obstacle_y)
 # obstacle = Obstacle(obstacle_x, obstacle_y)
 
 mpc = ModelPredictiveControl(n_agents, l_agent, obstacle)
-theta_solution = mpc.inverse_kinematics_with_constraints((2, 0.5))
-# print(theta_solution)
-# print(mpc.model_config.theta)
+theta_solution = mpc.inverse_kinematics_with_constraints((3, 1))
+print(theta_solution)
+print(mpc.model_config.endpoints)
 mpc.model_config.visualize_agent_configuration(obstacle)
 
