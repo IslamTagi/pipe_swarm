@@ -321,7 +321,8 @@ class ModelPredictiveControl():
 
             # initial sigma0 guess -- control parameters
         # self.sigma = np.zeros(n_agents) # TODO (IT): randomize based on n_agents --> self.sigma = np.random.uniform(low=sigma_min, high=sigma_max, size=n_agents)
-        self.sigma = np.random.uniform(low=sigma_min, high=sigma_max, size=n_agents)
+        self.sigma = [0]
+        self.sigma.extend(np.random.uniform(low=sigma_min, high=sigma_max, size=n_agents-1))
         print(f'Starting Seed: {self.sigma}')
         self.x_pos = 0
         self.sigma0 = [self.x_pos]
@@ -342,17 +343,25 @@ class ModelPredictiveControl():
         self.model_config.get_coordinate_representation(sigma[1:], sigma[0])
         intersection_points_, touching_points = get_intersection_points(self.model_config.get_line_shape(), 
                                                       self.obstacle.get_shapley_polygon())
-        grounded_touch = [0] * (len(sigma)-1)
-        # link_grounded = [False, False, False]
-        if(len(touching_points[0]) > 0):
-            for touching_point in touching_points[0]:
-                # touching point x needs to be within x of first robot -->
-                for link in range(len(sigma)-1): # ignore x translation
-                    if(self.model_config.endpoints[0][link] <= touching_point <= self.model_config.endpoints[0][link+1]):
-                        grounded_touch[link]+=1
-        # grounded_boolean = [touches >= 2 for touches in grounded_touch]
-        return grounded_touch
+        # grounded_touch = [0] * (len(sigma)-1)
 
+        if len(touching_points[0]) == 0:
+            # No touches at all, return zeros per link
+            return np.zeros(len(sigma) - 1, dtype=int)
+
+        touching_x = np.array(touching_points[0])  # shape: (P,)
+        endpoints_x = np.array(self.model_config.endpoints[0])  # shape: (L+1,)
+
+        link_starts = endpoints_x[:-1][:, None]  # shape: (L,1)
+        link_ends = endpoints_x[1:][:, None]     # shape: (L,1)
+
+        # Broadcast comparison, shape: (L, P)
+        mask = (touching_x >= link_starts) & (touching_x <= link_ends)
+
+        # Count touches per link
+        grounded_touch = mask.sum(axis=1)
+        # print(grounded_touch)
+        return grounded_touch
 
     def objective(self, sigma0):
         # Compute current end-effector position
