@@ -210,7 +210,7 @@ class Obstacle():
 
 class ModularConfiguration():
 
-    def __init__(self, sigma_np, x_pos, l_agent):
+    def __init__(self, sigma_np, x_pos, l_agent, m_agent):
 
         # global reference frame
         self.global_coordinates = (0, 1e-6)
@@ -219,6 +219,7 @@ class ModularConfiguration():
         # modular robot parameters
         self.n_agents = len(sigma_np)
         self.l_agent = l_agent
+        self.m_agent = m_agent
         self.get_coordinate_representation(sigma_np, x_pos)
 
     def reset_modular_robot(self, sigma_np, x_pos):
@@ -312,7 +313,7 @@ class ModularConfiguration():
 
 class ModelPredictiveControl():
 
-    def __init__(self, n_agents, l_agent, obstacle:Obstacle,
+    def __init__(self, n_agents, l_agent, m_agent, obstacle:Obstacle,
                  x_pos_min=-100, x_pos_max=100, sigma_min=-45, sigma_max=45):
 
         # defining model
@@ -330,12 +331,28 @@ class ModelPredictiveControl():
         self.theta0_bounds = [(sigma_min, sigma_max) for _ in range(n_agents)] # sigma bounds
         self.theta0_bounds.insert(0, (x_pos_min, x_pos_max)) # x pos bounds
         
-        self.model_config = ModularConfiguration(self.sigma, self.x_pos, l_agent)
+        self.model_config = ModularConfiguration(self.sigma, self.x_pos, l_agent, m_agent)
 
           # objective function
         self.pos_desired = (0, 0)
 
         self.obstacle = obstacle
+
+    def get_grounded_robots(self, sigma):
+        self.model_config.get_coordinate_representation(sigma[1:], sigma[0])
+        intersection_points_, touching_points = get_intersection_points(self.model_config.get_line_shape(), 
+                                                      self.obstacle.get_shapley_polygon())
+        grounded_touch = [0] * (len(sigma)-1)
+        # link_grounded = [False, False, False]
+        if(len(touching_points[0]) > 0):
+            for touching_point in touching_points[0]:
+                # touching point x needs to be within x of first robot -->
+                for link in range(len(sigma)-1): # ignore x translation
+                    if(self.model_config.endpoints[0][link] <= touching_point <= self.model_config.endpoints[0][link+1]):
+                        grounded_touch[link]+=1
+        # grounded_boolean = [touches >= 2 for touches in grounded_touch]
+        return grounded_touch
+
 
     def objective(self, sigma0):
         # Compute current end-effector position
@@ -360,13 +377,16 @@ class ModelPredictiveControl():
         self.model_config.get_coordinate_representation(sigma0[1:], sigma0[0])
         intersection_points_, touching_points = get_intersection_points(self.model_config.get_line_shape(), 
                                                       self.obstacle.get_shapley_polygon())
-        grounded_touch = 0
-        if(len(touching_points[0]) > 0): 
-            for touching_point in touching_points[0]:
-                # touching point x needs to be within x of first robot --> 
-                if(touching_point >= self.model_config.endpoints[0][0] and touching_point <= self.model_config.endpoints[0][1]):
-                    grounded_touch+=1
-        return grounded_touch - 2 # first link needs to be grounded (from both ends)
+        
+        link_grounded = self.get_grounded_robots(sigma0)
+        
+        return link_grounded[0] - 2 # first link needs to be grounded (from both ends)
+    
+    def torque_constraint(self, sigma0):
+        self.model_config.get_coordinate_representation(sigma0[1:], sigma0[0])
+        torque_limit = 10
+        
+        return sigma0[0]
     
     def inverse_kinematics_with_constraints(self, pos_desired,
                                         max_iter=750, tolerance=2e-6):
@@ -377,6 +397,7 @@ class ModelPredictiveControl():
         constraints = [
             {'type': 'ineq', 'fun': self.obstalce_collision_constraint},
             {'type': 'ineq', 'fun': self.grounded_contact_constraint},
+            # {'type': 'ineq', 'fun': self.torque_constraint},
             {'type': 'eq', 'fun': self.grounded_angle_constraint},
             # TODO (IT): implement com constraint
             # TODO (IT): implement torque constraint
@@ -400,9 +421,6 @@ class ModelPredictiveControl():
         else:
             print("Optimization failed.")
             return None
-    
-l_agent = 2
-n_agents = 3    # number of agents
 
 # define obstacle
 
@@ -452,7 +470,7 @@ class Pipe():
     def get_obstacle(self):
         return self.obstacle
 
-pipe_radius = 0.5
+pipe_radius = 1
 pipe_length = 6
 pipe_thickness = 0.5
 
@@ -480,9 +498,12 @@ obstacle = Obstacle(obstacle_x, obstacle_y)
 # obstacle_x, obstacle_y = obstacle.get_overall_obstacle(gap, 'gap')
 # obstacle = Obstacle(obstacle_x, obstacle_y)
 
-mpc = ModelPredictiveControl(n_agents, l_agent, obstacle)
-theta_solution = mpc.inverse_kinematics_with_constraints((3, 1))
-print(theta_solution)
+l_agent = 2
+m_agent = 5
+n_agents = 3    # number of agents
+
+mpc = ModelPredictiveControl(n_agents, l_agent, m_agent, obstacle)
+theta_solution = mpc.inverse_kinematics_with_constraints((4, 2))
 print(mpc.model_config.endpoints)
 mpc.model_config.visualize_agent_configuration(obstacle)
 
