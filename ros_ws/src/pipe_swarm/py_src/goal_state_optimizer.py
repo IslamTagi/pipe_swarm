@@ -10,7 +10,7 @@ class GoalStateNode(Node):
         self.get_logger().info("Goal State Solver Active")
         self.string_publisher = self.create_publisher(Float64MultiArray , "/modular_goal_state", 20)
 
-    def sendGoalState(self, message):
+    def send_goal_state(self, message):
         goal_state_msg = Float64MultiArray ()
         goal_state_msg.data = [float(x) for x in message]
         self.string_publisher.publish(goal_state_msg)
@@ -58,14 +58,17 @@ def main(args=None):
     node = GoalStateNode()
     
     mpc = ModelPredictiveControl(n_agents, l_agent, m_agent, obstacle)
-    theta_solution = mpc.inverse_kinematics_with_constraints((30, 10))
+    
+    theta_solution = mpc.inverse_kinematics_with_constraints((20, 20))
     node.get_logger().info(f'Goal Endpoints: {mpc.model_config.endpoints}')
     if theta_solution is not None:
-        node.sendGoalState(theta_solution)
+        ros_solution = mpc.model_config.reformat_solution(theta_solution)
+        node.send_goal_state(ros_solution)
+        mpc.model_config.visualize_agent_configuration(obstacle)
     else:
         node.get_logger().warn("Failed to find goal state")
-
-    mpc.model_config.visualize_agent_configuration(obstacle)
+        mpc.model_config.visualize_agent_configuration(obstacle)
+    
     rclpy.shutdown()
 
 if __name__ == '__main__':

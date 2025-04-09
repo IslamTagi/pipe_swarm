@@ -7,7 +7,7 @@
 #include <geometry_msgs/msg/pose.hpp>
 #include <moveit_visual_tools/moveit_visual_tools.h>
 #include <geometry_msgs/msg/twist.hpp>
-
+#include "std_msgs/msg/float64_multi_array.hpp"
 
 void splitExecuteTrajectory(std::shared_ptr<rclcpp::Node> move_group_node,
                             // rclcpp::Logger logger,
@@ -49,7 +49,7 @@ void splitExecuteTrajectory(std::shared_ptr<rclcpp::Node> move_group_node,
 }
 
 void transformPrismaticCmd(std::shared_ptr<rclcpp::Node> move_group_node,
-                          rclcpp::Logger logger,
+                        //   rclcpp::Logger logger,
                           moveit::planning_interface::MoveGroupInterface::Plan plan)
 {
   // Create a publisher for cmd_vel
@@ -67,8 +67,8 @@ void transformPrismaticCmd(std::shared_ptr<rclcpp::Node> move_group_node,
   for (size_t i = 0; i <= plan.trajectory_.joint_trajectory.points.size(); i=i+10)
   {
     const auto& point = plan.trajectory_.joint_trajectory.points[i];
-    RCLCPP_INFO(logger, "Point %zu: time_from_start.sec = %d, nanosec = %u", 
-      i, point.time_from_start.sec, point.time_from_start.nanosec);
+    // RCLCPP_INFO(logger, "Point %zu: time_from_start.sec = %d, nanosec = %u", 
+    //   i, point.time_from_start.sec, point.time_from_start.nanosec);
 
 
     double current_position = point.positions[0]; // assuming index 0 is the prismatic joint
@@ -83,7 +83,7 @@ void transformPrismaticCmd(std::shared_ptr<rclcpp::Node> move_group_node,
     double dt = (current_time - prev_time).seconds();
     if (dt <= 0)
     {
-      RCLCPP_WARN(logger, "Delta time is non-positive at point %zu, skipping", i);
+    //   RCLCPP_WARN(logger, "Delta time is non-positive at point %zu, skipping", i);
       continue;
     }
 
@@ -113,103 +113,156 @@ void transformPrismaticCmd(std::shared_ptr<rclcpp::Node> move_group_node,
   cmd_vel_pub->publish(stop_msg);
 }
 
+class ModularRobotMover : public rclcpp::Node
+{
+    public:
+
+        typedef rclcpp::Subscription<std_msgs::msg::Float64MultiArray>::SharedPtr Float64Subscriber;
+
+        // moveit2 parameters
+        std::string PLANNING_GROUP = "mobile_chain";
+
+        ModularRobotMover() : Node(
+            "modular_robot_mover",
+            rclcpp::NodeOptions()
+                .automatically_declare_parameters_from_overrides(true)
+                .parameter_overrides({{"use_sim_time", rclcpp::ParameterValue(true)}})
+        )
+        {
+            // construct
+            RCLCPP_INFO(this->get_logger(), "Modular Robot Mover Active");
+            _goal_state_subscriber = create_subscription<std_msgs::msg::Float64MultiArray>(
+                                    "/modular_goal_state",
+                                    20,
+                                    std::bind(&ModularRobotMover::_moveToGoalState, this, std::placeholders::_1));
+            
+        }
+
+        void initialise(void)
+        {
+            _initialiseMoveGroupInterface(); // updating to current joint positions as target joint position
+            std::vector<geometry_msgs::msg::Pose> pipe_positions(1);
+
+            pipe_positions[0].orientation.w = 1.0;
+            pipe_positions[0].position.x = 0.17;
+            pipe_positions[0].position.y = 0.0;
+            pipe_positions[0].position.z = 0.2;
+            // _definePlanningSceneInterface("agent_n_base_link", pipe_positions);
+
+        }
+
+        bool startPlan(void)
+        {
+            _move_group_interface_ptr->setPlanningTime(10.0);  // Set 10-second timeout
+            moveit::core::MoveItErrorCode plan_state = _move_group_interface_ptr->plan(_plan);
+            RCLCPP_INFO(this->get_logger(), "Motion Planning Request: %s", moveit::core::error_code_to_string(plan_state).c_str());
+            bool success = (plan_state == moveit::core::MoveItErrorCode::SUCCESS);
+            return success;
+        }
+
+        bool executePlan()
+        {
+            // splitExecuteTrajectory(this, /*logger,*/ _plan);
+            // transformPrismaticCmd(this, /*logger*/, _plan);
+            moveit::core::MoveItErrorCode execute_state = _move_group_interface_ptr->execute(_plan);
+            RCLCPP_INFO(this->get_logger(), "Execution Request: %s", moveit::core::error_code_to_string(execute_state).c_str());
+            bool success = (execute_state == moveit::core::MoveItErrorCode::SUCCESS);
+            return success;
+        }
+
+        void setJointPosition(std::vector<double> positions)
+        {
+            for(uint8_t i=0; i<=_target_joint_positions.size(); i++)
+            {
+                _target_joint_positions[i] = positions[i];
+            }
+            _move_group_interface_ptr->setJointValueTarget(_target_joint_positions);
+        }
+
+    private:
+
+        Float64Subscriber _goal_state_subscriber;
+
+        // moveit2 parameters
+        moveit::core::RobotStatePtr _current_state_ptr;
+        std::shared_ptr<moveit::planning_interface::MoveGroupInterface> _move_group_interface_ptr;
+        const moveit::core::JointModelGroup* _joint_model_group_ptr;
+        std::vector<double> _target_joint_positions;
+
+        // planning scene
+        moveit::planning_interface::PlanningSceneInterface _planning_scene_interface;
+        moveit_msgs::msg::CollisionObject _collision_object;
+        moveit::planning_interface::MoveGroupInterface::Plan _plan;
+
+        void _moveToGoalState(const std_msgs::msg::Float64MultiArray::SharedPtr goal_state)
+        {
+            std::vector<double> new_pos;
+            for (size_t i = 0; i <= goal_state->data.size(); i++) {
+                new_pos.push_back(goal_state->data[i]);
+                RCLCPP_INFO(this->get_logger(), "%f", goal_state->data[i]);
+            }
+            setJointPosition(new_pos);
+            if(true == startPlan())
+            {
+                executePlan();
+            }
+        }
+
+        void _initialiseMoveGroupInterface(void)
+        {
+            _move_group_interface_ptr = std::make_shared<moveit::planning_interface::MoveGroupInterface>(
+                shared_from_this(), PLANNING_GROUP);
+            _current_state_ptr = _move_group_interface_ptr->getCurrentState(10);
+            _joint_model_group_ptr = _move_group_interface_ptr->getCurrentState()->getJointModelGroup(PLANNING_GROUP);
+            _current_state_ptr->copyJointGroupPositions(_joint_model_group_ptr, _target_joint_positions);
+            _move_group_interface_ptr->setJointValueTarget(_target_joint_positions);
+            _move_group_interface_ptr->setMaxVelocityScalingFactor(0.05);
+            _move_group_interface_ptr->setMaxAccelerationScalingFactor(0.05);
+        }
+
+        void _definePlanningSceneInterface(std::string frame_id, std::vector<geometry_msgs::msg::Pose> pipe_poses)
+        {
+            _collision_object.header.frame_id = frame_id;  // Use your planning frame
+            _collision_object.id = "pipe_block";
+
+            // Define the box shape
+            shape_msgs::msg::SolidPrimitive pipe_shape;
+            pipe_shape.type = pipe_shape.BOX;
+            pipe_shape.dimensions = {0.1, 0.2, 0.2};  // size in meters (x, y, z)
+
+            // Define the box pose
+
+            // Attach shape and pose to the object
+            for (const auto& pose : pipe_poses)
+            {
+                _collision_object.primitives.push_back(pipe_shape);
+                _collision_object.primitive_poses.push_back(pose);
+                _collision_object.operation = _collision_object.ADD;
+            }
+
+            // Apply the collision object
+            _planning_scene_interface.applyCollisionObjects({_collision_object});
+        }
+};
+
 int main(int argc, char * argv[])
 {
-  // Initialize ROS and create the Node
-  rclcpp::init(argc, argv);
-  auto const move_group_node = std::make_shared<rclcpp::Node>(
-    "modular_robot_moveit",
-    rclcpp::NodeOptions()
-      .automatically_declare_parameters_from_overrides(true)
-      .parameter_overrides({{"use_sim_time", rclcpp::ParameterValue(true)}})
-  );
-
-  static const std::string PLANNING_GROUP = "mobile_chain";
-  // Create a ROS logger
-  auto const logger = rclcpp::get_logger("modular_robot_moveit");
-
-  rclcpp::executors::SingleThreadedExecutor executor;
-  executor.add_node(move_group_node);
-  std::thread([&executor]() { executor.spin(); }).detach();
-
-  // create moveit interface to allow access to moveit functionality
-  using moveit::planning_interface::MoveGroupInterface;
-  auto move_group_interface = MoveGroupInterface(move_group_node, PLANNING_GROUP);
-  moveit::core::RobotStatePtr current_state = move_group_interface.getCurrentState(10);
-  
-  // fetch joint states and modify them then update planning state
-  const moveit::core::JointModelGroup* joint_model_group =
-      move_group_interface.getCurrentState()->getJointModelGroup(PLANNING_GROUP);
-  std::vector<double> target_joint_group_positions;
-  current_state->copyJointGroupPositions(joint_model_group, target_joint_group_positions);
-  target_joint_group_positions[0] = 0.09;  // m
-  target_joint_group_positions[1] = -0.78;  // radians
-  target_joint_group_positions[2] = -0.78;  // radians
-  move_group_interface.setJointValueTarget(target_joint_group_positions);
-
-  // We lower the allowed maximum velocity and acceleration to 5% of their maximum.
-  // The default values are 10% (0.1).
-  // Set your preferred defaults in the joint_limits.yaml file of your robot's moveit_config
-  // or set explicit factors in your code if you need your robot to move faster.
-  move_group_interface.setMaxVelocityScalingFactor(0.05);
-  move_group_interface.setMaxAccelerationScalingFactor(0.05);
-
-  moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
-  moveit_msgs::msg::CollisionObject collision_object;
-  collision_object.header.frame_id = "agent_n_base_link";  // Use your planning frame
-  collision_object.id = "obstacle_box";
-
-  // Define the box shape
-  shape_msgs::msg::SolidPrimitive box;
-  box.type = box.BOX;
-  box.dimensions = {0.1, 0.2, 0.2};  // size in meters (x, y, z)
-
-  // Define the box pose
-  geometry_msgs::msg::Pose box_pose;
-  box_pose.orientation.w = 1.0;
-  box_pose.position.x = 0.17;
-  box_pose.position.y = 0.0;
-  box_pose.position.z = 0.2;
-
-  // Attach shape and pose to the object
-  collision_object.primitives.push_back(box);
-  collision_object.primitive_poses.push_back(box_pose);
-  collision_object.operation = collision_object.ADD;
-
-  // Apply the collision object
-  planning_scene_interface.applyCollisionObjects({collision_object});
-
-  // start path planning
-  moveit::planning_interface::MoveGroupInterface::Plan my_plan;
-  move_group_interface.setPlanningTime(10.0);  // Set 10-second timeout
-  moveit::core::MoveItErrorCode plan_state = move_group_interface.plan(my_plan);
-  bool success = (plan_state == moveit::core::MoveItErrorCode::SUCCESS);
-  RCLCPP_INFO(logger, "Motion Planning Request: %s", moveit::core::error_code_to_string(plan_state).c_str());
-  if (true == success)
-  {
-    splitExecuteTrajectory(move_group_node, /*logger,*/ my_plan);
-    transformPrismaticCmd(move_group_node, logger, my_plan);
-    moveit::core::MoveItErrorCode exec_status = move_group_interface.execute(my_plan);
-    RCLCPP_INFO(logger, "Execution Request: %s", moveit::core::error_code_to_string(exec_status).c_str());
-  }
+    // Initialize ROS and create the Node
+    rclcpp::init(argc, argv);
+    auto mover_node = std::make_shared<ModularRobotMover>();
+    mover_node->initialise();
+    rclcpp::spin(mover_node);
   
   // RCLCPP_INFO(logger, "Visualizing plan 2 (joint space goal)");
   
   // visualize the plan in RViz:
+  /*
   namespace rvt = rviz_visual_tools;
-  moveit_visual_tools::MoveItVisualTools visual_tools(move_group_node, "agent_n_base_link", "visualization_marker_array",
+  moveit_visual_tools::MoveItVisualTools visual_tools(mover_node, "agent_n_base_link", "visualization_marker_array",
                                                       move_group_interface.getRobotModel());
-
-  visual_tools.deleteAllMarkers();
-
-  /* Remote control is an introspection tool that allows users to step through a high level script */
-  /* via buttons and keyboard shortcuts in RViz */
-  // visual_tools.loadRemoteControl();
-  // visual_tools.publishTrajectoryLine(my_plan.trajectory_, joint_model_group);
-
-  visual_tools.trigger();
-  // visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to continue the demo");
-  
+    visual_tools.deleteAllMarkers();
+    visual_tools.trigger();
+*/
   // Shutdown ROS
   rclcpp::shutdown();
   return 0;
