@@ -304,8 +304,8 @@ class ModularConfiguration():
 
         # Formatting
         plt.title("Snake Robot Configuration (Centered Links)", fontsize=14)
-        plt.xlabel("Horizontal Position (m)", fontsize=12)
-        plt.ylabel("Vertical Position (m)", fontsize=12)
+        plt.xlabel("Horizontal Position (cm)", fontsize=12)
+        plt.ylabel("Vertical Position (cm)", fontsize=12)
         plt.axis('equal')
         plt.grid(True)
         plt.legend()
@@ -395,9 +395,7 @@ class ModelPredictiveControl():
 
         if not any(grounded_boolean):
             # No grounded robots at all
-            print("No grounded robots found — constraint fail.")
             return -1.0  # Violates constraint
-
 
         last_grounded_index = max(idx for idx, grounded in enumerate(grounded_boolean) if grounded)
         total_torque = 0.0
@@ -409,12 +407,9 @@ class ModelPredictiveControl():
         for link in range(last_grounded_index, len(grounded_boolean)):
             # Centre of mass of the link
             com_x = self.model_config.x[link]
-            distance = abs(com_x - pivot_x) / 10 # mm -> cm
+            distance = abs(com_x - pivot_x)
             torque = link_mass * gravity * (distance/10)
             total_torque += torque
-
-
-        print(f"Total torque on last grounded link: {total_torque}")
 
         return 11 - total_torque  # total torque <= 11kg/cm
     
@@ -499,14 +494,14 @@ class Pipe():
     def get_obstacle(self):
         return self.obstacle
 
-pipe_radius = 1
-pipe_length = 6
-pipe_thickness = 0.5
+pipe_radius = 15
+pipe_length = 60
+pipe_thickness = 5
 
-pipe = Pipe(pipe_length, pipe_radius, pipe_thickness, [-4,0])
+pipe = Pipe(pipe_length, pipe_radius, pipe_thickness, [-40,0])
 obstacle = pipe.get_obstacle()
 
-step_pipe = Pipe(pipe_length, pipe_radius, pipe_thickness, [2,0.25])
+step_pipe = Pipe(pipe_length, pipe_radius, pipe_thickness, [20,2.5])
 step_pipe_obstacle = step_pipe.get_obstacle()
 
 obstacle_x, obstacle_y = obstacle.get_overall_obstacle(step_pipe_obstacle)
@@ -527,12 +522,12 @@ obstacle = Obstacle(obstacle_x, obstacle_y)
 # obstacle_x, obstacle_y = obstacle.get_overall_obstacle(gap, 'gap')
 # obstacle = Obstacle(obstacle_x, obstacle_y)
 
-l_agent = 2 # 
+l_agent = 15 #cm
 m_agent = 0.175 # kg
 n_agents = 3    # number of agents
 
 mpc = ModelPredictiveControl(n_agents, l_agent, m_agent, obstacle)
-theta_solution = mpc.inverse_kinematics_with_constraints((4, 2))
+theta_solution = mpc.inverse_kinematics_with_constraints((30, 10))
 print(mpc.model_config.endpoints)
 mpc.model_config.visualize_agent_configuration(obstacle)
 
