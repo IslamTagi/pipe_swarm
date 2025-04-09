@@ -313,7 +313,7 @@ class ModularConfiguration():
 
     def reformat_solution(self, sigma_np):
         formatted = []
-        formatted.append(sigma_np[0] / 1000.0) # mm -> m
+        formatted.append(sigma_np[0] / 100.0) # mm -> m
         for angle_deg in sigma_np[2:]:
             angle_rad = -np.deg2rad(angle_deg)
             formatted.append(angle_rad)

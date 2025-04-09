@@ -135,19 +135,16 @@ class ModularRobotMover : public rclcpp::Node
                                     "/modular_goal_state",
                                     20,
                                     std::bind(&ModularRobotMover::_moveToGoalState, this, std::placeholders::_1));
+            _obstacle_position_subscriber = create_subscription<std_msgs::msg::Float64MultiArray>(
+                                            "/define_pipe_positions",
+                                            20,
+                                            std::bind(&ModularRobotMover::_drawPipeShapes, this, std::placeholders::_1));
             
         }
 
         void initialise(void)
         {
             _initialiseMoveGroupInterface(); // updating to current joint positions as target joint position
-            std::vector<geometry_msgs::msg::Pose> pipe_positions(1);
-
-            pipe_positions[0].orientation.w = 1.0;
-            pipe_positions[0].position.x = 0.17;
-            pipe_positions[0].position.y = 0.0;
-            pipe_positions[0].position.z = 0.2;
-            // _definePlanningSceneInterface("agent_n_base_link", pipe_positions);
 
         }
 
@@ -182,6 +179,7 @@ class ModularRobotMover : public rclcpp::Node
     private:
 
         Float64Subscriber _goal_state_subscriber;
+        Float64Subscriber _obstacle_position_subscriber;
 
         // moveit2 parameters
         moveit::core::RobotStatePtr _current_state_ptr;
@@ -207,6 +205,46 @@ class ModularRobotMover : public rclcpp::Node
                 executePlan();
             }
         }
+        
+        void _drawPipeShapes(const std_msgs::msg::Float64MultiArray::SharedPtr pipe_array)
+        {
+            double length       = pipe_array->data[0] / 100;
+            double radius       = pipe_array->data[1] / 100;
+            double thickness    = pipe_array->data[2] / 100;
+            double x1           = pipe_array->data[3] / 100;
+            double y1           = pipe_array->data[4] / 100;
+            double x2           = pipe_array->data[5] / 100;
+            double y2           = pipe_array->data[6] / 100;
+
+            std::vector<geometry_msgs::msg::Pose> pipe_positions(4);
+            double robot_height = 0.062 + 0.015 + 0.02; // base_h + wheel_r + offset
+
+            // pipe 1 bottom
+            pipe_positions[0].orientation.w = 1.0;
+            pipe_positions[0].position.x = (length / 2.0);
+            pipe_positions[0].position.y = 0.0;
+            pipe_positions[0].position.z = (y1 - thickness / 2.0) - robot_height/2;
+            
+            // pipe 1 top
+            pipe_positions[1].orientation.w = 1.0;
+            pipe_positions[1].position.x = (length / 2.0);
+            pipe_positions[1].position.y = 0.0;
+            pipe_positions[1].position.z = (y1 - thickness / 2.0) + radius*2 - robot_height/2;
+
+            // pipe 2 bottom
+            pipe_positions[2].orientation.w = 1.0;
+            pipe_positions[2].position.x = (x2 - x1 + length / 2.0);
+            pipe_positions[2].position.y = 0.0;
+            pipe_positions[2].position.z = (y2 - thickness / 2.0) - robot_height/2;
+            
+            // pipe 2 top
+            pipe_positions[3].orientation.w = 1.0;
+            pipe_positions[3].position.x = (x2 - x1 + length / 2.0);
+            pipe_positions[3].position.y = 0.0;
+            pipe_positions[3].position.z = (y2 - thickness / 2.0) + radius*2 - robot_height/2;
+            _definePlanningSceneInterface("agent_n_base_link", pipe_positions, length, thickness);
+
+        }
 
         void _initialiseMoveGroupInterface(void)
         {
@@ -220,7 +258,8 @@ class ModularRobotMover : public rclcpp::Node
             _move_group_interface_ptr->setMaxAccelerationScalingFactor(0.05);
         }
 
-        void _definePlanningSceneInterface(std::string frame_id, std::vector<geometry_msgs::msg::Pose> pipe_poses)
+        void _definePlanningSceneInterface(std::string frame_id, std::vector<geometry_msgs::msg::Pose> pipe_poses, 
+                                            double length, double thickness)
         {
             _collision_object.header.frame_id = frame_id;  // Use your planning frame
             _collision_object.id = "pipe_block";
@@ -228,7 +267,7 @@ class ModularRobotMover : public rclcpp::Node
             // Define the box shape
             shape_msgs::msg::SolidPrimitive pipe_shape;
             pipe_shape.type = pipe_shape.BOX;
-            pipe_shape.dimensions = {0.1, 0.2, 0.2};  // size in meters (x, y, z)
+            pipe_shape.dimensions = {length, 0.2, thickness};  // size in meters (x, y, z)
 
             // Define the box pose
 
