@@ -414,7 +414,7 @@ class ModelPredictiveControl():
         return 11 - total_torque  # total torque <= 11kg/cm
     
     def inverse_kinematics_with_constraints(self, pos_desired,
-                                        max_iter=750, tolerance=2e-6):
+                                        max_iter=250, tolerance=2e-6):
         
         # objective function
         self.pos_desired = pos_desired
@@ -491,3 +491,4 @@ class Pipe():
     
     def get_obstacle(self):
         return self.obstacle
+

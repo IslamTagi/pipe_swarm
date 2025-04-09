@@ -45,18 +45,15 @@ install(
 ament_python_install_package(${PROJECT_NAME})
 
 #install python nodes
+file(GLOB PY_SCRIPTS "py_src/*.py")
+
+foreach(py_script ${PY_SCRIPTS})
+  execute_process(COMMAND chmod +x ${py_script})
+endforeach()
+
 install(
   PROGRAMS
-    py_src/python_talker.py
-    py_src/link_service.py
-    py_src/centre_robot.py
-    py_src/move_robot.py
-    py_src/move_using_lidar.py
-    py_src/move_robot_with_imu.py
-    py_src/joint_control.py
-    py_src/alignment_topic.py
-    py_src/connect_robots.py
-    py_src/obstacle_detection.py
+    ${PY_SCRIPTS}
   DESTINATION lib/${PROJECT_NAME}/  
 )
 
