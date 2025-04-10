@@ -85,6 +85,60 @@ def get_intersection_points(robot_links:LineString, obstacle_polygon:ShapelyPoly
             intersection_points[1].extend(y_intersection)
 
     return intersection_points, touching_points
+
+def get_polygon_intersection_points(agent_polygons, obstacle_polygon, tolerance=2e-4):
+    intersection_points = [[], []]
+    touching_points = [[], []]
+
+    # Buffer the obstacle
+    upscaled_obstacle = obstacle_polygon.buffer(tolerance, cap_style="flat")
+    downscaled_obstacle = obstacle_polygon.buffer(-tolerance, cap_style="flat")
+
+    # Also buffer the agent polygons!
+    buffered_agent_polygons = [poly.buffer(tolerance, cap_style="flat") for poly in agent_polygons]
+    shrunk_agent_polygons = [poly.buffer(-tolerance, cap_style="flat") for poly in agent_polygons]
+
+    def extract_coords(geom):
+        if geom.is_empty:
+            return [], []
+        if geom.geom_type == "Point":
+            return [geom.x], [geom.y]
+        elif geom.geom_type in ("MultiPoint", "MultiLineString", "LineString"):
+            coords = []
+            for g in geom.geoms if hasattr(geom, "geoms") else [geom]:
+                x, y = g.xy
+                coords.extend(zip(x, y))
+            if coords:
+                xs, ys = zip(*coords)
+                return list(xs), list(ys)
+        elif geom.geom_type == "Polygon":
+            x, y = geom.exterior.xy
+            return list(x), list(y)
+        return [], []
+
+    for agent_poly, buffered_agent, shrunk_agent in zip(agent_polygons, buffered_agent_polygons, shrunk_agent_polygons):
+        # Check actual intersections (hard collision)
+        intersection = agent_poly.intersection(obstacle_polygon)
+        x_touch, y_touch = extract_coords(intersection)
+        intersection_points[0].extend(x_touch)
+        intersection_points[1].extend(y_touch)
+
+        # Check near contacts (soft contacts using buffered agent polygons)
+        near_contact = buffered_agent.intersection(obstacle_polygon)
+        up_x, up_y = extract_coords(near_contact)
+        touching_points[0].extend(up_x)
+        touching_points[1].extend(up_y)
+
+        # Optional: if you want inner buffer too
+        inner_contact = shrunk_agent.intersection(obstacle_polygon)
+        down_x, down_y = extract_coords(inner_contact)
+        touching_points[0].extend(down_x)
+        touching_points[1].extend(down_y)
+
+    return intersection_points, touching_points
+
+
+
 class Obstacle():
 
     def __init__(self, x_coordinates, y_coordinates, obstacle_type='solid'):
@@ -216,7 +270,7 @@ class ModularConfiguration():
 
         # global reference frame
         y_offset = thickness_agent/2 + agent_pivot_offset
-        self.global_coordinates = (0, y_offset)
+        self.global_coordinates = (0, y_offset+1e-6)
         self.theta_global = 0
 
         # modular robot parameters
@@ -275,6 +329,54 @@ class ModularConfiguration():
         
         return links
     
+    def get_agent_polygons(self):
+        agent_polygons = []
+        for i in range(self.n_agents):
+            # Start and end points of the link
+            x_start = self.endpoints[0][i]
+            y_start = self.endpoints[1][i]
+            x_end = self.endpoints[0][i + 1]
+            y_end = self.endpoints[1][i + 1]
+
+            # Vector of the link
+            dx = x_end - x_start
+            dy = y_end - y_start
+
+            # Length and angle
+            length = np.sqrt(dx**2 + dy**2)
+            angle = np.arctan2(dy, dx)
+
+            # Define corners of the rectangle relative to (0, 0)
+            half_thickness = self.thickness_agent / 2
+            corners = np.array([
+                [0,         -half_thickness-self.agent_pivot_offset],
+                [length,    -half_thickness-self.agent_pivot_offset],
+                [length,    half_thickness-self.agent_pivot_offset],
+                [0,         half_thickness-self.agent_pivot_offset]
+            ])
+
+            # Rotate and translate corners
+            rotation = np.array([
+                [np.cos(angle), -np.sin(angle)],
+                [np.sin(angle),  np.cos(angle)]
+            ])
+
+            transformed_corners = corners @ rotation.T + np.array([x_start, y_start])
+
+            # Create polygon
+            agent_polygons.append(ShapelyPolygon(transformed_corners))
+
+        return agent_polygons
+    
+    def get_collision_polygons(self, obstacle_polygon):
+        agent_polygons = self.get_agent_polygons()
+        collisions = []
+
+        for poly in agent_polygons:
+            if poly.intersects(obstacle_polygon):
+                collisions.append(poly)
+
+        return collisions
     
     def draw_agent_boxes(self, ax, x_list, y_list, angles_deg):
         # self.draw_agent_boxes(ax, self.x[1:], self.y[1:], self.sigma[1:], self.l_agent, self.l_agent / 4.0)
@@ -303,8 +405,7 @@ class ModularConfiguration():
         # ignore global theta coordinate
         self.get_coordinate_representation(self.sigma[1:], self.x_pos)
         
-        intersection_points, touching_points = get_intersection_points(self.get_line_shape(), 
-                                                      obstacle.get_shapley_polygon())
+        intersection_points, touching_points = get_polygon_intersection_points(self.get_agent_polygons(), obstacle.get_shapley_polygon())
 
         plt.figure(figsize=(8, 6))
         
@@ -380,8 +481,10 @@ class ModelPredictiveControl():
 
     def get_grounded_robots(self, sigma0):
         self.model_config.get_coordinate_representation(sigma0[1:], sigma0[0])
-        intersection_points_, touching_points = get_intersection_points(self.model_config.get_line_shape(), 
-                                                      self.obstacle.get_shapley_polygon())
+
+        intersection_points_, touching_points = get_polygon_intersection_points(
+                                                self.model_config.get_agent_polygons(), 
+                                                obstacle.get_shapley_polygon())
 
         if len(touching_points[0]) == 0:
             # No touches at all, return zeros per link
@@ -398,7 +501,6 @@ class ModelPredictiveControl():
 
         # Count touches per link
         grounded_touch = mask.sum(axis=1)
-        # print(grounded_touch)
         return grounded_touch
 
     def objective(self, sigma0):
@@ -413,8 +515,11 @@ class ModelPredictiveControl():
     # Constraints
     def obstalce_collision_constraint(self, sigma0):
         self.model_config.get_coordinate_representation(sigma0[1:], sigma0[0])
-        intersection_points, touching_points_ = get_intersection_points(self.model_config.get_line_shape(), 
-                                                      self.obstacle.get_shapley_polygon())
+
+        intersection_points, touching_points_ = get_polygon_intersection_points(
+                                                self.model_config.get_agent_polygons(), 
+                                                obstacle.get_shapley_polygon())
+        
         return -len(intersection_points[0]) # if any intersection points
     
     def grounded_angle_constraint(self, sigma0):
@@ -422,8 +527,6 @@ class ModelPredictiveControl():
     
     def grounded_contact_constraint(self, sigma0):
         self.model_config.get_coordinate_representation(sigma0[1:], sigma0[0])
-        intersection_points_, touching_points = get_intersection_points(self.model_config.get_line_shape(), 
-                                                      self.obstacle.get_shapley_polygon())
         link_grounded = self.get_grounded_robots(sigma0)
         return link_grounded[0] - 2 # first link needs to be grounded (from both ends)
     
