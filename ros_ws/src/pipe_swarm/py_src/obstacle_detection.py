@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 import rclpy
+import math
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
-from sensor_msgs.msg import LaserScan
+import rclpy.time
+from sensor_msgs.msg import Range
+import time
+# from sensor_msgs.msg import LaserScan
 import numpy as np
 
 class MyNode(Node):
@@ -13,24 +17,47 @@ class MyNode(Node):
         self.previous_x = 0.0
         self.last_cmd = None
         self.initialized = False
+        self.initial_time = 0.0
         self.obstacle_detected = False
-        self.initial_scans = []
-        self.initial_scan = None
-        self.outlierBufferTop = []
-        self.outlierBufferBottom = []
+        self.obstacle_identified = False
+        self.initial_scan_heights = []
+        self.initial_scan_height = None
+        self.previous_height = None
+        self.initial_scan_horizontal_distances = []
+        self.initial_scan_horizontal_distance = None
+        self.outlierBuffer = []
+        self.height_check = None
+        self.x_coordinate = None
+        self.y_coordinate = None
         self.difference_threshold = 0.1  # 10% difference threshold
+        self.obstacle_difference_threshold = 0.0001
 
         self.cmd_vel_publisher_ = self.create_publisher(Twist, "/agent_0/cmd_vel", 10)
         self.odometry_subscriber_ = self.create_subscription(Odometry, "/agent_0/odom", self.odometry_callback, 10)
-        self.lidar_subscriber_ = self.create_subscription(LaserScan, "/agent_0/laserscan", self.lidar_callback, 10)
+        self.lidar_subscriber_ = self.create_subscription(Range, "/agent_0/infrared_range", self.lidar_callback, 10)
         
         self.get_logger().info("Robot controller with LiDAR obstacle detection started")
 
-    def send_velocity_command(self, linear_x, angular_z):
+    def send_velocity_command(self, linear_x, angular_z, range=None):
         cmd = Twist()
         if self.obstacle_detected:
-            cmd.linear.x = 0.0  # Stop when obstacle is detected
-            self.get_logger().info("Obstacle detected! Stopping robot.")
+            if self.x_coordinate == None:
+                current_time = time.time()
+                cmd.linear.x = 0.0
+                self.cmd_vel_publisher_.publish(cmd)
+                self.get_logger().info("Obstacle detected! Stopping robot.")
+                time_taken = current_time - self.initial_time
+                distance = 0.2 * time_taken
+                self.x_coordinate = distance + self.outlierBuffer[3]
+            else:
+                cmd.linear.x = 0.02
+                self.get_logger().info(f"x_coordinate = {self.x_coordinate}")
+                if self.height_check is not None:
+                    self.y_coordinate = self.initial_scan_height - self.height_check
+                    self.get_logger().info(str(self.y_coordinate))
+            if (self.x_coordinate != None) and (self.y_coordinate != None):
+                cmd.linear.x = 0.0
+                self.get_logger().info(str(self.x_coordinate) + ", " + str(self.y_coordinate))
         else:
             cmd.linear.x = linear_x
             cmd.angular.z = angular_z
@@ -43,47 +70,56 @@ class MyNode(Node):
     def odometry_callback(self, msg: Odometry):
         position = msg.pose.pose.position
         x = position.x
-        self.get_logger().info(f'Position -> x: {x:.2f}')
+        # self.get_logger().info(f'Position -> x: {x:.2f}')
 
         if not self.initialized:
             self.initialized = True
-            self.send_velocity_command(0.5, 0.0)
-            self.get_logger().info("Initialized: Moving forward")
+            # self.send_velocity_command(0.2, 0.0)
+            self.get_logger().info("Initialized")
             return
 
-    def lidar_callback(self, msg: LaserScan):
-        if len(self.initial_scans) <= 4:
-            self.initial_scans.append(msg.ranges)
-            if len(self.initial_scans) == 5:
-                totalTop = 0
-                totalBottom = 0
-                for temp in self.initial_scans:
-                    totalTop = totalTop + temp[0]
-                    totalBottom = totalBottom + temp[2]
-                averageTop = totalTop / 5
-                averageBottom = totalBottom / 5
-                self.initial_scan = [averageTop, averageBottom]
-                self.send_velocity_command(0.5, 0.0)  # Start moving immediately
+    def lidar_callback(self, msg: Range):
+        height_measurement = math.sin((math.pi)/12) * msg.range
+        horizontal_distance_measurement = math.cos((math.pi)/12) * msg.range
+
+        if len(self.initial_scan_heights) <= 4:
+            self.initial_scan_heights.append(height_measurement)
+            if len(self.initial_scan_heights) == 5:
+                total = 0
+                for temp in self.initial_scan_heights:
+                    total = total + temp
+                average = total / 5
+                self.initial_scan_height = average
+                self.initial_time = time.time()
+                self.send_velocity_command(0.2, 0.0)  # Start moving immediately
+                self.get_logger().info("Initial LiDAR scan stored.")
+            return
+        if len(self.initial_scan_horizontal_distances) <= 4:
+            self.initial_scan_horizontal_distances.append(horizontal_distance_measurement)
+            if len(self.initial_scan_horizontal_distances) == 5:
+                total = 0
+                for temp in self.initial_scan_horizontal_distances:
+                    total = total + temp
+                average = total / 5
+                self.initial_scan_horizontal_distance = average
+                self.send_velocity_command(0.2, 0.0)  # Start moving immediately
                 self.get_logger().info("Initial LiDAR scan stored.")
             return
 
+
         # robot_ranges = []
         # for i in range(len(msg.ranges)):
-        #     if msg.ranges[i] > 0 and self.initial_scan[i] > 0:
-        #         difference = abs(msg.ranges[i] - self.initial_scan[i]) / self.initial_scan[i]
+        #     if msg.ranges[i] > 0 and self.initial_scan_height[i] > 0:
+        #         difference = abs(msg.ranges[i] - self.initial_scan_height[i]) / self.initial_scan_height[i]
         #         if difference > self.difference_threshold:
         #             robot_ranges.append(msg.ranges[i])
         
-        differenceTop = abs(msg.ranges[0] - self.initial_scan[0]) / self.initial_scan[0]
-        differenceBottom = abs(msg.ranges[2] - self.initial_scan[1]) / self.initial_scan[1]
-        if differenceTop > self.difference_threshold:
-            self.outlierBufferTop.append(differenceTop)
-        if differenceBottom > self.difference_threshold:
-            self.outlierBufferBottom.append(differenceBottom)
-        
-        if len(self.outlierBufferTop) > 3 or len(self.outlierBufferBottom) > 3:
-            self.obstacle_detected = True 
-        
+        difference = abs(height_measurement - self.initial_scan_height) / self.initial_scan_height
+        if (difference > self.difference_threshold) and len(self.outlierBuffer) < 4:
+            self.outlierBuffer.append(horizontal_distance_measurement)
+        elif len(self.outlierBuffer) > 1 and self.obstacle_detected != True:
+            for anomolies in range(len(self.outlierBuffer)):
+                self.outlierBuffer.pop()
         # if robot_ranges:
         #     robot_distance = np.mean(robot_ranges)
         #     self.obstacle_detected = True
@@ -91,12 +127,18 @@ class MyNode(Node):
         # else:
         #     self.obstacle_detected = False
 
-        if len(self.outlierBufferTop) > 3 or len(self.outlierBufferBottom) > 3:
+        if len(self.outlierBuffer) > 3:
             self.obstacle_detected = True
             self.get_logger().info(f'Obstacle detected, stopping.')
+            obstacle_difference = abs(height_measurement - self.previous_height) / self.previous_height
+            self.get_logger().info(str(obstacle_difference))
+            if obstacle_difference < self.obstacle_difference_threshold:
+                self.get_logger().info(str(height_measurement))
+                self.height_check = height_measurement
         else:
             self.obstacle_detected = False
-
+        
+        self.previous_height = height_measurement
         self.send_velocity_command(self.last_cmd, 0.0)
         
 
