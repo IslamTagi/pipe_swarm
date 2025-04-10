@@ -23,7 +23,7 @@ class Connect_Robots(Node):
         self.roll = 0.0 # Store roll
 
         # Initilize counts
-        self.lock_count = 0.0 # Count to wait before engaging lock
+        self.count = 0.0 # Count to wait before engaging lock
         self.robot_detection_count = 0.0 # Count to wait before determining robot moved
         self.align_count = 0.0 # Count to wait before checking alignment the opposite side
         self.initialization_count = 0.0
@@ -39,6 +39,7 @@ class Connect_Robots(Node):
         self.robot_scan = None
         self.robot_distance = None
         self.range = None
+        self.imu = None
         self.locked_distance = None
 
         # True false statements
@@ -51,6 +52,7 @@ class Connect_Robots(Node):
         self.unlocked = False
         self.locked = False
         self.connected = False
+        self.close = False
         self.alignment_failed =  False
 
         # 10% difference threshold for Lidar and IMU
@@ -68,7 +70,7 @@ class Connect_Robots(Node):
         self.alignment_subscriber = self.create_subscription(Bool, "/agent_0/alignment", self.alignment_callback, 10)
         self.male_joint_subscriber = self.create_subscription(JointTrajectoryControllerState, '/agent_0/male_joint_trajectory_controller/controller_state', self.male_joint_state_callback, 10)
 
-        print("Connecting robots started")
+        print("Aligning robots started")
 
         # 2 second initial delay
         if self.delay_occured is False:
@@ -81,55 +83,13 @@ class Connect_Robots(Node):
         if not self.delay_occured:
             print('Initial delay complete')
             self.delay_occured = True
+            # self.initial_delay_timer.cancel()
 
     def connect_robots(self):
-        # If robots are connected, set velocities to zero and exit function
-        if self.connected is True:
-            print('Locked and Connected')
-            linear_x = 0.0
-            angular_z = 0.0
-            self.send_velocity_command_agent_1(linear_x, angular_z)
-            self.send_velocity_command_agent_0(linear_x, angular_z)
-            return
-        
-        # Robot is locked, check whether robots are connectred
-        if self.locked is True: 
-            print('Locked')
-
-            if self.locked_distance is None:
-                self.locked_distance = self.range
-
-            # Test whether robots are successfully locked together
-            linear_x = -0.05
-            self.send_velocity_command_agent_0(linear_x, self.last_angular_cmd_agent_0)
-
-            self.post_lock_count += 1
-
-            if self.post_lock_count > 50:
-                # Compare whether rear robot TOF value changes
-                connection_difference = abs(self.range - self.locked_distance) / self.locked_distance
-                print(f'Connection difference: {connection_difference}')
-
-                if connection_difference < 2 * self.difference_threshold:
-                    self.connected = True
-                else:
-                    print('Connection Failed')
-                    self.connected = False
-
-                    self.post_lock_count = 0.0
-                    self.initialized = False
-            return
-        
-        # If robots fail to align, reset
-        if self.alignment_failed is True:
-            self.reset()
-            return
-
-        # Wait for the initial delay to occur, then initialize 
         if not self.delay_occured:
             return
 
-        # If not moving forward, move forward and initilise male and female angles
+        # If not moving forward, move forward and initilise IMU, male and female angles
         if not self.initialized:
 
             # If lock in locked position, unlock
@@ -145,59 +105,112 @@ class Connect_Robots(Node):
             # Send the robot forward
             linear_x = 0.1
             self.send_velocity_command_agent_0(linear_x, self.last_angular_cmd_agent_0)
-            print("Robots Initialized: Robot 0 moving forward")
+            print("Robot Initialized: Moving forward")
 
             self.initialized = True
-            return
 
         else:
+            if self.alignment_failed is True:
+                self.robot_distance = self.range
+                self.reset()
+                return
+
+            # if robots are connected
+            if self.connected is True:
+                print('Locked and Connected')
+                linear_x = 0.0
+                angular_z = 0.0
+                self.send_velocity_command_agent_1(linear_x, angular_z)
+                self.send_velocity_command_agent_0(linear_x, angular_z)
+                # print('Lifting female joint')
+
+                # self.female_angle = 3.14159/4
+                # self.lift_female()
+                return
+            
+            # Check whether lock is in locked position
+            if self.locked is True: 
+                print('Locked')
+
+                if self.locked_distance is None:
+                    self.locked_distance = self.range
+
+                # Test whether robots are successfully locked together
+                linear_x = -0.05
+                self.send_velocity_command_agent_0(linear_x, self.last_angular_cmd_agent_0)
+
+                self.post_lock_count += 1
+
+                if self.post_lock_count > 100:
+                    # Compare whether rear robot TOF value changes
+                    connection_difference = abs(self.range - self.locked_distance) / self.locked_distance
+                    print(f'Connection difference: {connection_difference}')
+
+                    if connection_difference < 2 * self.difference_threshold:
+                        self.connected = True
+                    else:
+                        print('Connection Failed')
+                        self.connected = False
+                        self.count = 0.0
+
+                        # Unlock male
+                        self.lock = 0.0
+                        self.lock_male()
+
+                        self.alignment_failed = True
+                        self.post_lock_count = 0.0
+                return
+
             # centre robot
             self.centre_robot_0()
             
             # robot detection
             self.robot_detection()
             # Three exits to robot detection, either yes robot detected, only object detected or no object detected
+            
+            if self.robot_detected is True:
+                # Stop if distance is less than 1.5 cm
+                if self.robot_distance < 0.15:
+                    self.close = True
+                    print("Within 1.5 cm of obstacle")
+                    # check alignment
+                    if self.aligned is True:
+                        # print(f'Robots aligned, waiting {self.count}/200 before locking')
+                        print(f'Robots aligned')
 
-            self.robot_distance = self.range
+                        # Forward robot 0 into robot 1
+                        linear_x = 0.01
+                        self.send_velocity_command_agent_0(linear_x, 0.0)
 
-            if self.robot_distance < 0.15 and self.robot_detected is True:
-                # If robot is detected and close (less than 1.5 cm), check alignment
-                print("Within 1.5 cm of robot")
-                
-                # Check alignment
-                if self.aligned is True:
-                    print(f'Robots aligned')
+                        # Reverse robot 1 into robot 0
+                        linear_x = -0.015
+                        self.send_velocity_command_agent_1(linear_x, 0.0)
+                        self.count += 1
 
-                    # Forward robot 0 into robot 1
-                    linear_x = 0.01
-                    self.send_velocity_command_agent_0(linear_x, 0.0)
+                        # Wait to ensure robots are connected
+                        if self.unlocked is True and self.count > 100.0:
+                            print('Lock unlocked - locking')
+                            # Initiate lock
+                            self.lock = 3.14159/2
+                            self.lock_male()
+                            return
+                    
+                    else:
+                        # Stop whilst aligning
+                        linear_x = 0.0
+                        self.send_velocity_command_agent_0(linear_x, self.last_angular_cmd_agent_0)
+                        self.send_velocity_command_agent_1(linear_x, self.last_angular_cmd_agent_1)
 
-                    # Reverse robot 1 into robot 0
-                    linear_x = -0.015
-                    self.send_velocity_command_agent_1(linear_x, 0.0)
-                    self.lock_count += 1
-
-                    # Wait to ensure robots are connected
-                    if self.unlocked is True and self.lock_count > 100.0:
-                        print('Lock unlocked - locking')
-                        # Initiate lock
-                        self.lock = 3.14159/2
-                        self.lock_male()
+                        self.align_robots()
                         return
-                
-                # Align Robots
                 else:
-                    self.align_robots()
+                    self.close = False
+                    linear_x = 0.02
+                    self.send_velocity_command_agent_0(linear_x, self.last_angular_cmd_agent_0)
                     return
 
 
     def align_robots(self):
-        # Stop whilst aligning
-        linear_x = 0.0
-        self.send_velocity_command_agent_0(linear_x, self.last_angular_cmd_agent_0)
-        self.send_velocity_command_agent_1(linear_x, self.last_angular_cmd_agent_1)
-
-        # Twist to the left and to the right
         self.align_count += 1
         if self.align_count <= 100:
             print(f'Not aligned, alignment count: {self.align_count}/100, turning left')
@@ -217,8 +230,11 @@ class Connect_Robots(Node):
             self.alignment_failed = True
     
     def reset(self):
-        # Robot distance is TOF value
-        self.robot_distance = self.range
+        # If lock in locked position, unlock
+        if not self.unlocked:
+            print('Not unlocked - Setting to unlocked')
+            self.lock = 0.0
+            self.lock_male()
 
         # Seperate robots until seperation is 3 cm
         print(f'Robot seperation {self.robot_distance:.1f}/0.3')
@@ -229,19 +245,17 @@ class Connect_Robots(Node):
             self.send_velocity_command_agent_1(linear_x, 0.0)
             self.centre_robot_1()
         elif self.robot_distance >= 0.3:
-            linear_x = 0.0
+            self.alignment_failed = False
+            linear_x = 0.01
             self.send_velocity_command_agent_0(linear_x, self.last_angular_cmd_agent_0)
             linear_x = 0.0
             self.send_velocity_command_agent_1(linear_x, self.last_angular_cmd_agent_0)
 
-            # Reset values
-            self.alignment_failed = False
-            self.initialized = False
 
     def centre_robot_0(self):
         k_p = -0.05 # Proportional gain
 
-        if self.roll > 0.01 or self.roll < -0.01:
+        if self.roll > 0.1 or self.roll < -0.1:
             angular_z = k_p * self.roll
         else:
             angular_z = 0.0
@@ -299,17 +313,18 @@ class Connect_Robots(Node):
         
         # If robot has already been detected, skip
         if not self.robot_detected and not self.obstacle_detected:
-            # Take an initial scan of TOF
+            # Take an initial scan of LiDAR
             if self.initial_scan is None:
                 self.initial_scan = self.range
-                print(f"Initial TOF scan stored: {self.initial_scan}")
+                print(f"Initial LiDAR scan stored: {self.initial_scan}")
                 return
 
-            # Calculate the range BETTERS
+            # Calculate the range as the mean difference between the inital scan and the lidar scan. ANGLE NOT USED YET
 
             difference = abs(self.range - self.initial_scan) / self.initial_scan
             if difference > self.difference_threshold:
                 print("Obstacle Detected")
+                object_range = self.range
                 self.something_detected = True
 
             if self.something_detected is True:
@@ -346,11 +361,10 @@ class Connect_Robots(Node):
                     linear_x = 0.05
                     self.send_velocity_command_agent_0(linear_x, self.last_angular_cmd_agent_0)
                     # EXIT ONE: ROBOT DETECTED
-
                 elif self.robot_detection_count > 20:
                     print('Robot not detected - obstacle detected')
                     self.obstacle_detected = True
-
+                    # Thfis is triggering immediately. Create a count to wait to 2 loops before concluding this
                     linear_x = 0.0
                     self.send_velocity_command_agent_1(linear_x, self.last_angular_cmd_agent_1)
                     # EXIT TWO: OBJECT DETECTED
@@ -359,6 +373,7 @@ class Connect_Robots(Node):
             
             else:
                 self.obstacle_detected = False
+                # print('No obstacle detected')
                 # EXIT THREE: NO OBJECT DETECTED
                 return
         else:
@@ -375,7 +390,7 @@ class Connect_Robots(Node):
             self.aligned = True
         if msg.data is False:
             self.aligned = False
-            self.lock_count = 0.0
+            self.count = 0.0
 
     def male_joint_state_callback(self, msg):
         # Input position

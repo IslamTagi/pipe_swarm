@@ -90,9 +90,9 @@ def generate_launch_description():
             name=f'spawn_agent_{i}',
             output='screen',
             arguments=[ '-entity', namespace,
-                        '-x', f'{i*2}',
+                        '-x', f'{i}',
                         '-y', '0',
-                        '-z', '0.1',
+                        '-z', '0.15',
                         '-R', '0',  # Roll
                         '-P', '0',  # Pitch 
                         '-Y', f'{math.radians(0)}',  # Yaw
