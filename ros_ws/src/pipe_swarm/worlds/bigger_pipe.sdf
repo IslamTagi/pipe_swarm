@@ -1,0 +1,80 @@
+<sdf version="1.7">
+  <world name="default">
+      <!-- Add the Sun light to the world -->
+    <light name='sun' type='directional'>
+      <cast_shadows>1</cast_shadows>
+      <pose>0 0 10 0 -0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+      <spot>
+        <inner_angle>0</inner_angle>
+        <outer_angle>0</outer_angle>
+        <falloff>0</falloff>
+      </spot>
+    </light>
+
+    <!-- World settings (optional) -->
+    <gravity>0 0 -9.81</gravity> <!-- Default gravity -->
+    <scene>
+      <ambient_light>0.7 0.7 0.7 1.0</ambient_light>
+    </scene>
+
+    <!-- Add the hollow pipe model -->
+    <model name="half_hollow_pipe">
+      <static>true</static>  <!-- Pipe is static, it's not going to move -->
+      <pose>-0.2 -0.16 0.08 1.5708 0 1.5708</pose>
+      <link name="hollow_pipe_link">
+        <visual name="hollow_pipe_visual">
+          <geometry>
+            <mesh>
+              <!-- Path to the hollow pipe mesh -->
+              <uri>model://pipe_swarm/models/hollow_pipe/meshes/half_hollow_pipe.stl</uri>
+              <scale>0.002 0.002 0.002</scale>  <!-- Scale if needed -->
+            </mesh>
+          </geometry>
+        </visual>
+
+        <collision name="hollow_pipe_collision">
+          <geometry>
+            <mesh>
+              <!-- Path to the hollow pipe mesh for collision -->
+              <uri>model://pipe_swarm/models/hollow_pipe/meshes/half_hollow_pipe.stl</uri>
+              <scale>0.002 0.002 0.002</scale>  <!-- Scale for collision geometry -->
+            </mesh>
+          </geometry>
+        </collision>
+      </link>
+    </model>
+
+    <!-- Ground plane (optional) -->
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="ground_plane_link">
+        <visual name="ground_plane_visual">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>10 10</size>
+            </plane>
+          </geometry>
+        </visual>
+        <collision name="ground_plane_collision">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>10 10</size>
+            </plane>
+          </geometry>
+        </collision>
+      </link>
+    </model>
+
+  </world>
+</sdf>

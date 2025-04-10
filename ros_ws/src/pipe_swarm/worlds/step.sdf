@@ -20,11 +20,35 @@
       </spot>
     </light>
 
-    <!-- World settings (optional) -->
+    <!-- World settings (using Gazebo defaults implicitly by not specifying a <physics> block) -->
     <gravity>0 0 -9.81</gravity> <!-- Default gravity -->
     <scene>
-      <ambient_light>0.7 0.7 0.7 1.0</ambient_light>
+      <ambient>0.4 0.4 0.4 1.0</ambient> <!-- Use Gazebo's default ambient value -->
+      <background>0.7 0.7 0.7 1.0</background> <!-- Use Gazebo's default background -->
+      <shadows>1</shadows> <!-- Enable shadows -->
     </scene>
+
+    <physics name="default_physics" default="true" type="ode"> <!-- Use default="true" -->
+      <max_step_size>0.001</max_step_size> <!-- Typical default step size -->
+      <real_time_factor>1</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate> <!-- Match max_step_size -->
+      <ode>
+        <solver>
+          <type>quick</type> <!-- 'quick' is common, 'world' is more accurate but slower -->
+          <iters>50</iters> <!-- Default iterations -->
+          <sor>1.3</sor> <!-- Default SOR parameter -->
+          <use_dynamic_moi_rescaling>false</use_dynamic_moi_rescaling> <!-- Usually false -->
+        </solver>
+        <constraints>
+          <!-- Constraint Force Mixing (CFM) and Error Reduction Parameter (ERP) -->
+          <!-- These defaults make constraints reasonably stiff -->
+          <cfm>0.0</cfm>
+          <erp>0.2</erp>
+          <contact_max_correcting_vel>100.0</contact_max_correcting_vel>
+          <contact_surface_layer>0.001</contact_surface_layer>
+        </constraints>
+      </ode>
+    </physics>
 
     <!-- Add the hollow pipe model -->
     <model name="hollow_pipe">
@@ -49,6 +73,24 @@
               <scale>0.001 0.001 0.001</scale>  <!-- Scale for collision geometry -->
             </mesh>
           </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1.5</mu>   <!-- Increased friction -->
+                <mu2>1.5</mu2>  <!-- Increased friction -->
+                <slip1>0.0</slip1>
+                <slip2>0.0</slip2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <kp>1000000.0</kp> <!-- Standard contact stiffness -->
+                <kd>100.0</kd>     <!-- Standard contact damping -->
+                <max_vel>1.0</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
         </collision>
       </link>
     </model>
@@ -57,7 +99,7 @@
     <model name="half_hollow_pipe">
       <static>true</static>  <!-- Pipe is static, it's not going to move -->
       <pose>4.8 -0.08 0.12 1.5708 0 1.5708</pose>
-      <link name="hollow_pipe_link">
+      <link name="hollow_pipe_link"> <!-- Note: Link name is reused -->
         <visual name="hollow_pipe_visual">
           <geometry>
             <mesh>
@@ -76,6 +118,24 @@
               <scale>0.001 0.001 0.001</scale>  <!-- Scale for collision geometry -->
             </mesh>
           </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1.5</mu>   <!-- Increased friction -->
+                <mu2>1.5</mu2>  <!-- Increased friction -->
+                <slip1>0.0</slip1>
+                <slip2>0.0</slip2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <kp>1000000.0</kp> <!-- Standard contact stiffness -->
+                <kd>100.0</kd>     <!-- Standard contact damping -->
+                <max_vel>1.0</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
         </collision>
       </link>
     </model>
@@ -84,7 +144,7 @@
     <model name="pipe_end">
       <static>true</static>  <!-- Pipe is static, it's not going to move -->
       <pose>4.8 -0.08 -0.12 1.5708 0 1.5708</pose>
-      <link name="hollow_pipe_link">
+      <link name="hollow_pipe_link"> <!-- Note: Link name is reused -->
         <visual name="hollow_pipe_visual">
           <geometry>
             <mesh>
@@ -103,6 +163,24 @@
               <scale>0.001 0.001 0.001</scale>  <!-- Scale for collision geometry -->
             </mesh>
           </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1.5</mu>   
+                <mu2>1.5</mu2>  
+                <slip1>0.0</slip1>
+                <slip2>0.0</slip2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <kp>1000000.0</kp>
+                <kd>100.0</kd>   
+                <max_vel>1.0</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
         </collision>
       </link>
     </model>
@@ -113,19 +191,16 @@
       <link name="ground_plane_link">
         <visual name="ground_plane_visual">
           <geometry>
-            <plane>
-              <normal>0 0 1</normal>
-              <size>10 10</size>
-            </plane>
+            <plane><normal>0 0 1</normal><size>10 10</size></plane>
           </geometry>
+          <!-- Reverted ground material/surface to implicit defaults -->
         </visual>
         <collision name="ground_plane_collision">
           <geometry>
-            <plane>
-              <normal>0 0 1</normal>
-              <size>10 10</size>
-            </plane>
+            <plane><normal>0 0 1</normal><size>10 10</size></plane>
           </geometry>
+          <!-- Reverted ground material/surface to implicit defaults -->
+          <!-- If you need specific ground friction, add a <surface> block here -->
         </collision>
       </link>
     </model>

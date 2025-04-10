@@ -51,7 +51,7 @@ def generate_launch_description():
     pipe_swarm_share = get_package_share_directory('pipe_swarm')
     gazebo_ros_share = get_package_share_directory('gazebo_ros')
     xacro_path = os.path.join(pipe_swarm_share, 'urdf', 'pipe_agent.urdf.xacro')
-    world_path = os.path.join(pipe_swarm_share, 'worlds', 'bookshelf.sdf')
+    world_path = os.path.join(pipe_swarm_share, 'worlds', 'step.sdf')
 
     agents = []
 
@@ -60,7 +60,10 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             os.path.join(gazebo_ros_share, 'launch', 'gazebo.launch.py')
         ),
-        launch_arguments={'world': world_path}.items()
+        launch_arguments={
+            'world': world_path,
+            "use_sim_time": "true",
+        }.items()
     )
 
     # Pre-Agent Setup
@@ -87,9 +90,9 @@ def generate_launch_description():
             name=f'spawn_agent_{i}',
             output='screen',
             arguments=[ '-entity', namespace,
-                        '-x', f'{i*2}',
+                        '-x', f'{i}',
                         '-y', '0',
-                        '-z', '0.1',
+                        '-z', '0.15',
                         '-R', '0',  # Roll
                         '-P', '0',  # Pitch 
                         '-Y', f'{math.radians(0)}',  # Yaw
