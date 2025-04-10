@@ -7,7 +7,7 @@
             <ros>
                 <namespace>${agent_namespace}</namespace>
             </ros>
-            <update_rate>50</update_rate> 
+            <update_rate>100</update_rate> 
              
             <right_joint>${agent_namespace}_base_wheel_back_right_joint</right_joint>
             <left_joint>${agent_namespace}_base_wheel_back_left_joint</left_joint>
