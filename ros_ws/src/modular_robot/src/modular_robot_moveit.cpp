@@ -112,7 +112,6 @@ void transformPrismaticCmd(std::shared_ptr<rclcpp::Node> move_group_node,
   geometry_msgs::msg::Twist stop_msg;
   cmd_vel_pub->publish(stop_msg);
 }
-
 class ModularRobotMover : public rclcpp::Node
 {
     public:
@@ -229,7 +228,7 @@ class ModularRobotMover : public rclcpp::Node
             pipe_positions[1].orientation.w = 1.0;
             pipe_positions[1].position.x = (length / 2.0);
             pipe_positions[1].position.y = 0.0;
-            pipe_positions[1].position.z = (y1 - thickness / 2.0) + radius*2 - robot_height/2;
+            pipe_positions[1].position.z = (y1 - thickness / 2.0) + radius*2 - robot_height/2 + thickness;
 
             // pipe 2 bottom
             pipe_positions[2].orientation.w = 1.0;
@@ -241,7 +240,7 @@ class ModularRobotMover : public rclcpp::Node
             pipe_positions[3].orientation.w = 1.0;
             pipe_positions[3].position.x = (x2 - x1 + length / 2.0);
             pipe_positions[3].position.y = 0.0;
-            pipe_positions[3].position.z = (y2 - thickness / 2.0) + radius*2 - robot_height/2;
+            pipe_positions[3].position.z = (y2 - thickness / 2.0) + radius*2 - robot_height/2 + thickness;
             _definePlanningSceneInterface("agent_n_base_link", pipe_positions, length, thickness);
 
         }
@@ -286,23 +285,20 @@ class ModularRobotMover : public rclcpp::Node
 
 int main(int argc, char * argv[])
 {
-    // Initialize ROS and create the Node
     rclcpp::init(argc, argv);
     auto mover_node = std::make_shared<ModularRobotMover>();
+
+    // Start executor in background
+    rclcpp::executors::SingleThreadedExecutor executor;
+    executor.add_node(mover_node);
+    std::thread exec_thread([&executor]() { executor.spin(); });
+
+    // Initialise safely, now subscriptions and services are live
     mover_node->initialise();
-    rclcpp::spin(mover_node);
-  
-  // RCLCPP_INFO(logger, "Visualizing plan 2 (joint space goal)");
-  
-  // visualize the plan in RViz:
-  /*
-  namespace rvt = rviz_visual_tools;
-  moveit_visual_tools::MoveItVisualTools visual_tools(mover_node, "agent_n_base_link", "visualization_marker_array",
-                                                      move_group_interface.getRobotModel());
-    visual_tools.deleteAllMarkers();
-    visual_tools.trigger();
-*/
-  // Shutdown ROS
-  rclcpp::shutdown();
-  return 0;
+
+    // Join executor thread
+    exec_thread.join();
+
+    rclcpp::shutdown();
+    return 0;
 }

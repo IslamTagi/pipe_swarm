@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.patches import Polygon
+from matplotlib.patches import Polygon, Rectangle
+import matplotlib.transforms as transforms
 from shapely.geometry import LineString, Polygon as ShapelyPolygon
 from shapely.geometry import Polygon as ShapelyPolygon, MultiPolygon
 from scipy.optimize import minimize
@@ -210,15 +211,20 @@ class Obstacle():
 
 class ModularConfiguration():
 
-    def __init__(self, sigma_np, x_pos, l_agent, m_agent):
+    def __init__(self, sigma_np, x_pos, l_agent, thickness_agent, m_agent,
+                agent_pivot_offset=1.75):
 
         # global reference frame
-        self.global_coordinates = (0, 1e-6)
+        y_offset = thickness_agent/2 + agent_pivot_offset
+        self.global_coordinates = (0, y_offset)
         self.theta_global = 0
 
         # modular robot parameters
         self.n_agents = len(sigma_np)
         self.l_agent = l_agent
+        self.thickness_agent = thickness_agent
+        self.agent_pivot_offset = agent_pivot_offset
+
         self.m_agent = m_agent
         self.get_coordinate_representation(sigma_np, x_pos)
 
@@ -269,6 +275,27 @@ class ModularConfiguration():
         
         return links
     
+    
+    def draw_agent_boxes(self, ax, x_list, y_list, angles_deg):
+        # self.draw_agent_boxes(ax, self.x[1:], self.y[1:], self.sigma[1:], self.l_agent, self.l_agent / 4.0)
+        for x, y, theta_deg in zip(x_list, y_list, angles_deg):
+            rect = Rectangle(
+                (-self.l_agent / 2, (-self.thickness_agent/2)-self.agent_pivot_offset),  # full length from centre
+                self.l_agent,
+                self.thickness_agent,
+                edgecolor='blue',
+                facecolor='cyan',
+                alpha=0.5
+            )
+
+            transform = (transforms.Affine2D()
+                         .rotate_deg(theta_deg)
+                         .translate(x, y)
+                         + ax.transData)
+            rect.set_transform(transform)
+
+            ax.add_patch(rect)
+    
     def visualize_agent_configuration(self, obstacle: Obstacle):
         if self.sigma is None:
             return
@@ -286,7 +313,10 @@ class ModularConfiguration():
         
         # Links
         plt.plot(self.endpoints[0], self.endpoints[1], '-o', color='blue', markersize=8, linewidth=2, label='Link')
-        
+        ax = plt.gca()
+        self.draw_agent_boxes(ax, self.x[1:], self.y[1:], self.theta[1:])
+
+
         # Center of Mass
         plt.scatter(self.x[1:], self.y[1:], marker='x', color='green', label='Link Centre of Mass')
         plt.plot(self.com[0], self.com[1], 'x', color='green', markersize=8, linewidth=2, label='Centre of Mass')
@@ -320,18 +350,15 @@ class ModularConfiguration():
         return formatted
 
 
-        
-
-
 class ModelPredictiveControl():
 
-    def __init__(self, n_agents, l_agent, m_agent, obstacle:Obstacle,
+    def __init__(self, n_agents, l_agent, thickness_agent, m_agent, obstacle:Obstacle,
                  x_pos_min=-100, x_pos_max=100, sigma_min=-45, sigma_max=45):
 
         # defining model
         self.n_agents = n_agents
 
-            # initial sigma0 guess -- control parameters
+        # initial sigma0 guess -- control parameters
         # self.sigma = np.zeros(n_agents) # TODO (IT): randomize based on n_agents --> self.sigma = np.random.uniform(low=sigma_min, high=sigma_max, size=n_agents)
         self.sigma = [0]
         self.sigma.extend(np.random.uniform(low=sigma_min, high=sigma_max, size=n_agents-1))
@@ -344,7 +371,7 @@ class ModelPredictiveControl():
         self.theta0_bounds = [(sigma_min, sigma_max) for _ in range(n_agents)] # sigma bounds
         self.theta0_bounds.insert(0, (x_pos_min, x_pos_max)) # x pos bounds
         
-        self.model_config = ModularConfiguration(self.sigma, self.x_pos, l_agent, m_agent)
+        self.model_config = ModularConfiguration(self.sigma, self.x_pos, l_agent, thickness_agent, m_agent)
 
           # objective function
         self.pos_desired = (0, 0)
