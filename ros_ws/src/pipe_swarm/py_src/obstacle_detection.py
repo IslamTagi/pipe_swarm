@@ -27,8 +27,12 @@ class MyNode(Node):
         self.initial_scan_horizontal_distance = None
         self.outlierBuffer = []
         self.height_check = None
+        self.length_check = 0.0
+        self.current_distance = None
         self.x_coordinate = None
         self.y_coordinate = None
+        self.obstacle_identifier_start_time = None
+        self.bridge_stop_time = 0.0
         self.difference_threshold = 0.1  # 10% difference threshold
         self.obstacle_difference_threshold = 0.0001
 
@@ -38,7 +42,7 @@ class MyNode(Node):
         
         self.get_logger().info("Robot controller with LiDAR obstacle detection started")
 
-    def send_velocity_command(self, linear_x, angular_z, range=None):
+    def send_velocity_command(self, linear_x, angular_z):
         cmd = Twist()
         if self.obstacle_detected:
             if self.x_coordinate == None:
@@ -46,18 +50,26 @@ class MyNode(Node):
                 cmd.linear.x = 0.0
                 self.cmd_vel_publisher_.publish(cmd)
                 self.get_logger().info("Obstacle detected! Stopping robot.")
-                time_taken = current_time - self.initial_time
+                time_taken = current_time - self.initial_time - self.bridge_stop_time
                 distance = 0.2 * time_taken
-                self.x_coordinate = distance + self.outlierBuffer[3]
+                self.x_coordinate = (distance + self.outlierBuffer[3]) * 100
             else:
                 cmd.linear.x = 0.02
+                if self.obstacle_identifier_start_time == None:
+                    self.obstacle_identifier_start_time = time.time()
                 self.get_logger().info(f"x_coordinate = {self.x_coordinate}")
                 if self.height_check is not None:
-                    self.y_coordinate = self.initial_scan_height - self.height_check
+                    self.y_coordinate = (self.initial_scan_height - self.height_check) * 100
                     self.get_logger().info(str(self.y_coordinate))
             if (self.x_coordinate != None) and (self.y_coordinate != None):
                 cmd.linear.x = 0.0
-                self.get_logger().info(str(self.x_coordinate) + ", " + str(self.y_coordinate))
+                current_time = time.time()
+                obstacle_identifier_distance = 0.02 * (current_time - self.obstacle_identifier_start_time) * 100
+                if self.current_distance == None:
+                    self.current_distance = self.length_check + obstacle_identifier_distance
+                self.get_logger().info("coordinates: " + str(self.x_coordinate) + ", " + str(self.y_coordinate))
+                self.get_logger().info("pipe length: " + str(self.length_check))
+                self.get_logger().info("current position: " + str(self.current_distance))
         else:
             cmd.linear.x = linear_x
             cmd.angular.z = angular_z
@@ -79,6 +91,7 @@ class MyNode(Node):
             return
 
     def lidar_callback(self, msg: Range):
+        cmd = Twist()
         height_measurement = math.sin((math.pi)/12) * msg.range
         horizontal_distance_measurement = math.cos((math.pi)/12) * msg.range
 
@@ -120,6 +133,14 @@ class MyNode(Node):
         elif len(self.outlierBuffer) > 1 and self.obstacle_detected != True:
             for anomolies in range(len(self.outlierBuffer)):
                 self.outlierBuffer.pop()
+        try:
+            if (self.outlierBuffer[0] > self.initial_scan_horizontal_distance) and self.length_check == 0.0:
+                    current_time = time.time() - self.initial_time - 0.01
+                    gap_distance = horizontal_distance_measurement - self.initial_scan_horizontal_distance
+                    length_distance = ((0.2 * current_time) + (horizontal_distance_measurement - gap_distance))
+                    self.length_check = length_distance * 100
+        except IndexError:
+            current_time = time.time()
         # if robot_ranges:
         #     robot_distance = np.mean(robot_ranges)
         #     self.obstacle_detected = True
