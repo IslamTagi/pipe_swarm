@@ -90,53 +90,71 @@ def get_polygon_intersection_points(agent_polygons, obstacle_polygon, tolerance=
     intersection_points = [[], []]
     touching_points = [[], []]
 
-    # Buffer the obstacle
+    # Precompute upscaled and downscaled obstacles
     upscaled_obstacle = obstacle_polygon.buffer(tolerance, cap_style="flat")
     downscaled_obstacle = obstacle_polygon.buffer(-tolerance, cap_style="flat")
-
-    # Also buffer the agent polygons!
-    buffered_agent_polygons = [poly.buffer(tolerance, cap_style="flat") for poly in agent_polygons]
-    shrunk_agent_polygons = [poly.buffer(-tolerance, cap_style="flat") for poly in agent_polygons]
 
     def extract_coords(geom):
         if geom.is_empty:
             return [], []
+        coords = []
         if geom.geom_type == "Point":
-            return [geom.x], [geom.y]
-        elif geom.geom_type in ("MultiPoint", "MultiLineString", "LineString"):
-            coords = []
-            for g in geom.geoms if hasattr(geom, "geoms") else [geom]:
-                x, y = g.xy
-                coords.extend(zip(x, y))
-            if coords:
-                xs, ys = zip(*coords)
-                return list(xs), list(ys)
+            coords.append((geom.x, geom.y))
+        elif geom.geom_type in ("MultiPoint", "MultiLineString", "MultiPolygon"):
+            for g in geom.geoms:
+                xs, ys = extract_coords(g)
+                coords.extend(zip(xs, ys))
+        elif geom.geom_type == "LineString":
+            x, y = geom.xy
+            coords.extend(zip(x, y))
         elif geom.geom_type == "Polygon":
+            # Just extract outer ring for simplicity
             x, y = geom.exterior.xy
-            return list(x), list(y)
+            coords.extend(zip(x, y))
+        # Convert to separate x/y lists
+        if coords:
+            xs, ys = zip(*coords)
+            return list(xs), list(ys)
         return [], []
 
-    for agent_poly, buffered_agent, shrunk_agent in zip(agent_polygons, buffered_agent_polygons, shrunk_agent_polygons):
-        # Check actual intersections (hard collision)
+
+    for agent_poly in agent_polygons:
+        # Intersections
         intersection = agent_poly.intersection(obstacle_polygon)
-        x_touch, y_touch = extract_coords(intersection)
-        intersection_points[0].extend(x_touch)
-        intersection_points[1].extend(y_touch)
+        upscaled_intersection = agent_poly.intersection(upscaled_obstacle)
+        downscaled_intersection = agent_poly.intersection(downscaled_obstacle)
 
-        # Check near contacts (soft contacts using buffered agent polygons)
-        near_contact = buffered_agent.intersection(obstacle_polygon)
-        up_x, up_y = extract_coords(near_contact)
-        touching_points[0].extend(up_x)
-        touching_points[1].extend(up_y)
+        # Apply line-based logic (manual checking of relationships)
+        if (
+            agent_poly.touches(obstacle_polygon) or
+            agent_poly.touches(upscaled_obstacle) or
+            agent_poly.touches(downscaled_obstacle) or
+            agent_poly.equals(obstacle_polygon) or
+            agent_poly.equals(upscaled_obstacle) or
+            agent_poly.equals(downscaled_obstacle) or
+            (agent_poly.disjoint(downscaled_obstacle) and agent_poly.intersects(obstacle_polygon) and not agent_poly.touches(obstacle_polygon)) or
+            (agent_poly.disjoint(obstacle_polygon) and agent_poly.intersects(upscaled_obstacle) and not agent_poly.touches(upscaled_obstacle))
+        ):
+            # Touching points
+            x_touch, y_touch = extract_coords(intersection)
+            touching_points[0].extend(x_touch)
+            touching_points[1].extend(y_touch)
 
-        # Optional: if you want inner buffer too
-        inner_contact = shrunk_agent.intersection(obstacle_polygon)
-        down_x, down_y = extract_coords(inner_contact)
-        touching_points[0].extend(down_x)
-        touching_points[1].extend(down_y)
+            up_x, up_y = extract_coords(upscaled_intersection)
+            touching_points[0].extend(up_x)
+            touching_points[1].extend(up_y)
+
+            down_x, down_y = extract_coords(downscaled_intersection)
+            touching_points[0].extend(down_x)
+            touching_points[1].extend(down_y)
+
+        elif agent_poly.intersects(downscaled_obstacle) and not agent_poly.touches(downscaled_obstacle):
+            # Hard collision points
+            x_inter, y_inter = extract_coords(intersection)
+            intersection_points[0].extend(x_inter)
+            intersection_points[1].extend(y_inter)
 
     return intersection_points, touching_points
-
 
 
 class Obstacle():
@@ -270,7 +288,7 @@ class ModularConfiguration():
 
         # global reference frame
         y_offset = thickness_agent/2 + agent_pivot_offset
-        self.global_coordinates = (0, y_offset+1e-6)
+        self.global_coordinates = (0, y_offset+1e-5)
         self.theta_global = 0
 
         # modular robot parameters
@@ -321,6 +339,36 @@ class ModularConfiguration():
         self.com = (np.mean(self.x[1:]), np.mean(self.y[1:]))
         return self.x, self.y, self.endpoints, self.com
     
+    def get_last_agent_bottom_right_corner(self):
+        i = self.n_agents - 1  # index of the last link
+
+        # Start and end points of the link
+        x_start = self.endpoints[0][i]
+        y_start = self.endpoints[1][i]
+        x_end = self.endpoints[0][i + 1]
+        y_end = self.endpoints[1][i + 1]
+
+        # Vector of the link
+        dx = x_end - x_start
+        dy = y_end - y_start
+
+        # Length and angle
+        length = np.sqrt(dx**2 + dy**2)
+        angle = np.arctan2(dy, dx)
+
+        # Bottom-right corner in local frame:
+        local_corner = np.array([length, -self.thickness_agent / 2 - self.agent_pivot_offset])
+
+        # Rotate and translate
+        rotation = np.array([
+            [np.cos(angle), -np.sin(angle)],
+            [np.sin(angle),  np.cos(angle)]
+        ])
+
+        global_corner = rotation @ local_corner + np.array([x_start, y_start])
+
+        return global_corner
+
     def get_line_shape(self):
         endpoints = get_combined_coordinates(self.endpoints[0], self.endpoints[1])
         links = []
@@ -332,41 +380,37 @@ class ModularConfiguration():
     def get_agent_polygons(self):
         agent_polygons = []
         for i in range(self.n_agents):
-            # Start and end points of the link
-            x_start = self.endpoints[0][i]
-            y_start = self.endpoints[1][i]
-            x_end = self.endpoints[0][i + 1]
-            y_end = self.endpoints[1][i + 1]
+            # Centre position of the link
+            x_centre = self.x[i + 1]  # skip global coordinate
+            y_centre = self.y[i + 1]
+            theta_deg = self.theta[i + 1]
 
-            # Vector of the link
-            dx = x_end - x_start
-            dy = y_end - y_start
-
-            # Length and angle
-            length = np.sqrt(dx**2 + dy**2)
-            angle = np.arctan2(dy, dx)
-
-            # Define corners of the rectangle relative to (0, 0)
+            # Rectangle parameters
+            half_length = self.l_agent / 2
             half_thickness = self.thickness_agent / 2
+
+            # Define corners relative to centre
             corners = np.array([
-                [0,         -half_thickness-self.agent_pivot_offset],
-                [length,    -half_thickness-self.agent_pivot_offset],
-                [length,    half_thickness-self.agent_pivot_offset],
-                [0,         half_thickness-self.agent_pivot_offset]
+                [-half_length, -half_thickness - self.agent_pivot_offset],
+                [ half_length, -half_thickness - self.agent_pivot_offset],
+                [ half_length,  half_thickness - self.agent_pivot_offset],
+                [-half_length,  half_thickness - self.agent_pivot_offset]
             ])
 
-            # Rotate and translate corners
+            # Rotation
+            angle_rad = np.deg2rad(theta_deg)
             rotation = np.array([
-                [np.cos(angle), -np.sin(angle)],
-                [np.sin(angle),  np.cos(angle)]
+                [np.cos(angle_rad), -np.sin(angle_rad)],
+                [np.sin(angle_rad),  np.cos(angle_rad)]
             ])
 
-            transformed_corners = corners @ rotation.T + np.array([x_start, y_start])
+            transformed_corners = corners @ rotation.T + np.array([x_centre, y_centre])
 
             # Create polygon
             agent_polygons.append(ShapelyPolygon(transformed_corners))
 
         return agent_polygons
+
     
     def get_collision_polygons(self, obstacle_polygon):
         agent_polygons = self.get_agent_polygons()
@@ -450,11 +494,10 @@ class ModularConfiguration():
             formatted.append(angle_rad)
         return formatted
 
-
 class ModelPredictiveControl():
 
     def __init__(self, n_agents, l_agent, thickness_agent, m_agent, obstacle:Obstacle,
-                 x_pos_min=-100, x_pos_max=100, sigma_min=-45, sigma_max=45):
+                 x_pos_min=-10, x_pos_max=10, sigma_min=-45, sigma_max=45):
 
         # defining model
         self.n_agents = n_agents
@@ -484,7 +527,7 @@ class ModelPredictiveControl():
 
         intersection_points_, touching_points = get_polygon_intersection_points(
                                                 self.model_config.get_agent_polygons(), 
-                                                obstacle.get_shapley_polygon())
+                                                self.obstacle.get_shapley_polygon())
 
         if len(touching_points[0]) == 0:
             # No touches at all, return zeros per link
@@ -505,9 +548,14 @@ class ModelPredictiveControl():
 
     def objective(self, sigma0):
         # Compute current end-effector position
+        # self.model_config.get_coordinate_representation(sigma0[1:], sigma0[0])
+        # x = self.model_config.endpoints[0][-1]
+        # y = self.model_config.endpoints[1][-1]
+        # error = np.sqrt((x - self.pos_desired[0])**2
+        #                 + (y - self.pos_desired[1])**2)  # Minimize position error
+        
         self.model_config.get_coordinate_representation(sigma0[1:], sigma0[0])
-        x = self.model_config.endpoints[0][-1]
-        y = self.model_config.endpoints[1][-1]
+        x, y = self.model_config.get_last_agent_bottom_right_corner()
         error = np.sqrt((x - self.pos_desired[0])**2
                         + (y - self.pos_desired[1])**2)  # Minimize position error
         return error
@@ -518,7 +566,7 @@ class ModelPredictiveControl():
 
         intersection_points, touching_points_ = get_polygon_intersection_points(
                                                 self.model_config.get_agent_polygons(), 
-                                                obstacle.get_shapley_polygon())
+                                                self.obstacle.get_shapley_polygon())
         
         return -len(intersection_points[0]) # if any intersection points
     
@@ -529,6 +577,9 @@ class ModelPredictiveControl():
         self.model_config.get_coordinate_representation(sigma0[1:], sigma0[0])
         link_grounded = self.get_grounded_robots(sigma0)
         return link_grounded[0] - 2 # first link needs to be grounded (from both ends)
+    
+    def final_angle_constraint(self, sigma0):
+        return -sigma0[-1] # keep negative or 0
     
     def torque_constraint(self, sigma0):
         self.model_config.get_coordinate_representation(sigma0[1:], sigma0[0])
@@ -556,7 +607,7 @@ class ModelPredictiveControl():
         return 11 - total_torque  # total torque <= 11kg/cm
     
     def inverse_kinematics_with_constraints(self, pos_desired,
-                                        max_iter=250, tolerance=2e-6):
+                                        max_iter=50, tolerance=2e-6):
         
         # objective function
         self.pos_desired = pos_desired
@@ -565,6 +616,7 @@ class ModelPredictiveControl():
             {'type': 'ineq', 'fun': self.obstalce_collision_constraint},
             {'type': 'ineq', 'fun': self.grounded_contact_constraint},
             {'type': 'ineq', 'fun': self.torque_constraint},
+            {'type': 'ineq', 'fun': self.final_angle_constraint},
             {'type': 'eq', 'fun': self.grounded_angle_constraint},
             # TODO (IT): implement com constraint
         ]

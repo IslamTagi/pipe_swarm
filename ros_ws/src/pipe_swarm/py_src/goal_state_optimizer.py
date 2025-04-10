@@ -25,18 +25,22 @@ class GoalStateNode(Node):
 
 QUE_SIZE = 10
 
+
 # define agent
 l_agent = 15 #cm
+thickness_agent = 6.2 + 1.5 # base_h + wheel_r
 m_agent = 0.175 # kg
 n_agents = 3    # number of agents
 
 # define pipe
-pipe_radius = 15
-pipe_length = 60
+pipe_1_x = 0 # tail
+pipe_1_origin = [pipe_1_x, 0]
+pipe_radius = 7.5
 pipe_thickness = 5
+pipe_length = n_agents*l_agent
 
-pipe_1_origin = [0,0]
-pipe_2_origin = [40, 5]
+pipe_2_x = pipe_length + pipe_1_x
+pipe_2_origin = [pipe_length + pipe_1_x, 2.5]
 
 pipe = Pipe(pipe_length, pipe_radius, pipe_thickness, pipe_1_origin)
 obstacle = pipe.get_obstacle()
@@ -47,20 +51,6 @@ step_pipe_obstacle = step_pipe.get_obstacle()
 obstacle_x, obstacle_y = obstacle.get_overall_obstacle(step_pipe_obstacle)
 obstacle = Obstacle(obstacle_x, obstacle_y)
 
-# step_endpoints = ((4, 3, 3), (0, 2, 0))
-# step = Obstacle(step_endpoints[0], step_endpoints[1])
-
-# gap_endpoints = ((0, 0, 2, 2), (0, -1, -1, 0))
-# gap = Obstacle(gap_endpoints[0], gap_endpoints[1], 'gap')
-
-# ground_endpoints = ((-2, -2, 5, 5), (0, -2, -2, 0))
-# ground = Obstacle(ground_endpoints[0], ground_endpoints[1])
-
-# obstacle_x, obstacle_y = ground.get_overall_obstacle(step)
-# obstacle = Obstacle(obstacle_x, obstacle_y)
-
-# obstacle_x, obstacle_y = obstacle.get_overall_obstacle(gap, 'gap')
-# obstacle = Obstacle(obstacle_x, obstacle_y)
 
 def main(args=None):
 
@@ -72,9 +62,9 @@ def main(args=None):
     pipe_pos.extend(pipe_2_origin) # x,y
     node.send_pipe_pos(pipe_pos)
     
-    mpc = ModelPredictiveControl(n_agents, l_agent, m_agent, obstacle)
-    
-    theta_solution = mpc.inverse_kinematics_with_constraints((40, 20))
+    mpc = ModelPredictiveControl(n_agents, l_agent, thickness_agent, m_agent, obstacle)
+    theta_solution = mpc.inverse_kinematics_with_constraints((pipe_2_x+3, 3))
+
     node.get_logger().info(f'Goal Endpoints: {mpc.model_config.endpoints}')
     if theta_solution is not None:
         ros_solution = mpc.model_config.reformat_solution(theta_solution)
@@ -83,6 +73,7 @@ def main(args=None):
     else:
         node.get_logger().warn("Failed to find goal state")
         mpc.model_config.visualize_agent_configuration(obstacle)
+    # mpc.model_config.visualize_agent_configuration(obstacle)
     
     rclpy.shutdown()
 

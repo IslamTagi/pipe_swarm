@@ -216,29 +216,30 @@ class ModularRobotMover : public rclcpp::Node
             double y2           = pipe_array->data[6] / 100;
 
             std::vector<geometry_msgs::msg::Pose> pipe_positions(4);
-            double robot_height = 0.062 + 0.015 + 0.02; // base_h + wheel_r + offset
+            double robot_height = 0.062 + 0.015 + 0.02; // base_h + wheel_r + wheel clearance offset
+            double robot_tail = 0.08; // base_h + wheel_r + offset
 
             // pipe 1 bottom
             pipe_positions[0].orientation.w = 1.0;
-            pipe_positions[0].position.x = (length / 2.0);
+            pipe_positions[0].position.x = x1 + (length / 2.0) - robot_tail;
             pipe_positions[0].position.y = 0.0;
             pipe_positions[0].position.z = (y1 - thickness / 2.0) - robot_height/2;
             
             // pipe 1 top
             pipe_positions[1].orientation.w = 1.0;
-            pipe_positions[1].position.x = (length / 2.0);
+            pipe_positions[1].position.x = x1 + (length / 2.0) - robot_tail;
             pipe_positions[1].position.y = 0.0;
             pipe_positions[1].position.z = (y1 - thickness / 2.0) + radius*2 - robot_height/2 + thickness;
 
             // pipe 2 bottom
             pipe_positions[2].orientation.w = 1.0;
-            pipe_positions[2].position.x = (x2 - x1 + length / 2.0);
+            pipe_positions[2].position.x = x2 + (length / 2.0) - robot_tail;
             pipe_positions[2].position.y = 0.0;
             pipe_positions[2].position.z = (y2 - thickness / 2.0) - robot_height/2;
             
             // pipe 2 top
             pipe_positions[3].orientation.w = 1.0;
-            pipe_positions[3].position.x = (x2 - x1 + length / 2.0);
+            pipe_positions[3].position.x = x2 + (length / 2.0) - robot_tail;
             pipe_positions[3].position.y = 0.0;
             pipe_positions[3].position.z = (y2 - thickness / 2.0) + radius*2 - robot_height/2 + thickness;
             _definePlanningSceneInterface("agent_n_base_link", pipe_positions, length, thickness);
