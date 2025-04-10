@@ -1,27 +1,27 @@
 <?xml version="1.0"?>
 <robot name="linkage" xmlns:xacro="http://www.ros.org/wiki/xacro">
     
-    <xacro:property name="cover_m" value="0.1" />  <!-- mass /kg -->
+    <xacro:property name="cover_m" value="0.02" />  <!-- mass /kg -->
     <xacro:property name="cover_w" value="0.029" />  <!-- width /m -->
     <xacro:property name="cover_h" value="0.024" />  <!-- height /m -->
     <xacro:property name="cover_l" value="0.024" />  <!-- length /m -->
     <xacro:property name="cover_o" value="0.0045" />  <!-- offset /m -->
     <xacro:property name="cover_out" value="0.0015" />  <!-- extruded cover /m -->
     
-    <xacro:property name="male_m" value="0.1" />  <!-- mass /kg -->
+    <xacro:property name="male_m" value="0.0065" />  <!-- mass /kg -->
     <xacro:property name="male_w" value="0.014" />  <!-- width /m -->
     <xacro:property name="male_h" value="0.0128" />  <!-- length /m -->
     <xacro:property name="male_l" value="0.0054" />  <!-- height /m -->
     <xacro:property name="male_o" value="0.007" />  <!-- offset /m -->
 
-    <xacro:property name="pivot_m" value="0.1" />  <!-- mass /kg -->
+    <xacro:property name="pivot_m" value="0.014" />  <!-- mass /kg -->
     <xacro:property name="pivot_w" value="0.035" />  <!-- width /m -->
     <xacro:property name="pivot_h" value="0.024" />  <!-- height /m -->
     <xacro:property name="pivot_l" value="0.055" />   <!-- length /m -->
     <xacro:property name="pivot_o" value="0.0075" />  <!-- offset /m -->
     <xacro:property name="pivot_zo" value="0.01" />  <!-- offset from centre of robot /m -->
     
-    <xacro:property name="female_m" value="0.1" />  <!-- mass /kg -->
+    <xacro:property name="female_m" value="0.00825" />  <!-- mass /kg -->
     <xacro:property name="female_w" value="0.02" />  <!-- width /m -->
     <xacro:property name="female_h" value="0.024" />  <!-- height /m -->
     <xacro:property name="female_l" value="0.024" />   <!-- length /m -->
