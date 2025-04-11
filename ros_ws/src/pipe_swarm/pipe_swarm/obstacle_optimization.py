@@ -86,7 +86,7 @@ def get_intersection_points(robot_links:LineString, obstacle_polygon:ShapelyPoly
 
     return intersection_points, touching_points
 
-def get_polygon_intersection_points(agent_polygons, obstacle_polygon, tolerance=2e-4):
+def get_polygon_intersection_points(agent_polygons, obstacle_polygon, tolerance=2e-5):
     intersection_points = [[], []]
     touching_points = [[], []]
 
@@ -579,7 +579,8 @@ class ModelPredictiveControl():
         return link_grounded[0] - 2 # first link needs to be grounded (from both ends)
     
     def final_angle_constraint(self, sigma0):
-        return -sigma0[-1] # keep negative or 0
+        self.model_config.get_coordinate_representation(sigma0[1:], sigma0[0])
+        return -self.model_config.theta[-1] # keep negative or 0
     
     def torque_constraint(self, sigma0):
         self.model_config.get_coordinate_representation(sigma0[1:], sigma0[0])
@@ -616,7 +617,7 @@ class ModelPredictiveControl():
             {'type': 'ineq', 'fun': self.obstalce_collision_constraint},
             {'type': 'ineq', 'fun': self.grounded_contact_constraint},
             {'type': 'ineq', 'fun': self.torque_constraint},
-            {'type': 'ineq', 'fun': self.final_angle_constraint},
+            {'type': 'eq', 'fun': self.final_angle_constraint},
             {'type': 'eq', 'fun': self.grounded_angle_constraint},
             # TODO (IT): implement com constraint
         ]
