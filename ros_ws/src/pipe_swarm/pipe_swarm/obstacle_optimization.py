@@ -283,12 +283,12 @@ class Obstacle():
 
 class ModularConfiguration():
 
-    def __init__(self, sigma_np, x_pos, l_agent, thickness_agent, m_agent,
+    def __init__(self, sigma_np, x_pos, l_agent, thickness_agent, m_agent, x_pos_init,
                 agent_pivot_offset=1.75):
 
         # global reference frame
         y_offset = thickness_agent/2 + agent_pivot_offset
-        self.global_coordinates = (0, y_offset+1e-5)
+        self.global_coordinates = (x_pos_init, y_offset+1e-5)
         self.theta_global = 0
 
         # modular robot parameters
@@ -496,8 +496,8 @@ class ModularConfiguration():
 
 class ModelPredictiveControl():
 
-    def __init__(self, n_agents, l_agent, thickness_agent, m_agent, obstacle:Obstacle,
-                 x_pos_min=-10, x_pos_max=10, sigma_min=-45, sigma_max=45):
+    def __init__(self, n_agents, l_agent, thickness_agent, m_agent, x_pos_init, obstacle:Obstacle,
+                 x_pos_min=-25, x_pos_max=25, sigma_min=-45, sigma_max=45):
 
         # defining model
         self.n_agents = n_agents
@@ -515,7 +515,7 @@ class ModelPredictiveControl():
         self.theta0_bounds = [(sigma_min, sigma_max) for _ in range(n_agents)] # sigma bounds
         self.theta0_bounds.insert(0, (x_pos_min, x_pos_max)) # x pos bounds
         
-        self.model_config = ModularConfiguration(self.sigma, self.x_pos, l_agent, thickness_agent, m_agent)
+        self.model_config = ModularConfiguration(self.sigma, self.x_pos, l_agent, thickness_agent, m_agent, x_pos_init)
 
           # objective function
         self.pos_desired = (0, 0)
