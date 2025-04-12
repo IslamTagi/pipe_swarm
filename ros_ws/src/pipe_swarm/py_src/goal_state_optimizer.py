@@ -9,6 +9,7 @@ class GoalStateNode(Node):
         super().__init__("pipe_swarm")
         self.get_logger().info("Goal State Solver Active")
         self.goal_state_publisher = self.create_publisher(Float64MultiArray , "/modular_goal_state", 20)
+        self.execute_state_publisher = self.create_publisher(Bool , "/execute_goal_state", 20)
         self.pipe_pos_publisher = self.create_publisher(Float64MultiArray , "/define_pipe_positions", 20)
         self.goal_plan_subscriber = self.create_subscription(Bool, "/plan_successful", self.get_plan_accepted, 20)
         self.got_plan_response = False
@@ -19,6 +20,12 @@ class GoalStateNode(Node):
         goal_state_msg.data = [float(x) for x in message]
         self.goal_state_publisher.publish(goal_state_msg)
         self.get_logger().info(f"Sent Goal State: {goal_state_msg.data}")
+    
+    def send_execute_state(self, message):
+        execute_state_msg = Bool ()
+        execute_state_msg.data = message
+        self.execute_state_publisher.publish(execute_state_msg)
+        self.get_logger().info(f"Sent Execute State: {execute_state_msg.data}")
     
     def send_pipe_pos(self, message):
         pipe_pos_msg = Float64MultiArray ()
@@ -34,13 +41,25 @@ class GoalStateNode(Node):
 
 QUE_SIZE = 10
 
-def get_robot_plan(x_starting_pos, obstacle, goal_endpoint, 
-                   pipe_1_origin, pipe_2_origin):
+def get_robot_plan(x_starting_pos, goal_endpoint, 
+                   pipe_1_origin, pipe_2_origin,
+                   pipe_length):
     
     success = False
     num_agents_init = 3
     max_retries_of_n_agents = 15
     max_agents = 5
+
+    pipe_thickness = pipe_2_origin[1] + 2 # y of 2nd pipe + offset if y=0
+
+    pipe = Pipe(pipe_length, pipe_radius, pipe_thickness, pipe_1_origin)
+    obstacle = pipe.get_obstacle()
+
+    step_pipe = Pipe(pipe_length, pipe_radius, pipe_thickness, pipe_2_origin)
+    step_pipe_obstacle = step_pipe.get_obstacle()
+
+    obstacle_x, obstacle_y = obstacle.get_overall_obstacle(step_pipe_obstacle)
+    obstacle = Obstacle(obstacle_x, obstacle_y)
 
     theta_solution = None
 
@@ -53,6 +72,14 @@ def get_robot_plan(x_starting_pos, obstacle, goal_endpoint,
             
             mpc = ModelPredictiveControl(num_agents, l_agent, thickness_agent, m_agent, new_starting_pos, obstacle)
             theta_solution = mpc.inverse_kinematics_with_constraints(goal_endpoint)
+
+            # reformat pipe position
+            pipe_1_origin[0] -= new_starting_pos
+            pipe_2_origin[0] -= new_starting_pos
+            pipe_pos = [pipe_length, pipe_radius, pipe_thickness]
+            pipe_pos.extend(pipe_1_origin) # x,y
+            pipe_pos.extend(pipe_2_origin) # x,y
+            node.send_pipe_pos(pipe_pos)
             
             if theta_solution is not None:
                 # if found a potential solution that is closer than 1cm
@@ -90,56 +117,32 @@ l_agent = 15 #cm
 thickness_agent = 6.2 + 1.5 # base_h + wheel_r
 m_agent = 0.175 # kg
 
+# define pipe
+pipe_radius = 7.5
+
 
 def main(args=None):
 
     # define agent
 
     # define pipe
-    pipe_radius = 7.5
-    pipe_thickness = 5
     pipe_length = 75
-    
-    pipe_1_origin = [-25, 0]
-    pipe_2_origin = [70, 5]
 
-    pipe = Pipe(pipe_length, pipe_radius, pipe_thickness, pipe_1_origin)
-    obstacle = pipe.get_obstacle()
+    pipe_1_origin = [-15, 0]
+    pipe_2_origin = [75, 0]
 
-    step_pipe = Pipe(pipe_length, pipe_radius, pipe_thickness, pipe_2_origin)
-    step_pipe_obstacle = step_pipe.get_obstacle()
 
-    obstacle_x, obstacle_y = obstacle.get_overall_obstacle(step_pipe_obstacle)
-    obstacle = Obstacle(obstacle_x, obstacle_y)
-
-    pipe_pos = [pipe_length, pipe_radius, pipe_thickness]
-    pipe_pos.extend(pipe_1_origin) # x,y
-    pipe_pos.extend(pipe_2_origin) # x,y
-    node.send_pipe_pos(pipe_pos)
-
-    x_pos = 35
-
-    n_agents, solution = get_robot_plan(x_pos, obstacle, (70, 5), pipe_1_origin, pipe_2_origin)
+    x_pos = 30
+    goal = (75,0)
+    n_agents, solution = get_robot_plan(x_pos, goal,
+                                        pipe_1_origin, pipe_2_origin,
+                                        pipe_length)
     if solution is not None:
         print(f"{n_agents} Agents Needed")
     else:
         print("NO SOLUTION FOUND")
 
-    
-    # mpc = ModelPredictiveControl(n_agents, l_agent, thickness_agent, m_agent, obstacle)
-    # theta_solution = mpc.inverse_kinematics_with_constraints((pipe_2_x+3, 3))
-
-    # node.get_logger().info(f'Goal Endpoints: {mpc.model_config.endpoints}')
-    # if theta_solution is not None:
-    #     ros_solution = mpc.model_config.reformat_solution(theta_solution)
-    #     node.send_goal_state(ros_solution)
-    #     mpc.model_config.visualize_agent_configuration(obstacle)
-    # else:
-    #     node.get_logger().warn("Failed to find goal state")
-    #     mpc.model_config.visualize_agent_configuration(obstacle)
-    # # mpc.model_config.visualize_agent_configuration(obstacle)
-    
-    # rclpy.shutdown()
+    node.send_execute_state((solution is not None))
 
 if __name__ == '__main__':
     main()
