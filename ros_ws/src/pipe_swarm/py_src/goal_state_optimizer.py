@@ -70,7 +70,7 @@ def get_robot_plan(x_starting_pos, goal_endpoint,
             new_starting_pos = x_starting_pos-(num_agents-1)*l_agent # for 3 agents, start 2 agents behind origin
             print(f'New starting pos: {new_starting_pos}')
             
-            mpc = ModelPredictiveControl(num_agents, l_agent, thickness_agent, m_agent, new_starting_pos, obstacle)
+            mpc = ModelPredictiveControl(num_agents, l_agent, h_agent, m_agent, new_starting_pos, obstacle)
             theta_solution = mpc.inverse_kinematics_with_constraints(goal_endpoint)
             mpc.model_config.visualize_agent_configuration(obstacle)
 
@@ -115,7 +115,7 @@ node = GoalStateNode()
 
 # define agent
 l_agent = 15 #cm
-thickness_agent = 6.2 + 1.5 # base_h + wheel_r
+h_agent = 6.2 + 1.5 # base_h + wheel_r
 m_agent = 0.175 # kg
 
 # define pipe
