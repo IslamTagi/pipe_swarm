@@ -18,8 +18,9 @@ def generate_launch_description():
     gazebo_ros_share = get_package_share_directory('gazebo_ros')
     moveit_config_share = get_package_share_directory('modular_robot_moveit_config')
     xacro_path = os.path.join(modular_robot_share, 'urdf', 'modular_robot.urdf.xacro')
+    world_path = os.path.join(modular_robot_share, 'worlds', 'step.sdf')
     rviz_path = os.path.join(moveit_config_share, 'config', 'moveit.rviz')
-
+    
     ros2_controllers_path = os.path.join(modular_robot_share, "config", "modular_controller.yaml")
 
     gazebo_launch_path = os.path.join(gazebo_ros_share, "launch", "gazebo.launch.py")
@@ -46,6 +47,7 @@ def generate_launch_description():
             "debug": "false",
             "gui": "true",
             "paused": "true",
+            "world": world_path,
         }.items()
     )
 

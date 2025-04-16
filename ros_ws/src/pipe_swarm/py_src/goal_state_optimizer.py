@@ -72,18 +72,19 @@ def get_robot_plan(x_starting_pos, goal_endpoint,
             
             mpc = ModelPredictiveControl(num_agents, l_agent, thickness_agent, m_agent, new_starting_pos, obstacle)
             theta_solution = mpc.inverse_kinematics_with_constraints(goal_endpoint)
+            mpc.model_config.visualize_agent_configuration(obstacle)
 
             # reformat pipe position
-            pipe_1_origin[0] -= new_starting_pos
-            pipe_2_origin[0] -= new_starting_pos
+            new_pipe_1_origin = (pipe_1_origin[0] - new_starting_pos, pipe_1_origin[1])
+            new_pipe_2_origin = (pipe_2_origin[0] - new_starting_pos, pipe_2_origin[1])
             pipe_pos = [pipe_length, pipe_radius, pipe_thickness]
-            pipe_pos.extend(pipe_1_origin) # x,y
-            pipe_pos.extend(pipe_2_origin) # x,y
+            pipe_pos.extend(new_pipe_1_origin) # x,y
+            pipe_pos.extend(new_pipe_2_origin) # x,y
             node.send_pipe_pos(pipe_pos)
             
             if theta_solution is not None:
                 # if found a potential solution that is closer than 1cm
-                if mpc.objective(theta_solution) > 1:
+                if mpc.objective(theta_solution) > 3:
                     continue
                 print(f"SUCCESS FOUND WITH: {theta_solution}")
 
@@ -109,7 +110,7 @@ def get_robot_plan(x_starting_pos, goal_endpoint,
         
 
 
-# rclpy.init()
+rclpy.init()
 node = GoalStateNode()
 
 # define agent
@@ -128,12 +129,11 @@ def main(args=None):
     # define pipe
     pipe_length = 75
 
-    pipe_1_origin = [-15, 0]
-    pipe_2_origin = [75, 0]
+    pipe_1_origin = [0, 0]
+    pipe_2_origin = [65, 4]
 
-
-    x_pos = 30
-    goal = (75,0)
+    x_pos = 45
+    goal = (67,4.2)
     n_agents, solution = get_robot_plan(x_pos, goal,
                                         pipe_1_origin, pipe_2_origin,
                                         pipe_length)

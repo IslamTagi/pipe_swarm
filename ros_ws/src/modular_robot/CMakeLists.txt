@@ -33,6 +33,7 @@ install(
     launch
     config
     meshes
+    worlds
   DESTINATION share/${PROJECT_NAME}/
 )
 

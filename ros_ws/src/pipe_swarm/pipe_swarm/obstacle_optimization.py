@@ -497,7 +497,7 @@ class ModularConfiguration():
 class ModelPredictiveControl():
 
     def __init__(self, n_agents, l_agent, thickness_agent, m_agent, x_pos_init, obstacle:Obstacle,
-                 x_pos_min=-10, x_pos_max=10, sigma_min=-45, sigma_max=45):
+                 x_pos_min=-15, x_pos_max=15, sigma_min=-45, sigma_max=45):
 
         # defining model
         self.n_agents = n_agents
