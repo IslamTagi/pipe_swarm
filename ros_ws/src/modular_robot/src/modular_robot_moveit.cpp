@@ -8,6 +8,7 @@
 #include <moveit_visual_tools/moveit_visual_tools.h>
 #include <geometry_msgs/msg/twist.hpp>
 #include "std_msgs/msg/float64_multi_array.hpp"
+#include "std_msgs/msg/bool.hpp"
 
 void splitExecuteTrajectory(std::shared_ptr<rclcpp::Node> move_group_node,
                             // rclcpp::Logger logger,
@@ -112,12 +113,13 @@ void transformPrismaticCmd(std::shared_ptr<rclcpp::Node> move_group_node,
   geometry_msgs::msg::Twist stop_msg;
   cmd_vel_pub->publish(stop_msg);
 }
-
 class ModularRobotMover : public rclcpp::Node
 {
     public:
 
+        typedef rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr BoolPublisher;
         typedef rclcpp::Subscription<std_msgs::msg::Float64MultiArray>::SharedPtr Float64Subscriber;
+        typedef rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr BoolSubscriber;
 
         // moveit2 parameters
         std::string PLANNING_GROUP = "mobile_chain";
@@ -131,21 +133,29 @@ class ModularRobotMover : public rclcpp::Node
         {
             // construct
             RCLCPP_INFO(this->get_logger(), "Modular Robot Mover Active");
+            _plan_success_publisher = create_publisher<std_msgs::msg::Bool>(
+                                    "/plan_successful", 
+                                    10 );
+            
+                                    
             _goal_state_subscriber = create_subscription<std_msgs::msg::Float64MultiArray>(
                                     "/modular_goal_state",
+                                    20,
+                                    std::bind(&ModularRobotMover::_planToGoalState, this, std::placeholders::_1));
+            _goal_execute_subscriber = create_subscription<std_msgs::msg::Bool>(
+                                    "/execute_goal_state",
                                     20,
                                     std::bind(&ModularRobotMover::_moveToGoalState, this, std::placeholders::_1));
             _obstacle_position_subscriber = create_subscription<std_msgs::msg::Float64MultiArray>(
                                             "/define_pipe_positions",
                                             20,
                                             std::bind(&ModularRobotMover::_drawPipeShapes, this, std::placeholders::_1));
-            
+            _plan_successful = false;
         }
 
         void initialise(void)
         {
             _initialiseMoveGroupInterface(); // updating to current joint positions as target joint position
-
         }
 
         bool startPlan(void)
@@ -153,8 +163,12 @@ class ModularRobotMover : public rclcpp::Node
             _move_group_interface_ptr->setPlanningTime(10.0);  // Set 10-second timeout
             moveit::core::MoveItErrorCode plan_state = _move_group_interface_ptr->plan(_plan);
             RCLCPP_INFO(this->get_logger(), "Motion Planning Request: %s", moveit::core::error_code_to_string(plan_state).c_str());
-            bool success = (plan_state == moveit::core::MoveItErrorCode::SUCCESS);
-            return success;
+            _plan_successful = (plan_state == moveit::core::MoveItErrorCode::SUCCESS);
+            
+            std_msgs::msg::Bool success;
+            success.data = _plan_successful;
+            _plan_success_publisher->publish(success);
+            return _plan_successful;
         }
 
         bool executePlan()
@@ -177,9 +191,13 @@ class ModularRobotMover : public rclcpp::Node
         }
 
     private:
+        BoolPublisher _plan_success_publisher;
 
         Float64Subscriber _goal_state_subscriber;
+        BoolSubscriber _goal_execute_subscriber;
         Float64Subscriber _obstacle_position_subscriber;
+
+        bool _plan_successful;
 
         // moveit2 parameters
         moveit::core::RobotStatePtr _current_state_ptr;
@@ -192,7 +210,7 @@ class ModularRobotMover : public rclcpp::Node
         moveit_msgs::msg::CollisionObject _collision_object;
         moveit::planning_interface::MoveGroupInterface::Plan _plan;
 
-        void _moveToGoalState(const std_msgs::msg::Float64MultiArray::SharedPtr goal_state)
+        void _planToGoalState(const std_msgs::msg::Float64MultiArray::SharedPtr goal_state)
         {
             std::vector<double> new_pos;
             for (size_t i = 0; i <= goal_state->data.size(); i++) {
@@ -201,6 +219,14 @@ class ModularRobotMover : public rclcpp::Node
             }
             setJointPosition(new_pos);
             if(true == startPlan())
+            {
+                executePlan();
+            }
+        }
+        
+        void _moveToGoalState(const std_msgs::msg::Bool::SharedPtr goal_state)
+        {
+            if(true == _plan_successful && true == goal_state->data)
             {
                 executePlan();
             }
@@ -217,31 +243,32 @@ class ModularRobotMover : public rclcpp::Node
             double y2           = pipe_array->data[6] / 100;
 
             std::vector<geometry_msgs::msg::Pose> pipe_positions(4);
-            double robot_height = 0.062 + 0.015 + 0.02; // base_h + wheel_r + offset
+            double robot_height = 0.062 + 0.015 + 0.02; // base_h + wheel_r + wheel clearance offset
+            double robot_tail = 0.08;
 
             // pipe 1 bottom
             pipe_positions[0].orientation.w = 1.0;
-            pipe_positions[0].position.x = (length / 2.0);
+            pipe_positions[0].position.x = x1 + (length / 2.0) - robot_tail;
             pipe_positions[0].position.y = 0.0;
             pipe_positions[0].position.z = (y1 - thickness / 2.0) - robot_height/2;
             
             // pipe 1 top
             pipe_positions[1].orientation.w = 1.0;
-            pipe_positions[1].position.x = (length / 2.0);
+            pipe_positions[1].position.x = x1 + (length / 2.0) - robot_tail;
             pipe_positions[1].position.y = 0.0;
-            pipe_positions[1].position.z = (y1 - thickness / 2.0) + radius*2 - robot_height/2;
+            pipe_positions[1].position.z = (y1 - thickness / 2.0) + radius*2 - robot_height/2 + thickness;
 
             // pipe 2 bottom
             pipe_positions[2].orientation.w = 1.0;
-            pipe_positions[2].position.x = (x2 - x1 + length / 2.0);
+            pipe_positions[2].position.x = x2 + (length / 2.0) - robot_tail;
             pipe_positions[2].position.y = 0.0;
             pipe_positions[2].position.z = (y2 - thickness / 2.0) - robot_height/2;
             
             // pipe 2 top
             pipe_positions[3].orientation.w = 1.0;
-            pipe_positions[3].position.x = (x2 - x1 + length / 2.0);
+            pipe_positions[3].position.x = x2 + (length / 2.0) - robot_tail;
             pipe_positions[3].position.y = 0.0;
-            pipe_positions[3].position.z = (y2 - thickness / 2.0) + radius*2 - robot_height/2;
+            pipe_positions[3].position.z = (y2 - thickness / 2.0) + radius*2 - robot_height/2 + thickness;
             _definePlanningSceneInterface("agent_n_base_link", pipe_positions, length, thickness);
 
         }
@@ -263,6 +290,9 @@ class ModularRobotMover : public rclcpp::Node
         {
             _collision_object.header.frame_id = frame_id;  // Use your planning frame
             _collision_object.id = "pipe_block";
+            
+            _collision_object.primitives.clear();
+            _collision_object.primitive_poses.clear();
 
             // Define the box shape
             shape_msgs::msg::SolidPrimitive pipe_shape;
@@ -286,23 +316,20 @@ class ModularRobotMover : public rclcpp::Node
 
 int main(int argc, char * argv[])
 {
-    // Initialize ROS and create the Node
     rclcpp::init(argc, argv);
     auto mover_node = std::make_shared<ModularRobotMover>();
+
+    // Start executor in background
+    rclcpp::executors::SingleThreadedExecutor executor;
+    executor.add_node(mover_node);
+    std::thread exec_thread([&executor]() { executor.spin(); });
+
+    // Initialise safely, now subscriptions and services are live
     mover_node->initialise();
-    rclcpp::spin(mover_node);
-  
-  // RCLCPP_INFO(logger, "Visualizing plan 2 (joint space goal)");
-  
-  // visualize the plan in RViz:
-  /*
-  namespace rvt = rviz_visual_tools;
-  moveit_visual_tools::MoveItVisualTools visual_tools(mover_node, "agent_n_base_link", "visualization_marker_array",
-                                                      move_group_interface.getRobotModel());
-    visual_tools.deleteAllMarkers();
-    visual_tools.trigger();
-*/
-  // Shutdown ROS
-  rclcpp::shutdown();
-  return 0;
+
+    // Join executor thread
+    exec_thread.join();
+
+    rclcpp::shutdown();
+    return 0;
 }

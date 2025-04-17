@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.patches import Polygon
+from matplotlib.patches import Polygon, Rectangle
+import matplotlib.transforms as transforms
 from shapely.geometry import LineString, Polygon as ShapelyPolygon
 from shapely.geometry import Polygon as ShapelyPolygon, MultiPolygon
 from scipy.optimize import minimize
@@ -84,6 +85,78 @@ def get_intersection_points(robot_links:LineString, obstacle_polygon:ShapelyPoly
             intersection_points[1].extend(y_intersection)
 
     return intersection_points, touching_points
+
+def get_polygon_intersection_points(agent_polygons, obstacle_polygon, tolerance=2e-5):
+    intersection_points = [[], []]
+    touching_points = [[], []]
+
+    # Precompute upscaled and downscaled obstacles
+    upscaled_obstacle = obstacle_polygon.buffer(tolerance, cap_style="flat")
+    downscaled_obstacle = obstacle_polygon.buffer(-tolerance, cap_style="flat")
+
+    def extract_coords(geom):
+        if geom.is_empty:
+            return [], []
+        coords = []
+        if geom.geom_type == "Point":
+            coords.append((geom.x, geom.y))
+        elif geom.geom_type in ("MultiPoint", "MultiLineString", "MultiPolygon"):
+            for g in geom.geoms:
+                xs, ys = extract_coords(g)
+                coords.extend(zip(xs, ys))
+        elif geom.geom_type == "LineString":
+            x, y = geom.xy
+            coords.extend(zip(x, y))
+        elif geom.geom_type == "Polygon":
+            # Just extract outer ring for simplicity
+            x, y = geom.exterior.xy
+            coords.extend(zip(x, y))
+        # Convert to separate x/y lists
+        if coords:
+            xs, ys = zip(*coords)
+            return list(xs), list(ys)
+        return [], []
+
+
+    for agent_poly in agent_polygons:
+        # Intersections
+        intersection = agent_poly.intersection(obstacle_polygon)
+        upscaled_intersection = agent_poly.intersection(upscaled_obstacle)
+        downscaled_intersection = agent_poly.intersection(downscaled_obstacle)
+
+        # Apply line-based logic (manual checking of relationships)
+        if (
+            agent_poly.touches(obstacle_polygon) or
+            agent_poly.touches(upscaled_obstacle) or
+            agent_poly.touches(downscaled_obstacle) or
+            agent_poly.equals(obstacle_polygon) or
+            agent_poly.equals(upscaled_obstacle) or
+            agent_poly.equals(downscaled_obstacle) or
+            (agent_poly.disjoint(downscaled_obstacle) and agent_poly.intersects(obstacle_polygon) and not agent_poly.touches(obstacle_polygon)) or
+            (agent_poly.disjoint(obstacle_polygon) and agent_poly.intersects(upscaled_obstacle) and not agent_poly.touches(upscaled_obstacle))
+        ):
+            # Touching points
+            x_touch, y_touch = extract_coords(intersection)
+            touching_points[0].extend(x_touch)
+            touching_points[1].extend(y_touch)
+
+            up_x, up_y = extract_coords(upscaled_intersection)
+            touching_points[0].extend(up_x)
+            touching_points[1].extend(up_y)
+
+            down_x, down_y = extract_coords(downscaled_intersection)
+            touching_points[0].extend(down_x)
+            touching_points[1].extend(down_y)
+
+        elif agent_poly.intersects(downscaled_obstacle) and not agent_poly.touches(downscaled_obstacle):
+            # Hard collision points
+            x_inter, y_inter = extract_coords(intersection)
+            intersection_points[0].extend(x_inter)
+            intersection_points[1].extend(y_inter)
+
+    return intersection_points, touching_points
+
+
 class Obstacle():
 
     def __init__(self, x_coordinates, y_coordinates, obstacle_type='solid'):
@@ -210,15 +283,20 @@ class Obstacle():
 
 class ModularConfiguration():
 
-    def __init__(self, sigma_np, x_pos, l_agent, m_agent):
+    def __init__(self, sigma_np, x_pos, l_agent, h_agent, m_agent, x_pos_init,
+                agent_pivot_offset=1.75):
 
         # global reference frame
-        self.global_coordinates = (0, 1e-6)
+        y_offset = h_agent/2 + agent_pivot_offset
+        self.global_coordinates = (x_pos_init, y_offset+1e-5)
         self.theta_global = 0
 
         # modular robot parameters
         self.n_agents = len(sigma_np)
         self.l_agent = l_agent
+        self.h_agent = h_agent
+        self.agent_pivot_offset = agent_pivot_offset
+
         self.m_agent = m_agent
         self.get_coordinate_representation(sigma_np, x_pos)
 
@@ -261,6 +339,23 @@ class ModularConfiguration():
         self.com = (np.mean(self.x[1:]), np.mean(self.y[1:]))
         return self.x, self.y, self.endpoints, self.com
     
+    def get_last_agent_bottom_right_corner(self):
+
+        angle = np.deg2rad(self.theta[-1])
+
+        # Bottom-right from link endpoint perspective:
+        local_corner = np.array([0, -self.h_agent / 2 - self.agent_pivot_offset])
+
+        # Rotate and translate
+        rotation = np.array([
+            [np.cos(angle), -np.sin(angle)],
+            [np.sin(angle),  np.cos(angle)]
+        ])
+
+        global_corner = rotation @ local_corner + np.array([self.endpoints[0][-1], self.endpoints[1][-1]])
+
+        return global_corner
+
     def get_line_shape(self):
         endpoints = get_combined_coordinates(self.endpoints[0], self.endpoints[1])
         links = []
@@ -269,6 +364,71 @@ class ModularConfiguration():
         
         return links
     
+    def get_agent_polygons(self):
+        agent_polygons = []
+        for i in range(self.n_agents):
+            # Centre position of the link
+            x_centre = self.x[i + 1]  # skip global coordinate
+            y_centre = self.y[i + 1]
+            theta_deg = self.theta[i + 1]
+
+            # Rectangle parameters
+            half_length = self.l_agent / 2
+            half_thickness = self.h_agent / 2
+
+            # Define corners relative to centre
+            corners = np.array([
+                [-half_length, -half_thickness - self.agent_pivot_offset],
+                [ half_length, -half_thickness - self.agent_pivot_offset],
+                [ half_length,  half_thickness - self.agent_pivot_offset],
+                [-half_length,  half_thickness - self.agent_pivot_offset]
+            ])
+
+            # Rotation
+            angle_rad = np.deg2rad(theta_deg)
+            rotation = np.array([
+                [np.cos(angle_rad), -np.sin(angle_rad)],
+                [np.sin(angle_rad),  np.cos(angle_rad)]
+            ])
+
+            transformed_corners = corners @ rotation.T + np.array([x_centre, y_centre])
+
+            # Create polygon
+            agent_polygons.append(ShapelyPolygon(transformed_corners))
+
+        return agent_polygons
+
+    
+    def get_collision_polygons(self, obstacle_polygon):
+        agent_polygons = self.get_agent_polygons()
+        collisions = []
+
+        for poly in agent_polygons:
+            if poly.intersects(obstacle_polygon):
+                collisions.append(poly)
+
+        return collisions
+    
+    def draw_agent_boxes(self, ax, x_list, y_list, angles_deg):
+        # self.draw_agent_boxes(ax, self.x[1:], self.y[1:], self.sigma[1:], self.l_agent, self.l_agent / 4.0)
+        for x, y, theta_deg in zip(x_list, y_list, angles_deg):
+            rect = Rectangle(
+                (-self.l_agent / 2, (-self.h_agent/2)-self.agent_pivot_offset),  # full length from centre
+                self.l_agent,
+                self.h_agent,
+                edgecolor='blue',
+                facecolor='cyan',
+                alpha=0.5
+            )
+
+            transform = (transforms.Affine2D()
+                         .rotate_deg(theta_deg)
+                         .translate(x, y)
+                         + ax.transData)
+            rect.set_transform(transform)
+
+            ax.add_patch(rect)
+    
     def visualize_agent_configuration(self, obstacle: Obstacle):
         if self.sigma is None:
             return
@@ -276,8 +436,7 @@ class ModularConfiguration():
         # ignore global theta coordinate
         self.get_coordinate_representation(self.sigma[1:], self.x_pos)
         
-        intersection_points, touching_points = get_intersection_points(self.get_line_shape(), 
-                                                      obstacle.get_shapley_polygon())
+        intersection_points, touching_points = get_polygon_intersection_points(self.get_agent_polygons(), obstacle.get_shapley_polygon())
 
         plt.figure(figsize=(8, 6))
         
@@ -286,7 +445,10 @@ class ModularConfiguration():
         
         # Links
         plt.plot(self.endpoints[0], self.endpoints[1], '-o', color='blue', markersize=8, linewidth=2, label='Link')
-        
+        ax = plt.gca()
+        self.draw_agent_boxes(ax, self.x[1:], self.y[1:], self.theta[1:])
+
+
         # Center of Mass
         plt.scatter(self.x[1:], self.y[1:], marker='x', color='green', label='Link Centre of Mass')
         plt.plot(self.com[0], self.com[1], 'x', color='green', markersize=8, linewidth=2, label='Centre of Mass')
@@ -319,19 +481,15 @@ class ModularConfiguration():
             formatted.append(angle_rad)
         return formatted
 
-
-        
-
-
 class ModelPredictiveControl():
 
-    def __init__(self, n_agents, l_agent, m_agent, obstacle:Obstacle,
-                 x_pos_min=-100, x_pos_max=100, sigma_min=-45, sigma_max=45):
+    def __init__(self, n_agents, l_agent, h_agent, m_agent, x_pos_init, obstacle:Obstacle,
+                 x_pos_min=-15, x_pos_max=15, sigma_min=-45, sigma_max=45):
 
         # defining model
         self.n_agents = n_agents
 
-            # initial sigma0 guess -- control parameters
+        # initial sigma0 guess -- control parameters
         # self.sigma = np.zeros(n_agents) # TODO (IT): randomize based on n_agents --> self.sigma = np.random.uniform(low=sigma_min, high=sigma_max, size=n_agents)
         self.sigma = [0]
         self.sigma.extend(np.random.uniform(low=sigma_min, high=sigma_max, size=n_agents-1))
@@ -344,7 +502,7 @@ class ModelPredictiveControl():
         self.theta0_bounds = [(sigma_min, sigma_max) for _ in range(n_agents)] # sigma bounds
         self.theta0_bounds.insert(0, (x_pos_min, x_pos_max)) # x pos bounds
         
-        self.model_config = ModularConfiguration(self.sigma, self.x_pos, l_agent, m_agent)
+        self.model_config = ModularConfiguration(self.sigma, self.x_pos, l_agent, h_agent, m_agent, x_pos_init)
 
           # objective function
         self.pos_desired = (0, 0)
@@ -353,8 +511,10 @@ class ModelPredictiveControl():
 
     def get_grounded_robots(self, sigma0):
         self.model_config.get_coordinate_representation(sigma0[1:], sigma0[0])
-        intersection_points_, touching_points = get_intersection_points(self.model_config.get_line_shape(), 
-                                                      self.obstacle.get_shapley_polygon())
+
+        intersection_points_, touching_points = get_polygon_intersection_points(
+                                                self.model_config.get_agent_polygons(), 
+                                                self.obstacle.get_shapley_polygon())
 
         if len(touching_points[0]) == 0:
             # No touches at all, return zeros per link
@@ -371,14 +531,18 @@ class ModelPredictiveControl():
 
         # Count touches per link
         grounded_touch = mask.sum(axis=1)
-        # print(grounded_touch)
         return grounded_touch
 
     def objective(self, sigma0):
         # Compute current end-effector position
+        # self.model_config.get_coordinate_representation(sigma0[1:], sigma0[0])
+        # x = self.model_config.endpoints[0][-1]
+        # y = self.model_config.endpoints[1][-1]
+        # error = np.sqrt((x - self.pos_desired[0])**2
+        #                 + (y - self.pos_desired[1])**2)  # Minimize position error
+        
         self.model_config.get_coordinate_representation(sigma0[1:], sigma0[0])
-        x = self.model_config.endpoints[0][-1]
-        y = self.model_config.endpoints[1][-1]
+        x, y = self.model_config.get_last_agent_bottom_right_corner()
         error = np.sqrt((x - self.pos_desired[0])**2
                         + (y - self.pos_desired[1])**2)  # Minimize position error
         return error
@@ -386,8 +550,11 @@ class ModelPredictiveControl():
     # Constraints
     def obstalce_collision_constraint(self, sigma0):
         self.model_config.get_coordinate_representation(sigma0[1:], sigma0[0])
-        intersection_points, touching_points_ = get_intersection_points(self.model_config.get_line_shape(), 
-                                                      self.obstacle.get_shapley_polygon())
+
+        intersection_points, touching_points_ = get_polygon_intersection_points(
+                                                self.model_config.get_agent_polygons(), 
+                                                self.obstacle.get_shapley_polygon())
+        
         return -len(intersection_points[0]) # if any intersection points
     
     def grounded_angle_constraint(self, sigma0):
@@ -395,10 +562,12 @@ class ModelPredictiveControl():
     
     def grounded_contact_constraint(self, sigma0):
         self.model_config.get_coordinate_representation(sigma0[1:], sigma0[0])
-        intersection_points_, touching_points = get_intersection_points(self.model_config.get_line_shape(), 
-                                                      self.obstacle.get_shapley_polygon())
         link_grounded = self.get_grounded_robots(sigma0)
         return link_grounded[0] - 2 # first link needs to be grounded (from both ends)
+    
+    def final_angle_constraint(self, sigma0):
+        self.model_config.get_coordinate_representation(sigma0[1:], sigma0[0])
+        return -self.model_config.theta[-1] # keep negative or 0
     
     def torque_constraint(self, sigma0):
         self.model_config.get_coordinate_representation(sigma0[1:], sigma0[0])
@@ -426,7 +595,7 @@ class ModelPredictiveControl():
         return 11 - total_torque  # total torque <= 11kg/cm
     
     def inverse_kinematics_with_constraints(self, pos_desired,
-                                        max_iter=250, tolerance=2e-6):
+                                        max_iter=50, tolerance=2e-6):
         
         # objective function
         self.pos_desired = pos_desired
@@ -435,6 +604,7 @@ class ModelPredictiveControl():
             {'type': 'ineq', 'fun': self.obstalce_collision_constraint},
             {'type': 'ineq', 'fun': self.grounded_contact_constraint},
             {'type': 'ineq', 'fun': self.torque_constraint},
+            {'type': 'eq', 'fun': self.final_angle_constraint},
             {'type': 'eq', 'fun': self.grounded_angle_constraint},
             # TODO (IT): implement com constraint
         ]

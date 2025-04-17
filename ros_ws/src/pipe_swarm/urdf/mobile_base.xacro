@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <robot name="mobile_base" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-    <xacro:property name="base_m" value="1" />  <!-- mass /kg -->
+    <xacro:property name="base_m" value="0.25" />  <!-- mass /kg -->
     <xacro:property name="base_w" value="0.1045" />  <!-- width /m -->
     <xacro:property name="base_w_offset" value="0.05" />  <!-- offset /m -->
     <xacro:property name="base_w_main" value="${base_w - base_w_offset}" />  <!-- width /m -->
