@@ -256,6 +256,44 @@ class ModelPredictiveControl():
                                                       self.obstacle.get_shapley_polygon())
         return -len(intersection_points[0]) # if any intersection points
     
+    def grounded_angle_constraint(self, sigma0):
+        return sigma0[1] # first link needs to be grounded
+    
+    def grounded_contact_constraint(self, sigma0):
+        self.model_config.get_coordinate_representation(sigma0[1:], sigma0[0])
+        link_grounded = self.get_grounded_robots(sigma0)
+        return link_grounded[0] - 2 # first link needs to be grounded (from both ends)
+    
+    def final_angle_constraint(self, sigma0):
+        self.model_config.get_coordinate_representation(sigma0[1:], sigma0[0])
+        return -self.model_config.theta[-1] # keep negative or 0
+    
+    def torque_constraint(self, sigma0):
+        self.model_config.get_coordinate_representation(sigma0[1:], sigma0[0])
+        link_grounded = self.get_grounded_robots(sigma0)
+        grounded_boolean = link_grounded >= 2
+
+        if not any(grounded_boolean):
+            # No grounded robots at all
+            return -1.0  # Violates constraint
+
+        last_grounded_index = max(idx for idx, grounded in enumerate(grounded_boolean) if grounded)
+        total_torque = 0.0
+        link_mass = self.model_config.m_agent
+        gravity = 9.81
+
+        pivot_x = self.model_config.endpoints[0][last_grounded_index]
+
+        for link in range(last_grounded_index, len(grounded_boolean)):
+            # Centre of mass of the link
+            com_x = self.model_config.x[link]
+            distance = abs(com_x - pivot_x)
+            torque = link_mass * gravity * (distance/100)
+            total_torque += torque
+
+        TORQUE_LIMIT_NM = 11 * 9.81 / 100  # 11 kg·cm → N·m
+        return TORQUE_LIMIT_NM - total_torque  # total torque <= 11kg/cm
+    
     def inverse_kinematics_with_constraints(self, pos_desired,
                                         max_iter=750, tolerance=2e-6):
         
