@@ -19,10 +19,10 @@ class MyNode(Node):
         # self.timer = self.create_timer(0.5, self.send_velocity_command)
         self.get_logger().info("Robot controller has started v8")
 
-    def send_velocity_command(self, linear_x):
+    def send_velocity_command(self, linear_x, angular_z):
         cmd = Twist()
         cmd.linear.x = linear_x
-        cmd.angular.z = 0.0
+        cmd.angular.z = angular_z
 
         if self.last_cmd != linear_x:
             self.cmd_vel_publisher_.publish(cmd)
@@ -40,20 +40,20 @@ class MyNode(Node):
 
         if not self.initialized:
             self.initialized = True
-            self.send_velocity_command(0.5)
+            self.send_velocity_command(0.5, 0.0)
             self.get_logger().info("Initialized: Moving forward with intial velocity")
             return
 
         # Move forward until x >= 3
         if x >= 3 and self.previous_x < 3:
             self.previous_x = x
-            self.send_velocity_command(-0.5) 
+            self.send_velocity_command(-0.5, 0.0) 
             self.get_logger().info("Reached x = 5, switching to move backwards")
 
         # Move Backwards unitl x <= 0
         elif x <= 0:
             self.previous_x = x
-            self.send_velocity_command(0.5)
+            self.send_velocity_command(0.5, 0.0)
             self.get_logger().info("Reached x =0, switching to move forward")
 
         # Update previous_x to track progress

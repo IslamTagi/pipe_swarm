@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<robot name="gazebo_linkage" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    
+    <!-- GAZEBO -->
+    <gazebo reference="${agent_namespace}_female_link">
+        <material>Gazebo/White</material>
+    </gazebo>
+    <gazebo reference="${agent_namespace}_male_link">
+        <material>Gazebo/White</material>
+    </gazebo>
+
+</robot>

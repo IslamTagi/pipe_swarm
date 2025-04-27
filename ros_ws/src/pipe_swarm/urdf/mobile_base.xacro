@@ -1,28 +1,92 @@
 <?xml version="1.0" ?>
 <robot name="mobile_base" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-    <xacro:property name="base_m" value="1" />  <!-- mass /kg -->
-    <xacro:property name="base_w" value="0.15" />  <!-- width /m -->
-    <xacro:property name="base_l" value="0.05" />  <!-- length /m -->
-    <xacro:property name="base_h" value="0.045" />  <!-- height /m -->
+    <xacro:property name="base_m" value="0.25" />  <!-- mass /kg -->
+    <xacro:property name="base_w" value="0.1045" />  <!-- width /m -->
+    <xacro:property name="base_w_offset" value="0.05" />  <!-- offset /m -->
+    <xacro:property name="base_w_main" value="${base_w - base_w_offset}" />  <!-- width /m -->
+    <xacro:property name="base_l" value="0.055" />  <!-- length /m -->
+    <xacro:property name="base_l_offset" value="0.015" />  <!-- length /m -->
+    <xacro:property name="base_h" value="0.062" />  <!-- height /m -->
     
     <!-- LINKS -->
     <link name="${agent_namespace}_footprint_link" />
 
     <link name="${agent_namespace}_base_link">
         <visual>
-            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <origin xyz="${(-base_w/2)+(base_w_main/2)} 0 0" rpy="0 0 0"/>
             <geometry>
-                <box size="${base_w} ${base_l} ${base_h}"/>
+                <box size="${base_w_main} ${base_l} ${base_h}"/>
             </geometry>
-            <material name="blue">
-                <color rgba="0 0 1 1"/>
+            <material name="grey">
+                <color rgba="0.86 0.86 0.86 1"/>
+            </material>
+        </visual>
+        <visual>
+            <origin xyz="${(base_w/2)-(base_w_offset/2)} ${(base_l/2) - (base_l_offset/2)} 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="${base_w_offset} ${base_l_offset} ${base_h}"/>
+            </geometry>
+            <material name="grey">
+                <color rgba="0.86 0.86 0.86 1"/>
+            </material>
+        </visual>
+        <visual>
+            <origin xyz="${(base_w/2)-(base_w_offset/2)} ${-((base_l/2) - (base_l_offset/2))} 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="${base_w_offset} ${base_l_offset} ${base_h}"/>
+            </geometry>
+            <material name="grey">
+                <color rgba="0.86 0.86 0.86 1"/>
+            </material>
+        </visual>
+        <visual>
+            <origin xyz="${(base_w/2)-(base_w_offset/2)} 0 ${(base_l/2) - (base_l_offset/2)}" rpy="0 0 0"/>
+            <geometry>
+                <box size="${base_w_offset} ${base_l} ${base_l_offset}"/>
+            </geometry>
+            <material name="grey">
+                    <color rgba="0.86 0.86 0.86 1"/>
+            </material>
+        </visual>
+        <visual>
+            <origin xyz="${(base_w/2)-(base_w_offset/2)} 0 ${-((base_l/2) - (base_l_offset/2))}" rpy="0 0 0"/>
+            <geometry>
+                <box size="${base_w_offset} ${base_l} ${base_l_offset}"/>
+            </geometry>
+            <material name="grey">
+                <color rgba="0.86 0.86 0.86 1"/>
             </material>
         </visual>
         
         <collision>
+            <origin xyz="${(-base_w/2)+(base_w_main/2)} 0 0" rpy="0 0 0"/>
             <geometry>
-                <box size="${base_w} ${base_l} ${base_h}"/>
+                <box size="${base_w_main} ${base_l} ${base_h}"/>
+            </geometry>
+        </collision>
+        <collision>
+            <origin xyz="${(base_w/2)-(base_w_offset/2)} ${(base_l/2) - (base_l_offset/2)} 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="${base_w_offset} ${base_l_offset} ${base_h}"/>
+            </geometry>
+        </collision>
+        <collision>
+            <origin xyz="${(base_w/2)-(base_w_offset/2)} ${-((base_l/2) - (base_l_offset/2))} 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="${base_w_offset} ${base_l_offset} ${base_h}"/>
+            </geometry>
+        </collision>
+        <collision>
+            <origin xyz="${(base_w/2)-(base_w_offset/2)} 0 ${(base_l/2) - (base_l_offset/2)}" rpy="0 0 0"/>
+            <geometry>
+                <box size="${base_w_offset} ${base_l} ${base_l_offset}"/>
+            </geometry>
+        </collision>
+        <collision>
+            <origin xyz="${(base_w/2)-(base_w_offset/2)} 0 ${-((base_l/2) - (base_l_offset/2))}" rpy="0 0 0"/>
+            <geometry>
+                <box size="${base_w_offset} ${base_l} ${base_l_offset}"/>
             </geometry>
         </collision>
         
@@ -36,12 +100,4 @@
         <child link="${agent_namespace}_base_link"/>
     </joint>
     
-    <!-- GAZEBO -->
-    <gazebo reference="${agent_namespace}_footprint_link">
-        <material>Gazebo/Blue</material>
-    </gazebo>
-    <gazebo reference="${agent_namespace}_base_link">
-        <material>Gazebo/Blue</material>
-    </gazebo>
-
 </robot>

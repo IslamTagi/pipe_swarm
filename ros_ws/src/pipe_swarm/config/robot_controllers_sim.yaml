@@ -1,29 +1,73 @@
 /**/controller_manager:
   ros__parameters:
-    update_rate: 50
+    update_rate: 100
     use_sim_time: true
 
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
 
-    position_controller:
-      type: position_controllers/JointGroupPositionController
+    female_joint_trajectory_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+    
+    male_joint_trajectory_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
     
     skid_steer_controller:
       type: diff_drive_controller/DiffDriveController
 
-/**/position_controller:
+/**/female_joint_trajectory_controller:
   ros__parameters:
     joints:
       - base_female_joint
+    
+    command_interfaces:
+      - position
+
+    state_interfaces:
+      - position
+      - velocity
+
+    action_monitor_rate: 20.0
+
+    allow_partial_joints_goal: true
+    open_loop_control: true
+    constraints:
+      stopped_velocity_tolerance: 0.01
+      goal_time: 0.05
+      base_female_joint:
+        trajectory: 0.1
+        goal: 0.1
+
+/**/male_joint_trajectory_controller:
+  ros__parameters:
+    joints:
+      - base_male_joint
+    
+    command_interfaces:
+      - position
+
+    state_interfaces:
+      - position
+      - velocity
+
+    action_monitor_rate: 20.0
+
+    allow_partial_joints_goal: false
+    open_loop_control: true
+    constraints:
+      stopped_velocity_tolerance: 0.01
+      goal_time: 0.0
+      base_male_joint:
+        trajectory: 0.05
+        goal: 0.0
 
 /**/skid_steer_controller:
   ros__parameters:
-    left_wheel_names: ["base_wheel_front_left_joint", "base_wheel_back_left_joint"]
-    right_wheel_names: ["base_wheel_front_right_joint", "base_wheel_back_right_joint"]
+    left_wheel_names: ["base_wheel_front_left_joint"]
+    right_wheel_names: ["base_wheel_front_right_joint"]
 
-    wheel_separation: 0.06
-    wheel_radius: 0.0175
+    wheel_separation: 0.0845
+    wheel_radius: 0.015
 
     use_stamped_vel: false
 

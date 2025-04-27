@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <robot name="lidar" xmlns:xacro="http://www.ros.org/wiki/xacro">
     
-    <xacro:property name="lidar_m" value="0.1" />  <!-- mass /kg -->
+    <xacro:property name="lidar_m" value="0.001" />  <!-- mass /kg -->
     <xacro:property name="lidar_w" value="0.01" />  <!-- width /m -->
     <xacro:property name="lidar_l" value="0.01" />  <!-- length /m -->
     <xacro:property name="lidar_h" value="0.01" />  <!-- height /m -->
@@ -29,41 +29,9 @@
 
     <!-- JOINTS -->
     <joint name="${agent_namespace}_base_lidar_joint" type="fixed">
-        <origin xyz="0 ${-(base_l*0.5 + lidar_l*0.5)} 0" rpy="${pi/2} 0 0"/>
+        <origin xyz="${(base_w*0.5)} ${-(base_l*0.5 - lidar_l*0.5)} ${(base_h*0.5)}" rpy="${pi/2} 0 0"/>
         <parent link="${agent_namespace}_base_link"/>
         <child link="${agent_namespace}_lidar_link"/>
     </joint>
-
-    <!-- GAZEBO -->
-    <gazebo reference="${agent_namespace}_lidar_link">
-        <material>Gazebo/Green</material>
-        <sensor name="lidar_sensor" type="lidar">
-            <pose>0 0 0 0 0 0</pose>
-            <visualize>true</visualize>
-            <update_rate>10.0</update_rate>
-            <ray> 
-                <scan>
-                    <horizontal>
-                        <samples>100</samples>
-                        <min_angle>${pi/2}</min_angle>
-                        <max_angle>${-pi/2}</max_angle>
-                    </horizontal>
-                </scan>
-                <range>
-                    <min>0.1</min>
-                    <max>1</max>
-                </range>
-            </ray>
-            <plugin name="lidar_controller" filename="libgazebo_ros_ray_sensor.so">
-                <ros>
-                    <namespace>${agent_namespace}</namespace>
-                    <remapping>~/out:=laserscan</remapping>
-                </ros>
-                <output_type>sensor_msgs/LaserScan</output_type>
-                <min_intensity>100.0</min_intensity>
-                <frame_name>${agent_namespace}_lidar_link</frame_name>
-            </plugin>
-        </sensor>
-    </gazebo>
 
 </robot>

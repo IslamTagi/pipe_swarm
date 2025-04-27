@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <robot name="camera" xmlns:xacro="http://www.ros.org/wiki/xacro">
     
-    <xacro:property name="camera_m" value="0.1" />  <!-- mass /kg -->
+    <xacro:property name="camera_m" value="0.001" />  <!-- mass /kg -->
     <xacro:property name="camera_w" value="0.01" />  <!-- width /m -->
     <xacro:property name="camera_l" value="0.01" />  <!-- length /m -->
     <xacro:property name="camera_h" value="0.01" />  <!-- height /m -->
@@ -29,25 +29,9 @@
 
     <!-- JOINTS -->
     <joint name="${agent_namespace}_base_camera_joint" type="fixed">
-        <origin xyz="${(base_w*0.5)} 0 ${(base_h*0.5)}" rpy="0 0 0"/>
+        <origin xyz="${(base_w*0.5)} 0 ${(base_h*0.5)+(camera_w*0.5)}" rpy="0 0 0"/>
         <parent link="${agent_namespace}_base_link"/>
         <child link="${agent_namespace}_camera_link"/>
     </joint>
-
-    <!-- GAZEBO -->
-    <gazebo reference="${agent_namespace}_camera_link">
-        <material>Gazebo/Green</material>
-        <sensor name="camera_sensor" type="camera">
-            <pose>0 0 0 0 0 0</pose>
-            <visualize>true</visualize>
-            <update_rate>10.0</update_rate> <!--update /Hz -->
-            <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
-                <ros>
-                    <namespace>${agent_namespace}</namespace>
-                </ros>
-                <frame_name>${agent_namespace}_camera_link</frame_name>
-            </plugin>
-        </sensor>
-    </gazebo>
 
 </robot>

@@ -1,0 +1,29 @@
+# MoveIt uses this configuration for controller management
+
+moveit_controller_manager: moveit_simple_controller_manager/MoveItSimpleControllerManager
+
+moveit_simple_controller_manager:
+  controller_names:
+    - chain_joint_trajectory_controller
+    - mobile_base_controller
+    - mobile_chain_controller
+
+  chain_joint_trajectory_controller:
+    type: FollowJointTrajectory
+    joints:
+      - agent_n2_pivot_base_joint
+      - agent_n3_pivot_base_joint
+    action_ns: follow_joint_trajectory
+    default: true
+  mobile_base_controller:
+    type: FollowJointTrajectory
+    joints:
+      - prismatic_agent_n_joint
+    action_ns: follow_joint_trajectory
+    default: true
+  mobile_chain_controller:
+    type: FollowJointTrajectory
+    joints:
+      - prismatic_agent_n_joint
+      - agent_n2_pivot_base_joint
+      - agent_n3_pivot_base_joint

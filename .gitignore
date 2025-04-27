@@ -4,3 +4,5 @@ ros_ws/build/
 ros_ws/install/
 ros_ws/src/pipe_swarm/build
 ros_ws/src/pipe_swarm/.vscode/
+*.json
+ros_ws/src/modular_robot_moveit/build/

@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<robot name="pipe_robot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:macro name="pipe_robot" params="namespace base_agent include_gazebo">
+        <xacro:property name="agent_namespace" value="${namespace}" />
+
+        <!-- Include shared components -->
+        <xacro:include filename="common.xacro"/>
+        <xacro:include filename="mobile_base.xacro"/>
+        <xacro:include filename="imu.xacro"/>
+        <!-- <xacro:include filename="lidar.xacro"/> -->
+        <!-- <xacro:include filename="tof_lidar.xacro"/> -->
+        <!-- <xacro:include filename="tof.xacro"/> -->
+        <xacro:include filename="front_tof.xacro"/>
+        <xacro:include filename="camera.xacro"/>
+        <xacro:include filename="linkage.xacro"/>
+        <xacro:include filename="wheels.xacro"/>
+        <xacro:include filename="detection_object.xacro"/>
+        <xacro:if value="${include_gazebo}">
+            <xacro:include filename="gazebo/pipe_robot.xacro"/>
+        </xacro:if>
+    </xacro:macro>
+</robot>

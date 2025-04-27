@@ -14,6 +14,9 @@ find_package(std_msgs REQUIRED)
 find_package(gazebo_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(pipe_swarm_interfaces REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(cv_bridge REQUIRED)
+find_package(image_transport REQUIRED)
 
   # if(BUILD_TESTING)
   #   find_package(ament_lint_auto REQUIRED)
@@ -32,6 +35,7 @@ install(
     urdf
     launch
     rviz
+    models
     config
     worlds
   DESTINATION share/${PROJECT_NAME}/
@@ -41,11 +45,15 @@ install(
 ament_python_install_package(${PROJECT_NAME})
 
 #install python nodes
+file(GLOB PY_SCRIPTS "py_src/*.py")
+
+foreach(py_script ${PY_SCRIPTS})
+  execute_process(COMMAND chmod +x ${py_script})
+endforeach()
+
 install(
   PROGRAMS
-    py_src/python_talker.py
-    py_src/link_service.py
-    py_src/move_robot.py
+    ${PY_SCRIPTS}
   DESTINATION lib/${PROJECT_NAME}/  
 )
 
