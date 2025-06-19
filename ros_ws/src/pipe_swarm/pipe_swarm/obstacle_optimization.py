@@ -490,9 +490,9 @@ class ModelPredictiveControl():
         self.n_agents = n_agents
 
         # initial sigma0 guess -- control parameters
-        # self.sigma = np.zeros(n_agents) # TODO (IT): randomize based on n_agents --> self.sigma = np.random.uniform(low=sigma_min, high=sigma_max, size=n_agents)
-        self.sigma = [0]
-        self.sigma.extend(np.random.uniform(low=sigma_min, high=sigma_max, size=n_agents-1))
+        self.sigma = np.zeros(n_agents) # TODO (IT): randomize based on n_agents --> self.sigma = np.random.uniform(low=sigma_min, high=sigma_max, size=n_agents)
+        # self.sigma = [0]
+        # self.sigma.extend(np.random.uniform(low=sigma_min, high=sigma_max, size=n_agents-1))
         print(f'Starting Seed: {self.sigma}')
         self.x_pos = 0
         self.sigma0 = [self.x_pos]
@@ -595,7 +595,7 @@ class ModelPredictiveControl():
         return 11 - total_torque  # total torque <= 11kg/cm
     
     def inverse_kinematics_with_constraints(self, pos_desired,
-                                        max_iter=50, tolerance=2e-6):
+                                        max_iter=300, tolerance=2e-6):
         
         # objective function
         self.pos_desired = pos_desired
@@ -674,3 +674,33 @@ class Pipe():
     def get_obstacle(self):
         return self.obstacle
 
+
+
+# define agent
+n_agents = 3
+l_agent = 15 #cm
+h_agent = 6.2 + 1.5 # base_h + wheel_r
+m_agent = 0.175 # kg
+x_pos = 55
+new_starting_pos = x_pos-(n_agents-1)*l_agent # for 3 agents, start 2 agents behind origin
+
+# define pipe
+pipe_radius = 7.5
+pipe_length = 80
+pipe_1_origin = [0, 0]
+pipe_2_origin = [80, 4]
+pipe_thickness = 5
+
+pipe = Pipe(pipe_length, pipe_radius, pipe_thickness, pipe_1_origin)
+obstacle = pipe.get_obstacle()
+
+step_pipe = Pipe(pipe_length, pipe_radius, pipe_thickness, pipe_2_origin)
+step_pipe_obstacle = step_pipe.get_obstacle()
+
+obstacle_x, obstacle_y = obstacle.get_overall_obstacle(step_pipe_obstacle)
+obstacle = Obstacle(obstacle_x, obstacle_y)
+
+goal = (83,6)
+mpc = ModelPredictiveControl(n_agents, l_agent, h_agent, m_agent, new_starting_pos, obstacle)
+theta_solution = mpc.inverse_kinematics_with_constraints((goal))
+mpc.model_config.visualize_agent_configuration(obstacle) 

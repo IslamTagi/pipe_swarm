@@ -7,3 +7,6 @@
 [submodule "embedded_ws"]
 	path = embedded_ws
 	url = https://islamtagi@dev.azure.com/islamtagi/Pipe%20Swarm%20Project/_git/embedded_system
+[submodule "mechanical_design"]
+	path = mechanical_design
+	url = git@ssh.dev.azure.com:v3/islamtagi/Pipe%20Swarm%20Project/mechanical_design
